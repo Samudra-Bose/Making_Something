@@ -188,39 +188,51 @@ const Waves = ({
         if (ripples[i].life <= 0) ripples.splice(i, 1);
       }
 
-      lines.forEach(pts => {
-        pts.forEach(p => {
+      for (let i = 0, lenLines = lines.length; i < lenLines; i++) {
+        const pts = lines[i];
+        for (let j = 0, lenPts = pts.length; j < lenPts; j++) {
+          const p = pts[j];
           const move = noise.perlin2((p.x + time * waveSpeedX) * 0.002, (p.y + time * waveSpeedY) * 0.0015) * 12;
           p.wave.x = Math.cos(move) * waveAmpX;
           p.wave.y = Math.sin(move) * waveAmpY;
 
           const dx = p.x - mouse.sx,
             dy = p.y - mouse.sy;
-          const dist = Math.hypot(dx, dy),
-            l = Math.max(175, mouse.vs);
-          if (dist < l) {
-            const s = 1 - dist / l;
-            const f = Math.cos(dist * 0.001) * s;
-            p.cursor.vx += Math.cos(mouse.a) * f * l * mouse.vs * 0.00065;
-            p.cursor.vy += Math.sin(mouse.a) * f * l * mouse.vs * 0.00065;
+          const l = Math.max(175, mouse.vs);
+          
+          if (dx > -l && dx < l && dy > -l && dy < l) {
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < l) {
+              const s = 1 - dist / l;
+              const f = Math.cos(dist * 0.001) * s;
+              p.cursor.vx += Math.cos(mouse.a) * f * l * mouse.vs * 0.00065;
+              p.cursor.vy += Math.sin(mouse.a) * f * l * mouse.vs * 0.00065;
+            }
           }
 
           // Apply click ripples
-          for (const ripple of ripples) {
-            const rdx = p.x - ripple.x;
-            const rdy = p.y - ripple.y;
-            const rDist = Math.hypot(rdx, rdy);
-            
-            const ringThickness = 80; // slightly wider than dots for a smooth string pluck
-            const distToRing = Math.abs(rDist - ripple.radius);
-            
-            if (distToRing < ringThickness) {
-              const force = (1 - distToRing / ringThickness) * ripple.life * 15;
-              const angle = Math.atan2(rdy, rdx);
+          if (ripples.length > 0) {
+            for (let k = 0, lenRipples = ripples.length; k < lenRipples; k++) {
+              const ripple = ripples[k];
+              const rdx = p.x - ripple.x;
+              const rdy = p.y - ripple.y;
               
-              // Pluck the string outward from the ripple center
-              p.cursor.vx += Math.cos(angle) * force;
-              p.cursor.vy += Math.sin(angle) * force;
+              const ringThickness = 80; // slightly wider than dots for a smooth string pluck
+              const bound = ripple.radius + ringThickness;
+              
+              if (rdx > -bound && rdx < bound && rdy > -bound && rdy < bound) {
+                const rDist = Math.sqrt(rdx * rdx + rdy * rdy);
+                const distToRing = Math.abs(rDist - ripple.radius);
+                
+                if (distToRing < ringThickness) {
+                  const force = (1 - distToRing / ringThickness) * ripple.life * 15;
+                  const angle = Math.atan2(rdy, rdx);
+                  
+                  // Pluck the string outward from the ripple center
+                  p.cursor.vx += Math.cos(angle) * force;
+                  p.cursor.vy += Math.sin(angle) * force;
+                }
+              }
             }
           }
 
@@ -232,34 +244,78 @@ const Waves = ({
           p.cursor.y += p.cursor.vy * 2;
           p.cursor.x = Math.min(maxCursorMove, Math.max(-maxCursorMove, p.cursor.x));
           p.cursor.y = Math.min(maxCursorMove, Math.max(-maxCursorMove, p.cursor.y));
-        });
-      });
+        }
+      }
     }
 
-    function moved(point, withCursor = true) {
+    // Temporary objects to avoid garbage collection pauses in the rendering loop
+    const tempP1 = { x: 0, y: 0 };
+    const tempP2 = { x: 0, y: 0 };
+
+    function moveInto(outObj, point, withCursor = true) {
       const x = point.x + point.wave.x + (withCursor ? point.cursor.x : 0);
       const y = point.y + point.wave.y + (withCursor ? point.cursor.y : 0);
-      return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+      // Math.round is expensive and unnecessary for sub-pixel canvas rendering
+      outObj.x = x;
+      outObj.y = y;
     }
 
     function drawLines() {
       const { width, height } = boundingRef.current;
       const ctx = ctxRef.current;
       ctx.clearRect(0, 0, width, height);
-      ctx.beginPath();
-      ctx.strokeStyle = configRef.current.lineColor;
-      linesRef.current.forEach(points => {
-        let p1 = moved(points[0], false);
-        ctx.moveTo(p1.x, p1.y);
-        points.forEach((p, idx) => {
-          const isLast = idx === points.length - 1;
-          p1 = moved(p, !isLast);
-          const p2 = moved(points[idx + 1] || points[points.length - 1], !isLast);
-          ctx.lineTo(p1.x, p1.y);
-          if (isLast) ctx.moveTo(p2.x, p2.y);
-        });
-      });
-      ctx.stroke();
+      const time = Date.now() * 0.001;
+      
+      const t08 = time * 0.8;
+      const t04 = time * 0.4;
+      const t1 = time;
+
+      for (let i = 0, lenLines = linesRef.current.length; i < lenLines; i++) {
+        const points = linesRef.current[i];
+        ctx.beginPath();
+        moveInto(tempP1, points[0], false);
+        ctx.moveTo(tempP1.x, tempP1.y);
+        
+        const lineX = points[0].x;
+
+        for (let j = 0, lenPts = points.length; j < lenPts; j++) {
+          const p = points[j];
+          const isLast = j === lenPts - 1;
+          moveInto(tempP1, p, !isLast);
+          
+          ctx.lineTo(tempP1.x, tempP1.y);
+          if (isLast) {
+            moveInto(tempP2, points[j + 1] || points[lenPts - 1], !isLast);
+            ctx.moveTo(tempP2.x, tempP2.y);
+          }
+        }
+
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        
+        // Add subtle flowing green heat to some lines based on perlin-like trig functions
+        const heat = Math.sin(lineX * 0.005 - t08) * Math.cos(lineX * 0.008 + t04);
+        
+        // To make the metallic strings feel dimensional, add a moving highlight position
+        const highlightPos = 0.5 + Math.sin(lineX * 0.01 + t1) * 0.2;
+        
+        if (heat > 0.35) { // Lowered threshold for more frequent appearance
+           const intensity = Math.min(1, (heat - 0.35) * 1.5); // 0 to 1
+           grad.addColorStop(0, `rgba(57, 67, 74, ${0.15 + intensity * 0.1})`);
+           grad.addColorStop(highlightPos, `rgba(34, 197, 94, ${0.4 + intensity * 0.6})`);
+           grad.addColorStop(1, `rgba(57, 67, 74, ${0.15 + intensity * 0.1})`);
+           ctx.shadowColor = `rgba(34, 197, 94, ${intensity * 0.8})`;
+           ctx.shadowBlur = intensity * 20;
+        } else {
+           // Base dark metallic steel with much brighter silver core for contrast
+           grad.addColorStop(0, 'rgba(30, 35, 40, 0.2)');
+           grad.addColorStop(highlightPos, 'rgba(210, 220, 225, 0.6)'); // stronger silver reflection
+           grad.addColorStop(1, 'rgba(30, 35, 40, 0.2)');
+           ctx.shadowBlur = 0;
+        }
+
+        ctx.strokeStyle = grad;
+        ctx.stroke();
+      }
     }
 
     function tick(t) {

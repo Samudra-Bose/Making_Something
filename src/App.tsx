@@ -15,9 +15,12 @@ export default function App() {
 
 function MainScreen({ onReplay }: { onReplay: () => void; key?: number }) {
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-black font-sans">
+    <div className="relative w-screen h-screen overflow-hidden bg-[#050708] font-sans">
       <motion.div
-        className="absolute inset-0 z-30 bg-[#030712] flex items-center justify-center overflow-hidden"
+        className="absolute inset-0 z-30 flex items-center justify-center overflow-hidden"
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, #11171B 0%, #0B0F12 50%, #050708 100%)'
+        }}
         initial={{ clipPath: 'circle(0% at 50% 50%)' }}
         animate={{ clipPath: 'circle(150% at 50% 50%)' }}
         transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }} // cinematic ease
@@ -25,7 +28,6 @@ function MainScreen({ onReplay }: { onReplay: () => void; key?: number }) {
         <div className="absolute inset-0 z-0 pointer-events-none">
           <DotGrid />
           <Waves
-            lineColor="rgba(139, 92, 246, 0.5)"
             backgroundColor="transparent"
             waveSpeedX={0.02}
             waveSpeedY={0.01}

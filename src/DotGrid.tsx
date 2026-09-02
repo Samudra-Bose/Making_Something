@@ -37,8 +37,9 @@ export default function DotGrid() {
     };
 
     const resize = () => {
-      // High-DPI screen support for crisp rendering
-      const dpr = window.devicePixelRatio || 1;
+      // Limit high-DPI screen support to max 1.5x for massive performance boost
+      // without significantly sacrificing visual crispness on mobile/retina.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const parent = canvas.parentElement;
       if (parent) {
          canvas.width = parent.clientWidth * dpr;
@@ -57,7 +58,8 @@ export default function DotGrid() {
 
     const draw = () => {
       // Clear canvas before next frame
-      ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
       
       // Interpolate mouse movement for smoothness (easing)
       mouse.x += (mouse.targetX - mouse.x) * 0.12;
@@ -76,92 +78,151 @@ export default function DotGrid() {
       const maxRadius = 4;
       const interactionRadius = 200;
       
-      const width = canvas.width / (window.devicePixelRatio || 1);
-      const height = canvas.height / (window.devicePixelRatio || 1);
-
-      ctx.fillStyle = '#06b6d4'; // Tailwind cyan-500
+      const width = canvas.width / dpr;
+      const height = canvas.height / dpr;
 
       // Global parallax shift based on mouse relative to center of screen
       const centerX = width / 2;
       const centerY = height / 2;
-      const parallaxX = mouse.x !== -1000 ? (mouse.x - centerX) * -0.03 : 0;
-      const parallaxY = mouse.y !== -1000 ? (mouse.y - centerY) * -0.03 : 0;
+      const parallaxX = mouse.x !== -1000 ? (mouse.x - centerX) * -0.08 : 0;
+      const parallaxY = mouse.y !== -1000 ? (mouse.y - centerY) * -0.08 : 0;
 
       // Calculate starting offset to center the grid
       const offsetX = (width % spacing) / 2 + parallaxX;
       const offsetY = (height % spacing) / 2 + parallaxY;
       
       const time = Date.now() * 0.001; // For subtle wavy ambient depth
+      
+      // Pre-calculate math values outside the loop for massive performance boost
+      const time12 = time * 1.2;
+      const time05 = time * 0.5;
+      const time03 = time * 0.3;
+      
+      let shadowActive = false;
 
       // Expand loop bounds slightly to prevent popping at edges due to parallax
       for (let x = offsetX - spacing; x < width + spacing; x += spacing) {
         for (let y = offsetY - spacing; y < height + spacing; y += spacing) {
           const dx = mouse.x - x;
           const dy = mouse.y - y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
           
           let radius = baseRadius;
-          let alpha = 0.25;
+          let alpha = 0.35;
           let dotOffsetX = 0;
           let dotOffsetY = 0;
           
-          // Ambient depth wave (makes the grid look like a gently undulating 3D plane)
-          const ambientWave = Math.sin(x * 0.01 + time) * Math.cos(y * 0.01 + time);
-          radius += ambientWave * 0.3;
-          alpha += ambientWave * 0.05;
+          // Ambient depth wave (makes the grid look like a undulating 3D terrain)
+          const ambientWave = Math.sin(x * 0.01 + time12) * Math.cos(y * 0.01 + time12);
+          
+          // Enhance radius and opacity variation for deeper 3D feel
+          radius += ambientWave * 1.2;
+          alpha += ambientWave * 0.25;
+          
+          // Physically warp the Y position to simulate rolling hills in 3D
+          dotOffsetY += ambientWave * 15;
 
-          if (distance < interactionRadius) {
-            const factor = 1 - distance / interactionRadius; 
-            const easeFactor = Math.sin(factor * Math.PI / 2); // Ease-out curve
-            
-            radius = baseRadius + easeFactor * (maxRadius - baseRadius) + (ambientWave * 0.3);
-            alpha = 0.25 + easeFactor * 0.75; // Increases opacity when close
+          let r = 105, g = 117, b = 124; // Base steel: #69757C
 
-            // Subtle repulsion effect - dots push away slightly from cursor
-            const repelStrength = easeFactor * 6; 
-            const angle = Math.atan2(dy, dx);
-            dotOffsetX = -Math.cos(angle) * repelStrength;
-            dotOffsetY = -Math.sin(angle) * repelStrength;
-            
-            // Apply 3D drop shadow giving the illusion of lifting off the background
-            ctx.shadowBlur = easeFactor * 12;
-            ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
-            // Cast shadow *away* from the mouse light source
-            ctx.shadowOffsetX = -Math.cos(angle) * easeFactor * 8;
-            ctx.shadowOffsetY = -Math.sin(angle) * easeFactor * 8;
-          } else {
-            // Reset shadow for inactive dots
+          // Determine if dot is part of the flowing green energy path
+          const greenEnergy = Math.max(0, Math.sin(x * 0.01 - time05) * Math.cos(y * 0.015 + time03));
+          
+          if (greenEnergy > 0.35) { // Lowered threshold for more frequent appearance
+             const intensity = Math.min(1, (greenEnergy - 0.35) * 1.5); // 0 to 1
+             r = 105 - (71 * intensity); // 34 - 105
+             g = 117 + (80 * intensity); // 197 - 117
+             b = 124 - (30 * intensity); // 94 - 124
+             alpha += intensity * 0.35; // Boost opacity for glowing dots
+          } else if (ambientWave > 0.3) {
+             // Peak of wave gets MUCH brighter silver highlight
+             const intensity = Math.min(1, (ambientWave - 0.3) * 1.5);
+             r = 105 + (105 * intensity);
+             g = 117 + (103 * intensity);
+             b = 124 + (101 * intensity);
+             alpha += intensity * 0.2;
+          } else if (ambientWave < -0.3) {
+             // Valleys get darker steel/graphite
+             const intensity = Math.min(1, Math.abs(ambientWave + 0.3) * 1.5);
+             r = 105 - (65 * intensity);
+             g = 117 - (72 * intensity);
+             b = 124 - (74 * intensity);
+          }
+
+          // Fast bounding box check before expensive square root
+          if (dx > -interactionRadius && dx < interactionRadius && dy > -interactionRadius && dy < interactionRadius) {
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < interactionRadius) {
+              const factor = 1 - distance / interactionRadius; 
+              const easeFactor = Math.sin(factor * 1.570796); // PI / 2
+              
+              radius = baseRadius + easeFactor * (maxRadius - baseRadius) + (ambientWave * 0.3);
+              alpha = 0.25 + easeFactor * 0.75; // Increases opacity when close
+
+              // Subtle repulsion effect - dots push away slightly from cursor
+              const repelStrength = easeFactor * 6; 
+              const angle = Math.atan2(dy, dx);
+              dotOffsetX = -Math.cos(angle) * repelStrength;
+              dotOffsetY = -Math.sin(angle) * repelStrength;
+              
+              // Apply 3D drop shadow giving the illusion of lifting off the background
+              ctx.shadowBlur = easeFactor * 12;
+              ctx.shadowColor = `rgba(${r | 0}, ${g | 0}, ${b | 0}, 0.6)`;
+              // Cast shadow *away* from the mouse light source
+              ctx.shadowOffsetX = -Math.cos(angle) * easeFactor * 8;
+              ctx.shadowOffsetY = -Math.sin(angle) * easeFactor * 8;
+              shadowActive = true;
+              
+              // Brighten slightly on interaction
+              r = Math.min(255, r + easeFactor * 30);
+              g = Math.min(255, g + easeFactor * 30);
+              b = Math.min(255, b + easeFactor * 30);
+            }
+          } else if (shadowActive) {
+            // Reset shadow for inactive dots only if it was active
             ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
+            shadowActive = false;
           }
 
           // Apply click ripples (shockwave effect)
-          for (const ripple of ripples) {
-            const rdx = ripple.x - x;
-            const rdy = ripple.y - y;
-            const rDist = Math.sqrt(rdx * rdx + rdy * rdy);
-            
-            const ringThickness = 60;
-            const distToRing = Math.abs(rDist - ripple.radius);
-            
-            if (distToRing < ringThickness) {
-              const force = (1 - distToRing / ringThickness) * ripple.life;
-              const angle = Math.atan2(rdy, rdx);
+          if (ripples.length > 0) {
+            for (let i = 0, len = ripples.length; i < len; i++) {
+              const ripple = ripples[i];
+              const rdx = ripple.x - x;
+              const rdy = ripple.y - y;
               
-              // Push dots outward from ripple center
-              dotOffsetX += -Math.cos(angle) * force * 15; 
-              dotOffsetY += -Math.sin(angle) * force * 15;
+              const ringThickness = 60;
+              const bound = ripple.radius + ringThickness;
               
-              // Temporarily increase size and opacity for the ripple
-              radius += force * 2.5;
-              alpha += force * 0.8;
+              if (rdx > -bound && rdx < bound && rdy > -bound && rdy < bound) {
+                const rDist = Math.sqrt(rdx * rdx + rdy * rdy);
+                const distToRing = Math.abs(rDist - ripple.radius);
+                
+                if (distToRing < ringThickness) {
+                  const force = (1 - distToRing / ringThickness) * ripple.life;
+                  const angle = Math.atan2(rdy, rdx);
+                  
+                  // Push dots outward from ripple center
+                  dotOffsetX += -Math.cos(angle) * force * 15; 
+                  dotOffsetY += -Math.sin(angle) * force * 15;
+                  
+                  // Temporarily increase size and opacity for the ripple
+                  radius += force * 2.5;
+                  alpha += force * 0.8;
+                  
+                  // Energy pulse color shift during ripple
+                  r = 105 - (71 * force);
+                  g = 117 + (80 * force);
+                  b = 124 - (30 * force);
+                }
+              }
             }
           }
 
-          ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+          // Using bitwise OR for slightly faster integer casting
+          ctx.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${alpha > 1 ? 1 : alpha < 0 ? 0 : alpha})`;
           ctx.beginPath();
-          ctx.arc(x + dotOffsetX, y + dotOffsetY, Math.max(0, radius), 0, Math.PI * 2);
+          ctx.arc(x + dotOffsetX, y + dotOffsetY, radius < 0 ? 0 : radius, 0, 6.283185); // PI * 2
           ctx.fill();
         }
       }
