@@ -115,17 +115,17 @@ export default function Brew() {
                 onClick={() => setBrewMethod(method)}
                 whileHover={{ y: -4 }}
                 whileTap={{ scale: 0.98 }}
-                className={`flex flex-col items-start p-6 rounded border transition-all duration-500 ${
+                className={`flex flex-col items-start p-6 rounded-sm border transition-all duration-500 ${
                   isSelected 
-                    ? 'border-drift-accent/50 bg-drift-accent/10 shadow-[0_10px_30px_rgba(196,159,125,0.1)]' 
-                    : 'border-drift-border/50 hover:border-drift-border bg-transparent'
+                    ? 'border-drift-foreground bg-drift-surface shadow-xl' 
+                    : 'border-drift-border hover:border-drift-foreground/30 bg-drift-surface'
                 }`}
               >
                 <span className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-4 flex items-center justify-between w-full">
                   {method}
                   {isRecommended && <span className="text-[10px] text-drift-accent">Rec</span>}
                 </span>
-                <span className="font-display text-xl">
+                <span className={`font-display text-xl transition-colors duration-500 ${isSelected ? 'text-drift-foreground' : 'text-drift-foreground-muted'}`}>
                   {method === 'v60' ? 'Pour Over' : method === 'espresso' ? 'Pressure' : 'Immersion'}
                 </span>
               </motion.button>
@@ -142,7 +142,7 @@ export default function Brew() {
           {/* Temperature */}
           <div className="flex-1">
             <div className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-4">Water Temp</div>
-            <div className="font-display text-5xl lg:text-7xl tabular-nums text-drift-accent tracking-tighter flex items-end">
+            <div className="font-display text-5xl lg:text-7xl tabular-nums text-drift-foreground tracking-tighter flex items-end">
               {brewTemperature}<span className="text-2xl lg:text-4xl text-drift-foreground-muted mb-2 ml-1">°C</span>
             </div>
             <input 
@@ -150,14 +150,14 @@ export default function Brew() {
               min="85" max="100" 
               value={brewTemperature} 
               onChange={(e) => setBrewTemperature(parseInt(e.target.value))}
-              className="w-full mt-8 accent-drift-accent bg-drift-surface-hover h-1 rounded-full appearance-none outline-none" 
+              className="w-full mt-8 accent-drift-foreground bg-drift-surface-hover h-1 rounded-sm appearance-none outline-none" 
             />
           </div>
           
           {/* Ratio */}
           <div className="flex-1">
             <div className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-4">Ratio (Coffee : Water)</div>
-            <div className="font-display text-5xl lg:text-7xl tabular-nums text-drift-accent tracking-tighter">
+            <div className="font-display text-5xl lg:text-7xl tabular-nums text-drift-foreground tracking-tighter">
               1 : {brewRatio}
             </div>
             <input 
@@ -165,7 +165,7 @@ export default function Brew() {
               min="2" max="20" step="0.5"
               value={brewRatio} 
               onChange={(e) => setBrewRatio(parseFloat(e.target.value))}
-              className="w-full mt-8 accent-drift-accent bg-drift-surface-hover h-1 rounded-full appearance-none outline-none" 
+              className="w-full mt-8 accent-drift-foreground bg-drift-surface-hover h-1 rounded-sm appearance-none outline-none" 
             />
           </div>
         </div>
@@ -176,11 +176,11 @@ export default function Brew() {
         <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-8 self-start w-full max-w-3xl">03. The Pour</h3>
         
         <motion.div 
-          className="w-full max-w-3xl aspect-[16/9] border border-drift-border/30 rounded flex items-center justify-center relative cursor-ns-resize overflow-hidden group"
+          className="w-full max-w-3xl aspect-[16/9] border border-drift-border rounded-sm flex items-center justify-center relative cursor-ns-resize overflow-hidden group bg-drift-surface/50"
           onPointerMove={handlePourPointerMove}
-          whileHover={{ borderColor: 'rgba(255,255,255,0.15)' }}
+          whileHover={{ borderColor: 'var(--color-drift-foreground)' }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-drift-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-drift-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
           <div className="text-center pointer-events-none z-10">
             <div className="font-display text-2xl md:text-4xl text-drift-foreground/50 group-hover:text-drift-foreground transition-colors duration-500">
               Hold and drag to pour
@@ -196,16 +196,16 @@ export default function Brew() {
       <div className="brew-stage min-h-[90vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8 relative">
         <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-12">04. Extraction</h3>
         
-        <div className="font-display text-7xl lg:text-9xl text-drift-accent tabular-nums tracking-tighter opacity-80 mix-blend-screen">
+        <div className="font-display text-7xl lg:text-9xl text-drift-foreground tabular-nums tracking-tighter">
           {Math.min(100, Math.floor(brewProgress * 130))}%
         </div>
         <div className="text-sm font-sans tracking-widest uppercase text-drift-foreground-muted mt-4">
           Dissolving sensory compounds
         </div>
         
-        <div className="w-full h-1 bg-drift-surface-hover mt-12 max-w-2xl rounded overflow-hidden">
+        <div className="w-full h-1 bg-drift-border mt-12 max-w-2xl rounded-sm overflow-hidden">
           <motion.div 
-            className="h-full bg-drift-accent" 
+            className="h-full bg-drift-foreground" 
             style={{ width: `${Math.min(100, brewProgress * 130)}%` }}
             layout
           />
@@ -219,7 +219,13 @@ export default function Brew() {
           The ritual resolves. Aroma, body, and acidity stabilize into their final form.
         </p>
         <div className="mt-12">
-          <button className="text-xs font-sans tracking-[0.2em] uppercase text-drift-accent border-b border-drift-accent/30 pb-1 hover:border-drift-accent transition-colors">
+          <button 
+            onClick={() => {
+              useExperienceStore.getState().openFork('shop');
+              useExperienceStore.getState().focusFork('shop');
+            }}
+            className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground border-b border-drift-border pb-1 hover:border-drift-foreground transition-colors"
+          >
             Experience Shop
           </button>
         </div>

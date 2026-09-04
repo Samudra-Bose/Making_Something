@@ -40,7 +40,7 @@ export default function Cart() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsCartOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 pointer-events-auto"
+            className="fixed inset-0 bg-black/80 z-50 pointer-events-auto"
           />
 
           {/* Cart Drawer */}
@@ -89,22 +89,22 @@ export default function Cart() {
                   <motion.div key="checkout" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
                     <div>
                       <h3 className="text-[10px] uppercase tracking-widest text-drift-foreground-muted mb-4">Contact</h3>
-                      <input type="email" placeholder="Email Address" className="w-full bg-drift-surface-hover/30 border border-drift-border/50 p-3 rounded-sm text-sm outline-none focus:border-drift-accent/50" />
+                      <input type="email" placeholder="Email Address" className="w-full bg-drift-surface border border-drift-border p-3 rounded-sm text-sm outline-none focus:border-drift-foreground transition-colors" />
                     </div>
                     <div>
                       <h3 className="text-[10px] uppercase tracking-widest text-drift-foreground-muted mb-4">Shipping</h3>
                       <div className="flex flex-col gap-3">
-                        <input type="text" placeholder="Full Name" className="w-full bg-drift-surface-hover/30 border border-drift-border/50 p-3 rounded-sm text-sm outline-none focus:border-drift-accent/50" />
-                        <input type="text" placeholder="Address" className="w-full bg-drift-surface-hover/30 border border-drift-border/50 p-3 rounded-sm text-sm outline-none focus:border-drift-accent/50" />
+                        <input type="text" placeholder="Full Name" className="w-full bg-drift-surface border border-drift-border p-3 rounded-sm text-sm outline-none focus:border-drift-foreground transition-colors" />
+                        <input type="text" placeholder="Address" className="w-full bg-drift-surface border border-drift-border p-3 rounded-sm text-sm outline-none focus:border-drift-foreground transition-colors" />
                         <div className="flex gap-3">
-                          <input type="text" placeholder="City" className="w-full bg-drift-surface-hover/30 border border-drift-border/50 p-3 rounded-sm text-sm outline-none focus:border-drift-accent/50" />
-                          <input type="text" placeholder="Postal Code" className="w-full bg-drift-surface-hover/30 border border-drift-border/50 p-3 rounded-sm text-sm outline-none focus:border-drift-accent/50" />
+                          <input type="text" placeholder="City" className="w-full bg-drift-surface border border-drift-border p-3 rounded-sm text-sm outline-none focus:border-drift-foreground transition-colors" />
+                          <input type="text" placeholder="Postal Code" className="w-full bg-drift-surface border border-drift-border p-3 rounded-sm text-sm outline-none focus:border-drift-foreground transition-colors" />
                         </div>
                       </div>
                     </div>
                     <div>
                       <h3 className="text-[10px] uppercase tracking-widest text-drift-foreground-muted mb-4">Payment (Simulated)</h3>
-                      <div className="w-full bg-drift-surface-hover/30 border border-drift-border/50 p-3 rounded-sm text-sm text-drift-foreground-muted flex justify-between items-center">
+                      <div className="w-full bg-drift-surface border border-drift-border p-3 rounded-sm text-sm text-drift-foreground-muted flex justify-between items-center">
                         <span>Card Number</span>
                         <span>MM/YY CVC</span>
                       </div>
@@ -166,22 +166,22 @@ export default function Cart() {
             </div>
 
             {!isSuccess && cart.length > 0 && (
-              <footer className="p-8 border-t border-drift-border/30 bg-drift-surface-hover/30">
+              <footer className="p-8 border-t border-drift-border bg-drift-surface">
                 <div className="flex justify-between items-end mb-8">
                   <span className="text-xs uppercase tracking-widest text-drift-foreground-muted">Total</span>
-                  <span className="text-3xl font-display text-drift-accent tabular-nums tracking-tighter">${subtotal}</span>
+                  <span className="text-3xl font-display text-drift-foreground tabular-nums tracking-tighter">${subtotal}</span>
                 </div>
                 {isCheckout ? (
                   <button 
                     onClick={handleCheckoutComplete}
-                    className="w-full bg-drift-accent text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:bg-drift-accent/90 transition-colors"
+                    className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-opacity"
                   >
                     Confirm Purchase
                   </button>
                 ) : (
                   <button 
                     onClick={() => setIsCheckout(true)}
-                    className="w-full bg-drift-accent text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:bg-drift-accent/90 transition-colors"
+                    className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-opacity"
                   >
                     Proceed to Checkout
                   </button>

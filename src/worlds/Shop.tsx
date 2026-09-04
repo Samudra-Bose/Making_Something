@@ -41,20 +41,20 @@ function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
           <motion.div
             key={product.id}
             whileHover={{ y: -8 }}
-            className="group flex flex-col cursor-pointer border border-drift-border/40 hover:border-drift-accent/40 bg-drift-surface-hover/30 p-6 lg:p-8 transition-colors duration-500 rounded"
+            className="group flex flex-col cursor-pointer border border-drift-border hover:border-drift-foreground/50 bg-drift-surface p-6 lg:p-8 transition-colors duration-500 rounded-sm shadow-md hover:shadow-xl"
             onClick={() => onSelect(product.id)}
           >
             <div className="flex justify-between items-start mb-12">
-              <span className="text-[10px] tracking-[0.2em] text-drift-foreground-muted uppercase border border-drift-border/50 px-2 py-1 rounded-sm">
+              <span className="text-[10px] tracking-[0.2em] text-drift-foreground-muted uppercase border border-drift-border px-2 py-1 rounded-sm">
                 No. 0{index + 1}
               </span>
-              <span className="text-sm font-display tracking-tight text-drift-accent">
+              <span className="text-sm font-display tracking-tight text-drift-foreground">
                 ${product.price}
               </span>
             </div>
 
             <div className="flex-1">
-              <h3 className="text-2xl lg:text-3xl font-display mb-2 group-hover:text-drift-accent transition-colors">
+              <h3 className="text-2xl lg:text-3xl font-display mb-2 group-hover:text-drift-foreground transition-colors">
                 {product.name}
               </h3>
               <p className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-6">
@@ -62,14 +62,14 @@ function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
               </p>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-drift-border/30 flex justify-between items-end">
+            <div className="mt-8 pt-6 border-t border-drift-border flex justify-between items-end">
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] uppercase tracking-widest text-drift-foreground-muted">Profile</span>
-                <span className="text-xs text-drift-foreground/90">{product.flavorProfile.slice(0, 2).join(', ')}</span>
+                <span className="text-xs text-drift-foreground">{product.flavorProfile.slice(0, 2).join(', ')}</span>
               </div>
               <div className="flex flex-col gap-1 text-right">
                 <span className="text-[10px] uppercase tracking-widest text-drift-foreground-muted">Roast</span>
-                <span className="text-xs text-drift-foreground/90 capitalize">{product.roast}</span>
+                <span className="text-xs text-drift-foreground capitalize">{product.roast}</span>
               </div>
             </div>
           </motion.div>
@@ -163,7 +163,7 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
             </div>
           </div>
 
-          <div className="mt-16 pt-8 border-t border-drift-border/30">
+          <div className="mt-16 pt-8 border-t border-drift-border">
             <h3 className="text-[10px] uppercase tracking-widest text-drift-foreground-muted mb-6">Experience Context</h3>
             <div className="flex flex-col gap-3">
               <ContextLink label="Discover Origin" world="origin" onClick={() => navigateContext('origin')} />
@@ -175,9 +175,9 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
 
         {/* Right Column: Commerce */}
         <div className="flex flex-col">
-          <div className="bg-drift-surface-hover/30 border border-drift-border/40 p-8 rounded sticky top-8">
+          <div className="bg-drift-surface border border-drift-border p-8 rounded-sm sticky top-8 shadow-lg">
             <div className="flex justify-between items-end mb-12">
-              <div className="text-4xl lg:text-5xl font-display text-drift-accent tracking-tighter tabular-nums">
+              <div className="text-4xl lg:text-5xl font-display text-drift-foreground tracking-tighter tabular-nums">
                 ${finalPrice}
               </div>
               <div className="text-xs text-drift-foreground-muted tracking-widest uppercase">One-time</div>
@@ -192,8 +192,8 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
                     onClick={() => setSelectedVariant(v.id)}
                     className={`py-3 text-xs tracking-widest uppercase transition-colors rounded-sm border ${
                       selectedVariant === v.id
-                        ? 'border-drift-accent bg-drift-accent/10 text-drift-accent'
-                        : 'border-drift-border/50 hover:border-drift-border text-drift-foreground-muted'
+                        ? 'border-drift-foreground bg-drift-foreground text-drift-bg'
+                        : 'border-drift-border hover:border-drift-foreground text-drift-foreground-muted'
                     }`}
                   >
                     {v.label}
@@ -206,7 +206,7 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleAddToCart}
-              className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:bg-drift-accent transition-colors"
+              className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm transition-colors opacity-90 hover:opacity-100"
             >
               Add to Cart
             </motion.button>
@@ -221,12 +221,12 @@ function ContextLink({ label, world, onClick }: { label: string, world: string, 
   return (
     <button 
       onClick={onClick}
-      className="flex items-center justify-between p-4 border border-drift-border/30 hover:border-drift-accent/50 bg-drift-surface-hover/10 transition-all text-left group rounded-sm"
+      className="flex items-center justify-between p-4 border border-drift-border hover:border-drift-foreground bg-drift-surface transition-all text-left group rounded-sm"
     >
-      <span className="text-xs tracking-widest uppercase text-drift-foreground/80 group-hover:text-drift-accent transition-colors">
+      <span className="text-xs tracking-widest uppercase text-drift-foreground group-hover:text-drift-foreground transition-colors">
         {label}
       </span>
-      <span className="text-drift-foreground-muted group-hover:text-drift-accent transition-colors">→</span>
+      <span className="text-drift-foreground-muted group-hover:text-drift-foreground transition-colors">→</span>
     </button>
   );
 }

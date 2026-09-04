@@ -131,7 +131,7 @@ export default function Roast() {
           </div>
           
           <motion.div 
-            className="mt-24 pt-8 border-t border-white/5 flex flex-col items-start gap-8"
+            className="mt-24 pt-8 border-t border-drift-border flex flex-col items-start gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -144,12 +144,12 @@ export default function Roast() {
                 useExperienceStore.getState().openFork('brew');
                 useExperienceStore.getState().focusFork('brew');
               }}
-              className="group relative px-10 py-5 border border-drift-accent/30 rounded-full hover:bg-drift-accent/5 transition-colors overflow-hidden cursor-pointer"
+              className="group relative px-10 py-5 border border-drift-border rounded-sm hover:bg-drift-foreground/5 transition-colors overflow-hidden cursor-pointer"
             >
-              <span className="relative z-10 text-xs tracking-[0.2em] uppercase text-drift-highlight group-hover:text-white transition-colors">
+              <span className="relative z-10 text-xs tracking-[0.2em] uppercase text-drift-foreground transition-colors">
                 Extract the Character
               </span>
-              <div className="absolute inset-0 bg-drift-accent/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[0.22,1,0.36,1]" />
+              <div className="absolute inset-0 bg-drift-foreground/5 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[0.22,1,0.36,1]" />
             </button>
           </motion.div>
         </div>
@@ -300,15 +300,15 @@ function RoastOption({ level, title, desc, current, onSelect }: { level: string,
   return (
     <motion.button
       onClick={() => onSelect(level)}
-      className={`text-left p-6 rounded-2xl border transition-all duration-500 ${
+      className={`text-left p-6 rounded-sm border transition-all duration-500 ${
         isActive 
-          ? 'border-drift-accent bg-drift-accent/10 shadow-[0_0_30px_rgba(196,159,125,0.1)]' 
-          : 'border-white/5 bg-white/5 hover:border-white/20'
+          ? 'border-drift-foreground bg-drift-surface shadow-xl' 
+          : 'border-drift-border bg-drift-surface hover:border-drift-foreground/30'
       }`}
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
     >
-      <h4 className={`text-lg font-display mb-3 transition-colors duration-500 ${isActive ? 'text-drift-accent' : 'text-white'}`}>
+      <h4 className={`text-lg font-display mb-3 transition-colors duration-500 ${isActive ? 'text-drift-foreground' : 'text-drift-foreground-muted'}`}>
         {title}
       </h4>
       <p className="text-sm font-sans text-drift-foreground-muted leading-relaxed">

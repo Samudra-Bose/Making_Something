@@ -132,7 +132,7 @@ export default function Origin() {
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 1.2, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="st-hero-text text-6xl md:text-8xl lg:text-9xl font-display text-white mb-8 uppercase tracking-wider leading-[0.9]"
+          className="st-hero-text text-6xl md:text-8xl lg:text-9xl font-display text-drift-foreground mb-8 uppercase tracking-wider leading-[0.9]"
         >
           Ethiopia<br />Guji
         </motion.h1>
@@ -142,7 +142,7 @@ export default function Origin() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="st-hero-text flex flex-col gap-3 mt-8 text-xs md:text-sm text-drift-foreground-muted tracking-[0.15em] font-sans uppercase border-l-2 border-drift-accent/30 pl-5"
+            className="st-hero-text flex flex-col gap-3 mt-8 text-xs md:text-sm text-drift-foreground-muted tracking-[0.15em] font-sans uppercase border-l border-drift-border pl-5"
           >
             <p className="hover:text-drift-foreground transition-colors cursor-default">1,900–2,100M Altitude</p>
             <p className="hover:text-drift-foreground transition-colors cursor-default">Natural Process</p>
@@ -155,7 +155,7 @@ export default function Origin() {
         <div className="relative z-10 max-w-4xl mx-auto">
           {/* 2. LAND / DISCOVERY */}
           <div className="st-altitude-trigger min-h-[70vh] flex flex-col justify-center">
-            <h2 className="st-altitude text-3xl md:text-5xl lg:text-6xl font-display text-drift-highlight mb-10 leading-tight">
+            <h2 className="st-altitude text-3xl md:text-5xl lg:text-6xl font-display text-drift-foreground mb-10 leading-tight">
               Every cup begins somewhere. In the Guji zone, coffee is not an industry—it is the geography itself.
             </h2>
             <p className="st-altitude text-drift-foreground-muted leading-loose font-light md:text-lg max-w-2xl">
@@ -164,28 +164,28 @@ export default function Origin() {
           </div>
 
           {/* 3. ALTITUDE & PLANT / CONTEXT */}
-          <div className="st-plant-trigger min-h-[80vh] flex flex-col lg:flex-row gap-16 items-center justify-between border-y border-drift-border/30 py-24 my-24">
+          <div className="st-plant-trigger min-h-[80vh] flex flex-col lg:flex-row gap-16 items-center justify-between border-y border-drift-border py-24 my-24">
             <div className="st-plant flex-1 w-full">
               <div className="text-xs text-drift-accent tracking-[0.2em] uppercase mb-6 flex items-center gap-3">
-                <span className="w-8 h-[1px] bg-drift-accent/50"></span>
+                <span className="w-8 h-[1px] bg-drift-accent"></span>
                 Elevation
               </div>
-              <div className="text-7xl md:text-9xl font-display text-white font-light tracking-tighter">
+              <div className="text-7xl md:text-9xl font-display text-drift-foreground font-light tracking-tighter">
                 1,900<span className="text-3xl md:text-5xl text-drift-foreground-muted ml-2 font-sans tracking-normal">m</span>
               </div>
               <p className="mt-8 text-drift-foreground-muted leading-loose md:text-lg">
                 Extreme altitude forces the plant to work harder, producing denser beans with a profoundly concentrated cellular structure and higher organic acid content.
               </p>
             </div>
-            <div className="st-plant flex-1 w-full p-10 md:p-14 bg-white/[0.01] border border-white/[0.03] rounded-2xl backdrop-blur-md shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-1000 pointer-events-none">
+            <div className="st-plant flex-1 w-full p-10 md:p-14 bg-drift-surface border border-drift-border rounded-sm shadow-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-1000 pointer-events-none text-drift-foreground">
                 <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
                   <path d="M12 2L22 22H2L12 2Z" />
                 </svg>
               </div>
               <div className="relative z-10">
                 <div className="text-xs text-drift-accent tracking-[0.2em] uppercase mb-6">Varietal</div>
-                <div className="text-4xl md:text-5xl font-display text-drift-highlight mb-6">Ethiopian Heirloom</div>
+                <div className="text-4xl md:text-5xl font-display text-drift-foreground mb-6">Ethiopian Heirloom</div>
                 <p className="text-sm md:text-base text-drift-foreground-muted leading-loose">
                   Unlike genetically uniform modern crops, this coffee is a chaotic, beautiful mix of indigenous landraces—each contributing a distinct thread to the final tapestry of flavor.
                 </p>
@@ -196,7 +196,7 @@ export default function Origin() {
           {/* 4. HARVEST & PROCESS / UNDERSTANDING */}
           <div className="st-process-trigger min-h-[80vh] flex flex-col justify-center">
             <div className="max-w-2xl mb-20">
-              <h2 className="text-4xl md:text-6xl font-display text-white mb-8">Sun & Time</h2>
+              <h2 className="text-4xl md:text-6xl font-display text-drift-foreground mb-8">Sun & Time</h2>
               <p className="text-drift-foreground-muted leading-loose md:text-lg">
                 After selective hand-picking by local smallholders, the cherries are spread across raised African drying beds. For weeks, they are turned continuously by hand under the equatorial sun, allowing the fruit sugars to ferment and bake directly into the seed.
               </p>
@@ -205,18 +205,18 @@ export default function Origin() {
             <div className="flex flex-col gap-8 w-full max-w-3xl">
               <div className="flex items-center gap-6">
                 <div className="w-24 md:w-32 text-xs md:text-sm tracking-widest text-drift-foreground-muted uppercase">Method</div>
-                <div className="h-[1px] bg-drift-accent/30 st-process-line flex-1"></div>
-                <div className="text-xl md:text-2xl font-display text-drift-highlight text-right">Natural (Dry)</div>
+                <div className="h-[1px] bg-drift-border st-process-line flex-1"></div>
+                <div className="text-xl md:text-2xl font-display text-drift-foreground text-right">Natural (Dry)</div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="w-24 md:w-32 text-xs md:text-sm tracking-widest text-drift-foreground-muted uppercase">Drying</div>
-                <div className="h-[1px] bg-drift-accent/30 st-process-line flex-1"></div>
-                <div className="text-xl md:text-2xl font-display text-drift-highlight text-right">18–21 Days</div>
+                <div className="h-[1px] bg-drift-border st-process-line flex-1"></div>
+                <div className="text-xl md:text-2xl font-display text-drift-foreground text-right">18–21 Days</div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="w-24 md:w-32 text-xs md:text-sm tracking-widest text-drift-foreground-muted uppercase">Profile</div>
-                <div className="h-[1px] bg-drift-accent/30 st-process-line flex-1"></div>
-                <div className="text-xl md:text-2xl font-display text-drift-highlight text-right">Fruit-forward & Syrupy</div>
+                <div className="h-[1px] bg-drift-border st-process-line flex-1"></div>
+                <div className="text-xl md:text-2xl font-display text-drift-foreground text-right">Fruit-forward & Syrupy</div>
               </div>
             </div>
           </div>
@@ -231,12 +231,12 @@ export default function Origin() {
                 useExperienceStore.getState().openFork('roast');
                 useExperienceStore.getState().focusFork('roast');
               }}
-              className="group relative px-10 py-5 border border-drift-accent/30 rounded-full hover:bg-drift-accent/5 transition-colors overflow-hidden cursor-pointer"
+              className="group relative px-10 py-5 border border-drift-border rounded-sm hover:bg-drift-foreground/5 transition-colors overflow-hidden cursor-pointer"
             >
-              <span className="relative z-10 text-xs tracking-[0.2em] uppercase text-drift-highlight group-hover:text-white transition-colors">
+              <span className="relative z-10 text-xs tracking-[0.2em] uppercase text-drift-foreground transition-colors">
                 Follow to Roast
               </span>
-              <div className="absolute inset-0 bg-drift-accent/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[0.22,1,0.36,1]" />
+              <div className="absolute inset-0 bg-drift-foreground/5 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[0.22,1,0.36,1]" />
             </button>
           </div>
         </div>
