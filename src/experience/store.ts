@@ -23,6 +23,12 @@ interface ExperienceState {
   roastLevel: RoastLevel;
   roastDevelopment: number; // 0 to 1, maps to progression of roasting
   
+  // Shared Brew State
+  brewMethod: 'v60' | 'espresso' | 'french-press';
+  brewTemperature: number;
+  brewRatio: number;
+  brewProgress: number; // 0 to 1
+  
   // Actions
   setHasEntered: (entered: boolean) => void;
   setActiveWorld: (world: World) => void;
@@ -37,6 +43,10 @@ interface ExperienceState {
   setCoffeeOrigin: (origin: string) => void;
   setRoastLevel: (level: RoastLevel) => void;
   setRoastDevelopment: (dev: number) => void;
+  setBrewMethod: (method: 'v60' | 'espresso' | 'french-press') => void;
+  setBrewTemperature: (temp: number) => void;
+  setBrewRatio: (ratio: number) => void;
+  setBrewProgress: (prog: number) => void;
 }
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
@@ -55,6 +65,11 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   coffeeOrigin: 'Ethiopia / Guji',
   roastLevel: 'light',
   roastDevelopment: 0,
+  
+  brewMethod: 'v60',
+  brewTemperature: 94,
+  brewRatio: 15,
+  brewProgress: 0,
   
   setHasEntered: (entered) => {
     if (entered) window.dispatchEvent(new CustomEvent('drift:enter'));
@@ -101,4 +116,11 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
     set({ roastLevel: level });
   },
   setRoastDevelopment: (dev) => set({ roastDevelopment: dev }),
+  setBrewMethod: (method) => {
+    window.dispatchEvent(new CustomEvent('drift:brewMethodChange', { detail: { method } }));
+    set({ brewMethod: method });
+  },
+  setBrewTemperature: (temp) => set({ brewTemperature: temp }),
+  setBrewRatio: (ratio) => set({ brewRatio: ratio }),
+  setBrewProgress: (prog) => set({ brewProgress: prog }),
 }));

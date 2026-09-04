@@ -11,6 +11,9 @@ export default function Origin() {
   const activeFork = useExperienceStore(s => s.activeFork);
   const expandedFork = useExperienceStore(s => s.expandedFork);
   const setScroll = useExperienceStore(s => s.setScroll);
+  const setCoffeeOrigin = useExperienceStore(state => state.setCoffeeOrigin);
+  const currentOrigin = useExperienceStore(state => state.coffeeOrigin);
+  const openFork = useExperienceStore(state => state.openFork);
   
   const isActive = activeFork === 'origin';
   const isExpanded = expandedFork === 'origin';

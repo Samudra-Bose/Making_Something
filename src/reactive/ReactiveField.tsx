@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function ReactiveField() {
   const activeWorld = useExperienceStore((state) => state.activeWorld);
   const roastDevelopment = useExperienceStore((state) => state.roastDevelopment);
+  const brewMethod = useExperienceStore((state) => state.brewMethod);
+  const brewProgress = useExperienceStore((state) => state.brewProgress);
   
   // Theme logic based on world
   const getGradient = (world: string) => {
@@ -20,7 +22,12 @@ export default function ReactiveField() {
         const g = Math.floor(28 + heat * 50);
         const b = Math.floor(22 + heat * 10);
         return `radial-gradient(circle at 50% 50%, rgba(${r},${g},${b},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
-      case 'brew': return 'radial-gradient(circle at 50% 50%, var(--color-world-brew) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
+      case 'brew': 
+        // Darkens and deepens as extraction progresses
+        const extR = Math.floor(19 - brewProgress * 10);
+        const extG = Math.floor(26 - brewProgress * 15);
+        const extB = Math.floor(31 - brewProgress * 18);
+        return `radial-gradient(circle at 50% 50%, rgba(${extR},${extG},${extB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
       case 'shop': return 'radial-gradient(circle at 50% 50%, var(--color-world-shop) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
       default: return 'radial-gradient(circle at 50% 50%, #11171B 0%, #0B0F12 50%, #050708 100%)';
     }
@@ -48,6 +55,39 @@ export default function ReactiveField() {
     waveSpeedX = 0.02 + energy * 0.06;
     waveSpeedY = 0.01 + energy * 0.04;
     tension = 0.01 + energy * 0.02; // snappier
+  } else if (activeWorld === 'brew') {
+    // Fluid, directional, responsive
+    xGap = 16;
+    yGap = 16;
+    
+    // As extraction (progress) increases, the field becomes more saturated/heavy
+    waveAmpX = 60 - brewProgress * 20;
+    waveAmpY = 15 + brewProgress * 10;
+    waveSpeedX = 0.04 + brewProgress * 0.03; // directional flow
+    waveSpeedY = 0.005;
+    tension = 0.005;
+    friction = 0.96; // slippery/fluid
+    
+    if (brewMethod === 'espresso') {
+      // higher pressure, concentrated
+      xGap = 8;
+      yGap = 8;
+      waveAmpX = 40;
+      waveAmpY = 40;
+      waveSpeedX = 0.06;
+      waveSpeedY = 0.04;
+      tension = 0.02;
+      friction = 0.9;
+    } else if (brewMethod === 'french-press') {
+      // slower immersion
+      xGap = 20;
+      yGap = 20;
+      waveSpeedX = 0.01;
+      waveSpeedY = 0.01;
+      waveAmpX = 30;
+      waveAmpY = 30;
+      friction = 0.92;
+    }
   }
 
   return (
