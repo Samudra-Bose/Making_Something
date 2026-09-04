@@ -1,62 +1,55 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import DotGrid from './DotGrid';
-import Waves from './Waves';
+import React, { useEffect } from 'react';
+import AppShell from './experience/AppShell';
+import ExperienceController from './experience/ExperienceController';
+import ReactiveField from './reactive/ReactiveField';
+import ForkManager from './fork/ForkManager';
+import { useExperienceStore, World } from './experience/store';
 
 export default function App() {
-  const [key, setKey] = useState(0);
-  return <MainScreen key={key} onReplay={() => setKey((k) => k + 1)} />;
-}
+  const openForks = useExperienceStore((state) => state.openForks);
+  const openFork = useExperienceStore((state) => state.openFork);
+  
+  // Initial setup for the demo
+  useEffect(() => {
+    if (openForks.length === 0) {
+      openFork('origin');
+    }
+  }, [openForks.length, openFork]);
 
-function MainScreen({ onReplay }: { onReplay: () => void; key?: number }) {
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#050708] font-sans">
-      <motion.div
-        className="absolute inset-0 z-30 flex items-center justify-center overflow-hidden"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, #11171B 0%, #0B0F12 50%, #050708 100%)'
-        }}
-        initial={{ clipPath: 'circle(0% at 50% 50%)' }}
-        animate={{ clipPath: 'circle(150% at 50% 50%)' }}
-        transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }} // cinematic ease
-      >
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <DotGrid />
-          <Waves
-            backgroundColor="transparent"
-            waveSpeedX={0.02}
-            waveSpeedY={0.01}
-            waveAmpX={40}
-            waveAmpY={20}
-            friction={0.9}
-            tension={0.01}
-            maxCursorMove={120}
-            xGap={12}
-            yGap={36}
-          />
-        </div>
-        <div className="flex flex-col items-center gap-10 z-10 relative">
-          <motion.button 
-            initial={{ opacity: 0, y: 30, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.7, duration: 0.8, type: 'spring', bounce: 0.4 }}
-            onClick={onReplay} 
-            className="px-8 py-3 bg-white/5 border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-white/10 rounded-full text-gray-300 font-medium transition-all active:scale-95 cursor-pointer flex items-center gap-2 group backdrop-blur-sm"
+    <AppShell>
+      <ExperienceController />
+      
+      {/* The Unified Background Environment */}
+      <ReactiveField />
+
+      {/* Development Navigation / Controls (Will be replaced by narrative ScrollTrigger) */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-4 p-2 bg-drift-surface/80 backdrop-blur-md rounded-full border border-drift-border">
+        {(['origin', 'roast', 'brew', 'shop'] as World[]).map((world) => (
+          <button 
+            key={world}
+            onClick={() => openFork(world)}
+            className="px-4 py-2 text-sm uppercase tracking-widest text-drift-foreground-muted hover:text-drift-foreground transition-colors rounded-full hover:bg-white/5"
           >
-            <span>Replay Animation</span>
-            <motion.span 
-              className="inline-block transition-transform duration-300 group-hover:rotate-180"
-            >
-              ↺
-            </motion.span>
-          </motion.button>
+            {world}
+          </button>
+        ))}
+      </div>
+      
+      {/* The Window System */}
+      <div className="relative z-10 w-full h-full p-4 lg:p-8 pt-24 pointer-events-none">
+        <div className="w-full h-full pointer-events-auto">
+          <ForkManager />
         </div>
-      </motion.div>
-    </div>
+      </div>
+      
+      {/* Site Header / Brand */}
+      <header className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none mix-blend-difference">
+        <h1 className="text-2xl font-display text-white tracking-widest uppercase">Drift</h1>
+        <div className="text-xs font-sans tracking-widest uppercase text-white/70">
+          Coffee changes the pace of a room
+        </div>
+      </header>
+    </AppShell>
   );
 }
