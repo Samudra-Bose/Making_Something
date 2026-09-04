@@ -5,12 +5,17 @@ interface ForkPaneProps {
   world: string;
   isActive: boolean;
   isFullWidth?: boolean;
+  className?: string;
   children: React.ReactNode;
 }
 
-export default function ForkPane({ world, isActive, isFullWidth, children }: ForkPaneProps) {
+export default function ForkPane({ world, isActive, isFullWidth, className = '', children }: ForkPaneProps) {
   const setActiveWorld = useExperienceStore((state) => state.setActiveWorld);
   const closeFork = useExperienceStore((state) => state.closeFork);
+  const focusFork = useExperienceStore((state) => state.focusFork);
+  const expandFork = useExperienceStore((state) => state.expandFork);
+  const collapseFork = useExperienceStore((state) => state.collapseFork);
+  const expandedFork = useExperienceStore((state) => state.expandedFork);
 
   return (
     <motion.div
@@ -21,8 +26,8 @@ export default function ForkPane({ world, isActive, isFullWidth, children }: For
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className={`relative overflow-hidden rounded-2xl border ${
         isActive ? 'border-drift-accent/50 shadow-2xl z-20' : 'border-drift-border/30 hover:border-drift-border z-10'
-      } bg-drift-surface/30 backdrop-blur-md flex flex-col ${isFullWidth ? 'col-span-2' : ''}`}
-      onClick={() => useExperienceStore.setState({ activeFork: world as World })}
+      } bg-drift-surface/30 backdrop-blur-md flex-col ${isFullWidth ? 'col-span-2' : ''} ${className}`}
+      onClick={() => focusFork(world as World)}
     >
       <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-50 pointer-events-none">
         <h3 className={`text-xs font-sans tracking-widest uppercase ${isActive ? 'text-drift-foreground' : 'text-drift-foreground-muted'}`}>{world}</h3>
@@ -31,17 +36,16 @@ export default function ForkPane({ world, isActive, isFullWidth, children }: For
             className="text-drift-foreground-muted hover:text-drift-foreground transition-colors p-2"
             onClick={(e) => {
               e.stopPropagation();
-              const expanded = useExperienceStore.getState().expandedFork;
-              if (expanded === world) {
-                useExperienceStore.getState().collapseFork();
+              if (expandedFork === world) {
+                collapseFork();
               } else {
-                useExperienceStore.getState().expandFork(world as World);
+                expandFork(world as World);
               }
             }}
           >
             <span className="sr-only">Expand/Collapse</span>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {useExperienceStore((state) => state.expandedFork) === world ? (
+              {expandedFork === world ? (
                 <path d="M1 4V1H4M11 8V11H8M11 4V1H8M1 8V11H4" stroke="currentColor" strokeWidth="1.2"/>
               ) : (
                 <path d="M4 1V4H1M8 11V8H11M8 1V4H11M4 11V8H1" stroke="currentColor" strokeWidth="1.2"/>

@@ -42,15 +42,19 @@ export default function ForkManager() {
     <div className={`relative z-10 w-full h-full grid gap-4 p-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${getForkLayoutClass(openForks.length, isExpanded)}`}>
       <AnimatePresence mode="popLayout">
         {openForks.map((world, index) => {
-          // If a fork is expanded and it's not this one, hide it
+          // If a fork is expanded and it's not this one, hide it completely
           if (isExpanded && expandedFork !== world) return null;
+
+          const isActive = activeFork === world;
 
           return (
             <ForkPane 
               key={world} 
               world={world} 
-              isActive={activeFork === world}
+              isActive={isActive}
               isFullWidth={!isExpanded && openForks.length === 3 && index === 2} // Make 3rd fork full width at bottom if not expanded
+              // on mobile (max-lg), hide non-active forks
+              className={!isExpanded && !isActive ? 'hidden lg:flex' : 'flex'}
             >
               {renderWorld(world)}
             </ForkPane>

@@ -14,6 +14,7 @@ export default function GlobalNavigation() {
   const activeFork = useExperienceStore((state) => state.activeFork);
   const openFork = useExperienceStore((state) => state.openFork);
   const closeFork = useExperienceStore((state) => state.closeFork);
+  const focusFork = useExperienceStore((state) => state.focusFork);
   const hasEntered = useExperienceStore((state) => state.hasEntered);
 
   if (!hasEntered) return null;
@@ -40,25 +41,22 @@ export default function GlobalNavigation() {
           const isActive = activeFork === world.id;
 
           return (
-            <button
+            <motion.button
               key={world.id}
               onClick={() => {
                 if (isOpen) {
-                  // If it's already active and we click, maybe close it, or just keep it open.
-                  // For now, if we click an open fork that is active, we might close it to toggle? 
-                  // No, let's keep it open or let them use close button on the panel.
-                  // Actually, clicking navigation for an open fork should just focus it if it isn't focused.
-                  // If we want to toggle:
                   if (isActive) {
                     closeFork(world.id);
                   } else {
-                    useExperienceStore.setState({ activeFork: world.id });
+                    focusFork(world.id);
                   }
                 } else {
                   openFork(world.id);
                 }
               }}
               className="group relative flex flex-col items-end gap-2"
+              whileHover={{ y: -2 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             >
               <div className="flex items-center gap-3">
                 <span className={`text-[10px] tracking-widest transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/30 group-hover:text-white/70'}`}>
@@ -79,7 +77,7 @@ export default function GlobalNavigation() {
                   style={{ transformOrigin: 'right' }}
                 />
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
