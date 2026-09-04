@@ -10,15 +10,17 @@ export default function Roast() {
   const setRoastDevelopment = useExperienceStore((state) => state.setRoastDevelopment);
   const roastLevel = useExperienceStore((state) => state.roastLevel);
   const setRoastLevel = useExperienceStore((state) => state.setRoastLevel);
+  const activeFork = useExperienceStore((state) => state.activeFork);
+  const setScroll = useExperienceStore((state) => state.setScroll);
 
   useEffect(() => {
     if (!containerRef.current) return;
+    const scroller = containerRef.current;
     
     // We create a ScrollTrigger that updates the store's roast development 
-    // to drive the shared background environment, but we debounce/throttle or just use it.
-    // Zustand handles frequent updates well.
     const st = ScrollTrigger.create({
-      trigger: containerRef.current,
+      trigger: scroller.querySelector('.st-roast-sequence'),
+      scroller: scroller,
       start: "top top",
       end: "bottom bottom",
       onUpdate: (self) => {
@@ -26,7 +28,6 @@ export default function Roast() {
       }
     });
 
-    // Refresh after a tiny delay to allow Framer Motion layout to settle
     const timeout = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 100);
@@ -34,12 +35,22 @@ export default function Roast() {
     return () => {
       clearTimeout(timeout);
       st.kill();
-      setRoastDevelopment(0); // reset when leaving
+      setRoastDevelopment(0);
     };
   }, [setRoastDevelopment]);
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (activeFork === 'roast') {
+      setScroll(e.currentTarget.scrollTop);
+    }
+  };
+
   return (
-    <div ref={containerRef} className="relative w-full text-drift-foreground">
+    <div 
+      ref={containerRef} 
+      onScroll={handleScroll}
+      className="relative h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar text-drift-foreground"
+    >
       {/* 1. OPENING / HERO */}
       <section className="min-h-screen flex flex-col justify-center px-8 lg:px-16 pt-32 pb-32">
         <div className="max-w-2xl">
@@ -74,7 +85,7 @@ export default function Roast() {
       </section>
 
       {/* 2. THE TRANSFORMATION SCROLL SEQUENCE */}
-      <section className="min-h-[300vh] relative">
+      <section className="st-roast-sequence min-h-[300vh] relative">
         <div className="sticky top-0 h-screen flex items-center justify-center pointer-events-none overflow-hidden">
           {/* We will build the interactive/visual bean transformation here */}
           <RoastVisualizer />
@@ -120,7 +131,7 @@ export default function Roast() {
           </div>
           
           <motion.div 
-            className="mt-24 pt-8 border-t border-white/5"
+            className="mt-24 pt-8 border-t border-white/5 flex flex-col items-start gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -128,6 +139,18 @@ export default function Roast() {
             <p className="text-xs font-sans tracking-widest text-drift-foreground-muted uppercase">
               This transformation creates the character you taste.
             </p>
+            <button 
+              onClick={() => {
+                useExperienceStore.getState().openFork('brew');
+                useExperienceStore.getState().focusFork('brew');
+              }}
+              className="group relative px-10 py-5 border border-drift-accent/30 rounded-full hover:bg-drift-accent/5 transition-colors overflow-hidden cursor-pointer"
+            >
+              <span className="relative z-10 text-xs tracking-[0.2em] uppercase text-drift-highlight group-hover:text-white transition-colors">
+                Extract the Character
+              </span>
+              <div className="absolute inset-0 bg-drift-accent/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[0.22,1,0.36,1]" />
+            </button>
           </motion.div>
         </div>
       </section>
