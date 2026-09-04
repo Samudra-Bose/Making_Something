@@ -10,13 +10,16 @@ export default function ForkManager() {
   const openForks = useExperienceStore((state) => state.openForks);
   const activeFork = useExperienceStore((state) => state.activeFork);
 
+  const expandedFork = useExperienceStore((state) => state.expandedFork);
+
   // Layout calculations depending on number of forks open
-  const getForkLayoutClass = (count: number) => {
+  const getForkLayoutClass = (count: number, expanded: boolean) => {
+    if (expanded) return 'grid-cols-1 grid-rows-1';
     switch (count) {
       case 1: return 'grid-cols-1 grid-rows-1';
-      case 2: return 'grid-cols-2 grid-rows-1';
-      case 3: return 'grid-cols-2 grid-rows-2'; // 3rd can span 2 cols or be empty space
-      case 4: return 'grid-cols-2 grid-rows-2';
+      case 2: return 'grid-cols-1 lg:grid-cols-2 grid-rows-2 lg:grid-rows-1';
+      case 3: return 'grid-cols-1 lg:grid-cols-2 grid-rows-3 lg:grid-rows-2'; // 3rd can span 2 cols or be empty space
+      case 4: return 'grid-cols-1 lg:grid-cols-2 grid-rows-4 lg:grid-rows-2';
       default: return 'grid-cols-1 grid-rows-1';
     }
   };
@@ -33,19 +36,26 @@ export default function ForkManager() {
 
   if (openForks.length === 0) return null;
 
+  const isExpanded = !!expandedFork;
+
   return (
-    <div className={`relative z-10 w-full h-full grid gap-4 p-4 ${getForkLayoutClass(openForks.length)}`}>
-      <AnimatePresence>
-        {openForks.map((world, index) => (
-          <ForkPane 
-            key={world} 
-            world={world} 
-            isActive={activeFork === world}
-            isFullWidth={openForks.length === 3 && index === 2} // Make 3rd fork full width at bottom
-          >
-            {renderWorld(world)}
-          </ForkPane>
-        ))}
+    <div className={`relative z-10 w-full h-full grid gap-4 p-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${getForkLayoutClass(openForks.length, isExpanded)}`}>
+      <AnimatePresence mode="popLayout">
+        {openForks.map((world, index) => {
+          // If a fork is expanded and it's not this one, hide it
+          if (isExpanded && expandedFork !== world) return null;
+
+          return (
+            <ForkPane 
+              key={world} 
+              world={world} 
+              isActive={activeFork === world}
+              isFullWidth={!isExpanded && openForks.length === 3 && index === 2} // Make 3rd fork full width at bottom if not expanded
+            >
+              {renderWorld(world)}
+            </ForkPane>
+          );
+        })}
       </AnimatePresence>
     </div>
   );

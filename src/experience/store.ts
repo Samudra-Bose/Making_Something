@@ -7,6 +7,7 @@ interface ExperienceState {
   hasEntered: boolean;
   activeWorld: World;
   activeFork: World | null;
+  expandedFork: World | null;
   openForks: World[];
   interactionMode: 'explore' | 'commerce' | 'narrative';
   visualMode: VisualMode;
@@ -20,6 +21,8 @@ interface ExperienceState {
   setActiveWorld: (world: World) => void;
   openFork: (world: World) => void;
   closeFork: (world: World) => void;
+  expandFork: (world: World) => void;
+  collapseFork: () => void;
   setPointer: (x: number, y: number) => void;
   setPointerVelocity: (vx: number, vy: number) => void;
   setScroll: (y: number) => void;
@@ -29,6 +32,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   hasEntered: false,
   activeWorld: 'origin',
   activeFork: null,
+  expandedFork: null,
   openForks: [],
   interactionMode: 'explore',
   visualMode: 'default',
@@ -45,8 +49,11 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   })),
   closeFork: (world) => set((state) => ({
     openForks: state.openForks.filter(w => w !== world),
-    activeFork: state.activeFork === world ? null : state.activeFork
+    activeFork: state.activeFork === world ? null : state.activeFork,
+    expandedFork: state.expandedFork === world ? null : state.expandedFork
   })),
+  expandFork: (world) => set({ expandedFork: world, activeFork: world }),
+  collapseFork: () => set({ expandedFork: null }),
   setPointer: (x, y) => set({ pointer: { x, y } }),
   setPointerVelocity: (vx, vy) => set({ pointerVelocity: { x: vx, y: vy } }),
   setScroll: (y) => set({ scroll: y }),
