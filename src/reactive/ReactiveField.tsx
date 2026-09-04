@@ -88,6 +88,17 @@ export default function ReactiveField() {
       waveAmpY = 30;
       friction = 0.92;
     }
+  } else if (activeWorld === 'shop') {
+    // Calm, precise, structured, restrained
+    xGap = 32;
+    yGap = 32;
+    waveAmpX = 10;
+    waveAmpY = 5;
+    waveSpeedX = 0.002;
+    waveSpeedY = 0.001;
+    tension = 0.002;
+    friction = 0.85; // heavily damped
+    maxCursorMove = 60; // minimal interaction with background
   }
 
   return (

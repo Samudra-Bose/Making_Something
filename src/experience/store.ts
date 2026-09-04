@@ -29,6 +29,12 @@ interface ExperienceState {
   brewRatio: number;
   brewProgress: number; // 0 to 1
   
+  // Shared Shop State
+  selectedProductId: string | null;
+  selectedVariant: string | null; // e.g. '250g', '500g', '1kg'
+  cart: { id: string; productId: string; variant: string; quantity: number; price: number }[];
+  isCartOpen: boolean;
+  
   // Actions
   setHasEntered: (entered: boolean) => void;
   setActiveWorld: (world: World) => void;
@@ -47,6 +53,13 @@ interface ExperienceState {
   setBrewTemperature: (temp: number) => void;
   setBrewRatio: (ratio: number) => void;
   setBrewProgress: (prog: number) => void;
+  
+  setSelectedProduct: (id: string | null) => void;
+  setSelectedVariant: (variant: string | null) => void;
+  addToCart: (item: { productId: string; variant: string; quantity: number; price: number }) => void;
+  removeFromCart: (cartId: string) => void;
+  updateCartQuantity: (cartId: string, quantity: number) => void;
+  setIsCartOpen: (isOpen: boolean) => void;
 }
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
@@ -70,6 +83,11 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   brewTemperature: 94,
   brewRatio: 15,
   brewProgress: 0,
+  
+  selectedProductId: null,
+  selectedVariant: '250g',
+  cart: [],
+  isCartOpen: false,
   
   setHasEntered: (entered) => {
     if (entered) window.dispatchEvent(new CustomEvent('drift:enter'));
@@ -123,4 +141,26 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   setBrewTemperature: (temp) => set({ brewTemperature: temp }),
   setBrewRatio: (ratio) => set({ brewRatio: ratio }),
   setBrewProgress: (prog) => set({ brewProgress: prog }),
+  
+  setSelectedProduct: (id) => set({ selectedProductId: id }),
+  setSelectedVariant: (variant) => set({ selectedVariant: variant }),
+  addToCart: (item) => set((state) => {
+    window.dispatchEvent(new CustomEvent('drift:cartAdd', { detail: { item } }));
+    const existing = state.cart.find(c => c.productId === item.productId && c.variant === item.variant);
+    if (existing) {
+      return {
+        cart: state.cart.map(c => 
+          c.id === existing.id ? { ...c, quantity: c.quantity + item.quantity } : c
+        )
+      };
+    }
+    return { cart: [...state.cart, { ...item, id: crypto.randomUUID() }] };
+  }),
+  removeFromCart: (cartId) => set((state) => ({
+    cart: state.cart.filter(c => c.id !== cartId)
+  })),
+  updateCartQuantity: (cartId, quantity) => set((state) => ({
+    cart: state.cart.map(c => c.id === cartId ? { ...c, quantity } : c)
+  })),
+  setIsCartOpen: (isOpen) => set({ isCartOpen: isOpen }),
 }));

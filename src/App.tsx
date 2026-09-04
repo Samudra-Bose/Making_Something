@@ -6,6 +6,7 @@ import ForkManager from './fork/ForkManager';
 import { useExperienceStore, World } from './experience/store';
 import Entry from './experience/Entry';
 import GlobalNavigation from './experience/GlobalNavigation';
+import Cart from './experience/Cart';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -26,6 +27,9 @@ export default function App() {
       {/* Global Navigation Shell */}
       <GlobalNavigation />
       
+      {/* Cart Drawer */}
+      <Cart />
+      
       {/* The Window System */}
       <div className="relative z-10 w-full h-full p-4 lg:p-12 pt-28 pointer-events-none">
         <div className="w-full h-full pointer-events-auto">
@@ -44,3 +48,4 @@ export default function App() {
     </AppShell>
   );
 }
+

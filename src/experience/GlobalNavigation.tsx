@@ -80,7 +80,45 @@ export default function GlobalNavigation() {
             </motion.button>
           );
         })}
+        
+        {/* Cart Toggle */}
+        <CartToggle />
       </div>
     </motion.div>
+  );
+}
+
+function CartToggle() {
+  const cart = useExperienceStore((state) => state.cart);
+  const setIsCartOpen = useExperienceStore((state) => state.setIsCartOpen);
+  
+  const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+  
+  return (
+    <motion.button
+      onClick={() => setIsCartOpen(true)}
+      className="group relative flex flex-col items-end gap-2 ml-4 lg:ml-12"
+      whileHover={{ y: -2 }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="text-xs tracking-[0.15em] uppercase text-white/50 group-hover:text-white/80 transition-colors duration-500">
+          Cart
+        </span>
+        {count > 0 && (
+          <span className="text-[10px] tabular-nums tracking-widest text-white bg-white/20 px-2 py-0.5 rounded-full">
+            {count}
+          </span>
+        )}
+      </div>
+      <div className="relative w-full h-[1px] bg-white/10 overflow-hidden">
+        <motion.div 
+          className="absolute inset-0 bg-white"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: count > 0 ? 0.3 : 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformOrigin: 'right' }}
+        />
+      </div>
+    </motion.button>
   );
 }
