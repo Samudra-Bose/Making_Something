@@ -1,1 +1,43 @@
 @import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/500.css";
+@import "@fontsource/playfair-display/600.css";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Playfair Display", serif;
+
+  --color-drift-bg: #050708;
+  --color-drift-surface: #0B0F12;
+  --color-drift-surface-hover: #11171B;
+  --color-drift-foreground: #F5F5F5;
+  --color-drift-foreground-muted: #8A9A9D;
+  --color-drift-border: rgba(255, 255, 255, 0.05);
+  --color-drift-accent: #C49F7D;
+  --color-drift-highlight: #E6D0BA;
+  
+  --color-world-origin: #1A1F22;
+  --color-world-roast: #2A1C16;
+  --color-world-brew: #131A1F;
+  --color-world-shop: #1C1C1E;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-drift-bg);
+    color: var(--color-drift-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+}
