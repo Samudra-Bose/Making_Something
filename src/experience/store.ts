@@ -4,6 +4,7 @@ export type World = 'origin' | 'roast' | 'brew' | 'shop';
 export type VisualMode = 'default' | 'cinematic' | 'focus';
 
 interface ExperienceState {
+  hasEntered: boolean;
   activeWorld: World;
   activeFork: World | null;
   openForks: World[];
@@ -15,6 +16,7 @@ interface ExperienceState {
   scroll: number;
   
   // Actions
+  setHasEntered: (entered: boolean) => void;
   setActiveWorld: (world: World) => void;
   openFork: (world: World) => void;
   closeFork: (world: World) => void;
@@ -24,6 +26,7 @@ interface ExperienceState {
 }
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
+  hasEntered: false,
   activeWorld: 'origin',
   activeFork: null,
   openForks: [],
