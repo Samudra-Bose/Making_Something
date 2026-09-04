@@ -65,14 +65,12 @@ export default function ForkPane({ world, isActive, isExpanded, layoutState, chi
       dragElastic={0.15}
       dragMomentum={false}
       onPointerDown={handlePointerDown}
-      style={{ x, y }} // Used for drag offset, which snaps back because of dragConstraints
+      style={{ x, y, borderRadius: '4px' }}
       className={`absolute overflow-hidden flex flex-col pointer-events-auto bg-drift-surface/30 backdrop-blur-md border ${
         isActive 
           ? 'border-drift-accent/40 shadow-[0_20px_50px_rgba(0,0,0,0.5)]' 
           : 'border-drift-border/30 hover:border-drift-border/60 shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
       }`}
-      // Use subtle rounding, architectural feel
-      style={{ borderRadius: '4px' }}
     >
       {/* Window Chrome / Header - Draggable Area */}
       <div 
