@@ -10,35 +10,48 @@ export default function ReactiveField() {
   const brewMethod = useExperienceStore((state) => state.brewMethod);
   const brewProgress = useExperienceStore((state) => state.brewProgress);
   
+  // Helper to interpolate between two numbers
+  const lerp = (start: number, end: number, amt: number) => {
+    return (1 - amt) * start + amt * end;
+  };
+
+  const openForks = useExperienceStore((state) => state.openForks);
+
   // Theme logic based on world
   const getGradient = (world: string) => {
+    const hasRoast = openForks.includes('roast');
+    const hasBrew = openForks.includes('brew');
+    
+    // Roast color calc
+    const heat = Math.sin(roastDevelopment * Math.PI) * 0.5; 
+    const rR = Math.floor(42 + heat * 150);
+    const rG = Math.floor(28 + heat * 50);
+    const rB = Math.floor(22 + heat * 10);
+    
+    // Brew color calc
+    const bR = Math.floor(19 - brewProgress * 10);
+    const bG = Math.floor(26 - brewProgress * 15);
+    const bB = Math.floor(31 - brewProgress * 18);
+    
+    if (hasRoast && hasBrew) {
+      const weightRoast = world === 'roast' ? 0.7 : 0.3;
+      const fR = Math.floor(lerp(bR, rR, weightRoast));
+      const fG = Math.floor(lerp(bG, rG, weightRoast));
+      const fB = Math.floor(lerp(bB, rB, weightRoast));
+      return `radial-gradient(circle at 50% 50%, rgba(${fR},${fG},${fB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
+    }
+
     switch (world) {
       case 'origin': return 'radial-gradient(circle at 50% 50%, var(--color-world-origin) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
       case 'roast': 
-        // When roasting, we intensify the heat (orange/red) based on development. 
-        // Max heat around 0.5 (first crack), then it darkens.
-        const heat = Math.sin(roastDevelopment * Math.PI) * 0.5; 
-        const r = Math.floor(42 + heat * 150);
-        const g = Math.floor(28 + heat * 50);
-        const b = Math.floor(22 + heat * 10);
-        return `radial-gradient(circle at 50% 50%, rgba(${r},${g},${b},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
+        return `radial-gradient(circle at 50% 50%, rgba(${rR},${rG},${rB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
       case 'brew': 
-        // Darkens and deepens as extraction progresses
-        const extR = Math.floor(19 - brewProgress * 10);
-        const extG = Math.floor(26 - brewProgress * 15);
-        const extB = Math.floor(31 - brewProgress * 18);
-        return `radial-gradient(circle at 50% 50%, rgba(${extR},${extG},${extB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
+        return `radial-gradient(circle at 50% 50%, rgba(${bR},${bG},${bB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
       case 'shop': return 'radial-gradient(circle at 50% 50%, var(--color-world-shop) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
       default: return 'radial-gradient(circle at 50% 50%, #11171B 0%, #0B0F12 50%, #050708 100%)';
     }
   };
 
-  const openForks = useExperienceStore((state) => state.openForks);
-
-  // Helper to interpolate between two numbers
-  const lerp = (start: number, end: number, amt: number) => {
-    return (1 - amt) * start + amt * end;
-  };
 
   // Base physics
   let waveAmpX = 40;
