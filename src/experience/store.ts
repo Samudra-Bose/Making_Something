@@ -37,6 +37,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   pointerVelocity: { x: 0, y: 0 },
   scroll: 0,
   
+  setHasEntered: (entered) => set({ hasEntered: entered }),
   setActiveWorld: (world) => set({ activeWorld: world }),
   openFork: (world) => set((state) => ({ 
     openForks: state.openForks.includes(world) ? state.openForks : [...state.openForks, world],
