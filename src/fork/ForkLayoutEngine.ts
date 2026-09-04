@@ -89,10 +89,22 @@ export function computeForkLayout({
         state.width = availableWidth;
         state.height = availableHeight;
       } else if (count === 2) {
-        const halfWidth = (availableWidth - gap) / 2;
-        state.width = halfWidth;
+        const activeIdx = openForks.indexOf(activeFork || openForks[0]);
+        const isDominant = index === activeIdx;
+        
+        const domWidth = availableWidth * 0.6 - gap/2;
+        const subWidth = availableWidth * 0.4 - gap/2;
+        
+        state.width = isDominant ? domWidth : subWidth;
         state.height = availableHeight;
-        state.x = index === 0 ? padding : padding + halfWidth + gap;
+        
+        if (activeIdx === 0) {
+          // left is dominant
+          state.x = index === 0 ? padding : padding + domWidth + gap;
+        } else {
+          // right is dominant
+          state.x = index === 0 ? padding : padding + subWidth + gap;
+        }
         state.y = topOffset;
       } else if (count === 3) {
         // 1 dominant, 2 secondary (stacked on right)

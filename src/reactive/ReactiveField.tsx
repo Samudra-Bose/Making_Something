@@ -33,7 +33,14 @@ export default function ReactiveField() {
     }
   };
 
-  // Compute physics based on world and development
+  const openForks = useExperienceStore((state) => state.openForks);
+
+  // Helper to interpolate between two numbers
+  const lerp = (start: number, end: number, amt: number) => {
+    return (1 - amt) * start + amt * end;
+  };
+
+  // Base physics
   let waveAmpX = 40;
   let waveAmpY = 20;
   let waveSpeedX = 0.02;
@@ -43,62 +50,77 @@ export default function ReactiveField() {
   let maxCursorMove = 120;
   let xGap = 12;
   let yGap = 36;
-  
-  if (activeWorld === 'roast') {
-    // Denser
-    xGap = 8;
-    yGap = 24;
-    // More energetic during transformation
-    const energy = Math.sin(roastDevelopment * Math.PI); // 0 at start, 1 at peak, 0 at end
-    waveAmpX = 40 + energy * 80;
-    waveAmpY = 20 + energy * 60;
-    waveSpeedX = 0.02 + energy * 0.06;
-    waveSpeedY = 0.01 + energy * 0.04;
-    tension = 0.01 + energy * 0.02; // snappier
-  } else if (activeWorld === 'brew') {
-    // Fluid, directional, responsive
-    xGap = 16;
-    yGap = 16;
-    
-    // As extraction (progress) increases, the field becomes more saturated/heavy
-    waveAmpX = 60 - brewProgress * 20;
-    waveAmpY = 15 + brewProgress * 10;
-    waveSpeedX = 0.04 + brewProgress * 0.03; // directional flow
-    waveSpeedY = 0.005;
-    tension = 0.005;
-    friction = 0.96; // slippery/fluid
-    
+
+  // Roast specific physics
+  const getRoastPhysics = () => {
+    const energy = Math.sin(roastDevelopment * Math.PI);
+    return {
+      xGap: 8,
+      yGap: 24,
+      waveAmpX: 40 + energy * 80,
+      waveAmpY: 20 + energy * 60,
+      waveSpeedX: 0.02 + energy * 0.06,
+      waveSpeedY: 0.01 + energy * 0.04,
+      tension: 0.01 + energy * 0.02,
+      friction: 0.9,
+      maxCursorMove: 120
+    };
+  };
+
+  // Brew specific physics
+  const getBrewPhysics = () => {
+    let p = {
+      xGap: 16, yGap: 16,
+      waveAmpX: 60 - brewProgress * 20,
+      waveAmpY: 15 + brewProgress * 10,
+      waveSpeedX: 0.04 + brewProgress * 0.03,
+      waveSpeedY: 0.005,
+      tension: 0.005,
+      friction: 0.96,
+      maxCursorMove: 120
+    };
     if (brewMethod === 'espresso') {
-      // higher pressure, concentrated
-      xGap = 8;
-      yGap = 8;
-      waveAmpX = 40;
-      waveAmpY = 40;
-      waveSpeedX = 0.06;
-      waveSpeedY = 0.04;
-      tension = 0.02;
-      friction = 0.9;
+      p = { ...p, xGap: 8, yGap: 8, waveAmpX: 40, waveAmpY: 40, waveSpeedX: 0.06, waveSpeedY: 0.04, tension: 0.02, friction: 0.9 };
     } else if (brewMethod === 'french-press') {
-      // slower immersion
-      xGap = 20;
-      yGap = 20;
-      waveSpeedX = 0.01;
-      waveSpeedY = 0.01;
-      waveAmpX = 30;
-      waveAmpY = 30;
-      friction = 0.92;
+      p = { ...p, xGap: 20, yGap: 20, waveSpeedX: 0.01, waveSpeedY: 0.01, waveAmpX: 30, waveAmpY: 30, friction: 0.92 };
     }
+    return p;
+  };
+
+  const getShopPhysics = () => ({
+    xGap: 32, yGap: 32,
+    waveAmpX: 10, waveAmpY: 5,
+    waveSpeedX: 0.002, waveSpeedY: 0.001,
+    tension: 0.002, friction: 0.85, maxCursorMove: 60
+  });
+
+  // Composition Rule:
+  // If multiple are open, active world has 70% weight, inactive open world has 30% weight
+  const hasRoast = openForks.includes('roast');
+  const hasBrew = openForks.includes('brew');
+  
+  if (hasRoast && hasBrew) {
+    const roastP = getRoastPhysics();
+    const brewP = getBrewPhysics();
+    const weightRoast = activeWorld === 'roast' ? 0.7 : 0.3;
+    
+    xGap = lerp(brewP.xGap, roastP.xGap, weightRoast);
+    yGap = lerp(brewP.yGap, roastP.yGap, weightRoast);
+    waveAmpX = lerp(brewP.waveAmpX, roastP.waveAmpX, weightRoast);
+    waveAmpY = lerp(brewP.waveAmpY, roastP.waveAmpY, weightRoast);
+    waveSpeedX = lerp(brewP.waveSpeedX, roastP.waveSpeedX, weightRoast);
+    waveSpeedY = lerp(brewP.waveSpeedY, roastP.waveSpeedY, weightRoast);
+    tension = lerp(brewP.tension, roastP.tension, weightRoast);
+    friction = lerp(brewP.friction, roastP.friction, weightRoast);
+  } else if (activeWorld === 'roast') {
+    const p = getRoastPhysics();
+    ({ xGap, yGap, waveAmpX, waveAmpY, waveSpeedX, waveSpeedY, tension, friction, maxCursorMove } = p);
+  } else if (activeWorld === 'brew') {
+    const p = getBrewPhysics();
+    ({ xGap, yGap, waveAmpX, waveAmpY, waveSpeedX, waveSpeedY, tension, friction, maxCursorMove } = p);
   } else if (activeWorld === 'shop') {
-    // Calm, precise, structured, restrained
-    xGap = 32;
-    yGap = 32;
-    waveAmpX = 10;
-    waveAmpY = 5;
-    waveSpeedX = 0.002;
-    waveSpeedY = 0.001;
-    tension = 0.002;
-    friction = 0.85; // heavily damped
-    maxCursorMove = 60; // minimal interaction with background
+    const p = getShopPhysics();
+    ({ xGap, yGap, waveAmpX, waveAmpY, waveSpeedX, waveSpeedY, tension, friction, maxCursorMove } = p);
   }
 
   return (
