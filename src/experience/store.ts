@@ -3,6 +3,8 @@ import { create } from 'zustand';
 export type World = 'origin' | 'roast' | 'brew' | 'shop';
 export type VisualMode = 'default' | 'cinematic' | 'focus';
 
+export type RoastLevel = 'light' | 'medium' | 'medium-dark' | 'dark';
+
 interface ExperienceState {
   hasEntered: boolean;
   activeWorld: World;
@@ -16,6 +18,11 @@ interface ExperienceState {
   pointerVelocity: { x: number; y: number };
   scroll: number;
   
+  // Shared Coffee State
+  coffeeOrigin: string;
+  roastLevel: RoastLevel;
+  roastDevelopment: number; // 0 to 1, maps to progression of roasting
+  
   // Actions
   setHasEntered: (entered: boolean) => void;
   setActiveWorld: (world: World) => void;
@@ -27,6 +34,9 @@ interface ExperienceState {
   setPointer: (x: number, y: number) => void;
   setPointerVelocity: (vx: number, vy: number) => void;
   setScroll: (y: number) => void;
+  setCoffeeOrigin: (origin: string) => void;
+  setRoastLevel: (level: RoastLevel) => void;
+  setRoastDevelopment: (dev: number) => void;
 }
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
@@ -41,6 +51,10 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   pointer: { x: -1000, y: -1000 },
   pointerVelocity: { x: 0, y: 0 },
   scroll: 0,
+  
+  coffeeOrigin: 'Ethiopia / Guji',
+  roastLevel: 'light',
+  roastDevelopment: 0,
   
   setHasEntered: (entered) => {
     if (entered) window.dispatchEvent(new CustomEvent('drift:enter'));
@@ -80,4 +94,11 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   setPointer: (x, y) => set({ pointer: { x, y } }),
   setPointerVelocity: (vx, vy) => set({ pointerVelocity: { x: vx, y: vy } }),
   setScroll: (y) => set({ scroll: y }),
+  
+  setCoffeeOrigin: (origin) => set({ coffeeOrigin: origin }),
+  setRoastLevel: (level) => {
+    window.dispatchEvent(new CustomEvent('drift:roastLevelChange', { detail: { level } }));
+    set({ roastLevel: level });
+  },
+  setRoastDevelopment: (dev) => set({ roastDevelopment: dev }),
 }));
