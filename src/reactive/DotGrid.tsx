@@ -121,30 +121,22 @@ export default function DotGrid() {
           // Physically warp the Y position to simulate rolling hills in 3D
           dotOffsetY += ambientWave * 15;
 
-          let r = 105, g = 117, b = 124; // Base steel: #69757C
+          let r = 106, g = 100, b = 93; // Base Muted Mineral: #6A645D
 
-          // Determine if dot is part of the flowing green energy path
-          const greenEnergy = Math.max(0, Math.sin(x * 0.01 - time05) * Math.cos(y * 0.015 + time03));
-          
-          if (greenEnergy > 0.35) { // Lowered threshold for more frequent appearance
-             const intensity = Math.min(1, (greenEnergy - 0.35) * 1.5); // 0 to 1
-             r = 105 - (71 * intensity); // 34 - 105
-             g = 117 + (80 * intensity); // 197 - 117
-             b = 124 - (30 * intensity); // 94 - 124
-             alpha += intensity * 0.35; // Boost opacity for glowing dots
-          } else if (ambientWave > 0.3) {
-             // Peak of wave gets MUCH brighter silver highlight
+          if (ambientWave > 0.3) {
+             // Peak of wave gets MUCH darker ink highlight (because light theme)
              const intensity = Math.min(1, (ambientWave - 0.3) * 1.5);
-             r = 105 + (105 * intensity);
-             g = 117 + (103 * intensity);
-             b = 124 + (101 * intensity);
-             alpha += intensity * 0.2;
+             r = 106 - (84 * intensity); // down to 22 (Ink)
+             g = 100 - (80 * intensity); // down to 20
+             b = 93 - (75 * intensity);  // down to 18
+             alpha += intensity * 0.3;
           } else if (ambientWave < -0.3) {
-             // Valleys get darker steel/graphite
+             // Valleys get lighter paper tone
              const intensity = Math.min(1, Math.abs(ambientWave + 0.3) * 1.5);
-             r = 105 - (65 * intensity);
-             g = 117 - (72 * intensity);
-             b = 124 - (74 * intensity);
+             r = 106 + (128 * intensity); // up to 234
+             g = 100 + (130 * intensity); // up to 230
+             b = 93 + (130 * intensity);  // up to 223
+             alpha -= intensity * 0.2;
           }
 
           // Fast bounding box check before expensive square root
@@ -210,10 +202,10 @@ export default function DotGrid() {
                   radius += force * 2.5;
                   alpha += force * 0.8;
                   
-                  // Energy pulse color shift during ripple
-                  r = 105 - (71 * force);
-                  g = 117 + (80 * force);
-                  b = 124 - (30 * force);
+                  // Energy pulse color shift during ripple (Subtle Copper)
+                  r = 106 + (48 * force); // up to 154
+                  g = 100 - (10 * force); // down to 90
+                  b = 93 - (40 * force);  // down to 53
                 }
               }
             }

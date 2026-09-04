@@ -21,16 +21,16 @@ export default function GlobalNavigation() {
 
   return (
     <motion.div 
-      className="fixed top-0 left-0 w-full p-6 lg:p-12 z-50 flex justify-between items-start pointer-events-none mix-blend-difference"
+      className="fixed top-0 left-0 w-full p-6 lg:p-12 z-50 flex justify-between items-start pointer-events-none"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex flex-col gap-2 pointer-events-auto">
-        <h1 className="text-xl md:text-2xl font-display text-white tracking-[0.2em] uppercase">
+        <h1 className="text-xl md:text-2xl font-display text-drift-foreground tracking-[0.2em] uppercase">
           Drift
         </h1>
-        <div className="flex gap-2 text-xs font-sans text-white/50 tracking-widest uppercase">
+        <div className="flex gap-2 text-[10px] font-sans text-drift-foreground-muted tracking-widest uppercase">
           {openForks.length > 0 ? `${openForks.length} active` : 'Environment'}
         </div>
       </div>
@@ -59,18 +59,18 @@ export default function GlobalNavigation() {
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             >
               <div className="flex items-center gap-3">
-                <span className={`text-[10px] tracking-widest transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/30 group-hover:text-white/70'}`}>
+                <span className={`text-[10px] tracking-widest transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted/50 group-hover:text-drift-foreground/70'}`}>
                   {world.number}
                 </span>
-                <span className={`text-xs tracking-[0.15em] uppercase transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/50 group-hover:text-white/80'}`}>
+                <span className={`text-[10px] tracking-[0.15em] uppercase transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted group-hover:text-drift-foreground/80'}`}>
                   {world.label}
                 </span>
               </div>
               
               {/* Active Indicator Line */}
-              <div className="relative w-full h-[1px] bg-white/10 overflow-hidden">
+              <div className="relative w-full h-[1px] bg-drift-border overflow-hidden">
                 <motion.div 
-                  className="absolute inset-0 bg-white"
+                  className="absolute inset-0 bg-drift-foreground"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: isActive ? 1 : isOpen ? 0.3 : 0 }}
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -97,22 +97,22 @@ function CartToggle() {
   return (
     <motion.button
       onClick={() => setIsCartOpen(true)}
-      className="group relative flex flex-col items-end gap-2 ml-4 lg:ml-12"
+      className="group relative flex flex-col items-end gap-2 ml-4 lg:ml-12 pointer-events-auto"
       whileHover={{ y: -2 }}
     >
       <div className="flex items-center gap-3">
-        <span className="text-xs tracking-[0.15em] uppercase text-white/50 group-hover:text-white/80 transition-colors duration-500">
+        <span className="text-[10px] tracking-[0.15em] uppercase text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
           Cart
         </span>
         {count > 0 && (
-          <span className="text-[10px] tabular-nums tracking-widest text-white bg-white/20 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] tabular-nums tracking-widest text-drift-bg bg-drift-foreground px-2 py-0.5 rounded-sm">
             {count}
           </span>
         )}
       </div>
-      <div className="relative w-full h-[1px] bg-white/10 overflow-hidden">
+      <div className="relative w-full h-[1px] bg-drift-border overflow-hidden">
         <motion.div 
-          className="absolute inset-0 bg-white"
+          className="absolute inset-0 bg-drift-foreground"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: count > 0 ? 0.3 : 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}

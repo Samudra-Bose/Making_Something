@@ -21,10 +21,10 @@ export default function Entry() {
   return (
     <motion.div 
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-drift-bg/50 backdrop-blur-sm pointer-events-auto"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-drift-bg pointer-events-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.05 }}
+      exit={{ opacity: 0, scale: 1.05 }}
       transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex flex-col items-center gap-12 text-center pointer-events-none">
@@ -49,11 +49,11 @@ export default function Entry() {
 
       <motion.button
         onClick={handleEnter}
-        className="mt-24 px-8 py-4 text-xs tracking-[0.3em] text-drift-foreground uppercase border border-drift-border rounded-full hover:bg-white/5 hover:border-white/20 transition-all duration-500 pointer-events-auto"
+        className="mt-24 px-8 py-4 text-xs tracking-[0.3em] text-drift-foreground uppercase border border-drift-border rounded-sm hover:bg-drift-foreground/5 hover:border-drift-foreground/20 transition-all duration-500 pointer-events-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
-        whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.05)' }}
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         Enter

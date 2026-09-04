@@ -65,27 +65,27 @@ export default function ForkPane({ world, isActive, isExpanded, layoutState, chi
       dragElastic={0.15}
       dragMomentum={false}
       onPointerDown={handlePointerDown}
-      style={{ x, y, borderRadius: '4px' }}
-      className={`absolute overflow-hidden flex flex-col pointer-events-auto bg-drift-surface/30 backdrop-blur-md border ${
+      style={{ x, y }}
+      className={`absolute flex flex-col pointer-events-auto bg-drift-surface border shadow-2xl transition-shadow ${
         isActive 
-          ? 'border-drift-accent/40 shadow-[0_20px_50px_rgba(0,0,0,0.5)]' 
-          : 'border-drift-border/30 hover:border-drift-border/60 shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
+          ? 'border-drift-foreground/20 shadow-[0_20px_50px_rgba(0,0,0,0.15)]' 
+          : 'border-drift-border hover:border-drift-foreground/20 shadow-[0_10px_30px_rgba(0,0,0,0.05)]'
       }`}
     >
       {/* Window Chrome / Header - Draggable Area */}
       <div 
-        className="w-full px-4 py-3 flex justify-between items-center z-50 select-none cursor-grab active:cursor-grabbing bg-black/10 backdrop-blur-sm border-b border-white/5"
+        className="w-full px-6 py-4 flex justify-between items-center z-50 select-none cursor-grab active:cursor-grabbing bg-drift-surface border-b border-drift-border"
         onPointerDown={(e) => {
           // ensure focus happens when clicking header too
           handlePointerDown();
         }}
       >
-        <div className="flex items-center gap-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-drift-accent/60 block" />
-          <h3 className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground/90 font-medium">{world}</h3>
+        <div className="flex items-center gap-4">
+          <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-drift-accent' : 'bg-drift-foreground-muted'}`} />
+          <h3 className="text-[10px] font-sans tracking-[0.25em] uppercase text-drift-foreground font-medium">{world}</h3>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <button 
             className="text-drift-foreground-muted hover:text-drift-foreground transition-colors p-1"
             onClick={toggleExpand}

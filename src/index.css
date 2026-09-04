@@ -11,19 +11,19 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Playfair Display", serif;
 
-  --color-drift-bg: #050708;
-  --color-drift-surface: #0B0F12;
-  --color-drift-surface-hover: #11171B;
-  --color-drift-foreground: #F5F5F5;
-  --color-drift-foreground-muted: #8A9A9D;
-  --color-drift-border: rgba(255, 255, 255, 0.05);
-  --color-drift-accent: #C49F7D;
-  --color-drift-highlight: #E6D0BA;
+  --color-drift-bg: #EAE6DF; /* Paper / Warm Cream */
+  --color-drift-surface: #F5F3EF; /* Lighter Paper */
+  --color-drift-surface-hover: #DEDAD1; /* Muted Mineral */
+  --color-drift-foreground: #161412; /* Deep Espresso / Ink */
+  --color-drift-foreground-muted: #6A645D; /* Muted Mineral */
+  --color-drift-border: rgba(22, 20, 18, 0.15); /* Ink rules */
+  --color-drift-accent: #9A5A35; /* Subtle Copper / Roasted */
+  --color-drift-highlight: #475442; /* Organic Green */
   
-  --color-world-origin: #1A1F22;
-  --color-world-roast: #2A1C16;
-  --color-world-brew: #131A1F;
-  --color-world-shop: #1C1C1E;
+  --color-world-origin: #DFE2DA;
+  --color-world-roast: #EADCD1;
+  --color-world-brew: #D8DFE0;
+  --color-world-shop: #EAE6DF;
 }
 
 @layer base {

@@ -20,6 +20,7 @@ interface ExperienceState {
   
   // Shared Coffee State
   coffeeOrigin: string;
+  coffeeAltitude: number; // 0 to 1, maps to elevation (e.g. 1000m - 2500m)
   roastLevel: RoastLevel;
   roastDevelopment: number; // 0 to 1, maps to progression of roasting
   
@@ -47,6 +48,7 @@ interface ExperienceState {
   setPointerVelocity: (vx: number, vy: number) => void;
   setScroll: (y: number) => void;
   setCoffeeOrigin: (origin: string) => void;
+  setCoffeeAltitude: (alt: number) => void;
   setRoastLevel: (level: RoastLevel) => void;
   setRoastDevelopment: (dev: number) => void;
   setBrewMethod: (method: 'v60' | 'espresso' | 'french-press') => void;
@@ -76,6 +78,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   scroll: 0,
   
   coffeeOrigin: 'Ethiopia / Guji',
+  coffeeAltitude: 0.8, // default high altitude
   roastLevel: 'light',
   roastDevelopment: 0,
   
@@ -129,6 +132,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   setScroll: (y) => set({ scroll: y }),
   
   setCoffeeOrigin: (origin) => set({ coffeeOrigin: origin }),
+  setCoffeeAltitude: (alt) => set({ coffeeAltitude: alt }),
   setRoastLevel: (level) => {
     window.dispatchEvent(new CustomEvent('drift:roastLevelChange', { detail: { level } }));
     set({ roastLevel: level });

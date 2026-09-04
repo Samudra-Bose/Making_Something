@@ -300,16 +300,16 @@ const Waves = ({
         
         if (heat > 0.35) { // Lowered threshold for more frequent appearance
            const intensity = Math.min(1, (heat - 0.35) * 1.5); // 0 to 1
-           grad.addColorStop(0, `rgba(57, 67, 74, ${0.15 + intensity * 0.1})`);
-           grad.addColorStop(highlightPos, `rgba(34, 197, 94, ${0.4 + intensity * 0.6})`);
-           grad.addColorStop(1, `rgba(57, 67, 74, ${0.15 + intensity * 0.1})`);
-           ctx.shadowColor = `rgba(34, 197, 94, ${intensity * 0.8})`;
-           ctx.shadowBlur = intensity * 20;
+           grad.addColorStop(0, `rgba(22, 20, 18, ${0.05 + intensity * 0.05})`);
+           grad.addColorStop(highlightPos, `rgba(154, 90, 53, ${0.2 + intensity * 0.4})`); // Copper
+           grad.addColorStop(1, `rgba(22, 20, 18, ${0.05 + intensity * 0.05})`);
+           ctx.shadowColor = `rgba(154, 90, 53, ${intensity * 0.5})`;
+           ctx.shadowBlur = intensity * 15;
         } else {
-           // Base dark metallic steel with much brighter silver core for contrast
-           grad.addColorStop(0, 'rgba(30, 35, 40, 0.2)');
-           grad.addColorStop(highlightPos, 'rgba(210, 220, 225, 0.6)'); // stronger silver reflection
-           grad.addColorStop(1, 'rgba(30, 35, 40, 0.2)');
+           // Base ink with muted paper reflection
+           grad.addColorStop(0, 'rgba(22, 20, 18, 0.05)');
+           grad.addColorStop(highlightPos, 'rgba(22, 20, 18, 0.3)'); // stronger ink line
+           grad.addColorStop(1, 'rgba(22, 20, 18, 0.05)');
            ctx.shadowBlur = 0;
         }
 

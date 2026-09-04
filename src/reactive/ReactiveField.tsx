@@ -15,43 +15,20 @@ export default function ReactiveField() {
     return (1 - amt) * start + amt * end;
   };
 
+  const coffeeAltitude = useExperienceStore((state) => state.coffeeAltitude);
+
   const openForks = useExperienceStore((state) => state.openForks);
 
   // Theme logic based on world
   const getGradient = (world: string) => {
-    const hasRoast = openForks.includes('roast');
-    const hasBrew = openForks.includes('brew');
-    
-    // Roast color calc
-    const heat = Math.sin(roastDevelopment * Math.PI) * 0.5; 
-    const rR = Math.floor(42 + heat * 150);
-    const rG = Math.floor(28 + heat * 50);
-    const rB = Math.floor(22 + heat * 10);
-    
-    // Brew color calc
-    const bR = Math.floor(19 - brewProgress * 10);
-    const bG = Math.floor(26 - brewProgress * 15);
-    const bB = Math.floor(31 - brewProgress * 18);
-    
-    if (hasRoast && hasBrew) {
-      const weightRoast = world === 'roast' ? 0.7 : 0.3;
-      const fR = Math.floor(lerp(bR, rR, weightRoast));
-      const fG = Math.floor(lerp(bG, rG, weightRoast));
-      const fB = Math.floor(lerp(bB, rB, weightRoast));
-      return `radial-gradient(circle at 50% 50%, rgba(${fR},${fG},${fB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
-    }
-
     switch (world) {
       case 'origin': return 'radial-gradient(circle at 50% 50%, var(--color-world-origin) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
-      case 'roast': 
-        return `radial-gradient(circle at 50% 50%, rgba(${rR},${rG},${rB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
-      case 'brew': 
-        return `radial-gradient(circle at 50% 50%, rgba(${bR},${bG},${bB},1) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)`;
+      case 'roast': return 'radial-gradient(circle at 50% 50%, var(--color-world-roast) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
+      case 'brew': return 'radial-gradient(circle at 50% 50%, var(--color-world-brew) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
       case 'shop': return 'radial-gradient(circle at 50% 50%, var(--color-world-shop) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
-      default: return 'radial-gradient(circle at 50% 50%, #11171B 0%, #0B0F12 50%, #050708 100%)';
+      default: return 'radial-gradient(circle at 50% 50%, var(--color-drift-surface-hover) 0%, var(--color-drift-surface) 50%, var(--color-drift-bg) 100%)';
     }
   };
-
 
   // Base physics
   let waveAmpX = 40;
@@ -64,27 +41,43 @@ export default function ReactiveField() {
   let xGap = 12;
   let yGap = 36;
 
-  // Roast specific physics
-  const getRoastPhysics = () => {
-    const energy = Math.sin(roastDevelopment * Math.PI);
+  // Origin physics based on Altitude (Terrain / Wind / Elevation)
+  const getOriginPhysics = () => {
+    // higher altitude = wider spacing (thinner air), more wind (waveAmp)
     return {
-      xGap: 8,
-      yGap: 24,
-      waveAmpX: 40 + energy * 80,
-      waveAmpY: 20 + energy * 60,
-      waveSpeedX: 0.02 + energy * 0.06,
-      waveSpeedY: 0.01 + energy * 0.04,
-      tension: 0.01 + energy * 0.02,
-      friction: 0.9,
-      maxCursorMove: 120
+      xGap: 8 + coffeeAltitude * 12, // 8 to 20
+      yGap: 24 + coffeeAltitude * 24, // 24 to 48
+      waveAmpX: 30 + coffeeAltitude * 40,
+      waveAmpY: 10 + coffeeAltitude * 20,
+      waveSpeedX: 0.01 + coffeeAltitude * 0.02,
+      waveSpeedY: 0.005 + coffeeAltitude * 0.01,
+      tension: 0.01,
+      friction: 0.94,
+      maxCursorMove: 100
     };
   };
 
-  // Brew specific physics
+  // Roast specific physics based on Development (Heat / Expansion / Pressure)
+  const getRoastPhysics = () => {
+    const energy = Math.sin(roastDevelopment * Math.PI); // Peaks at 0.5 (first crack)
+    return {
+      xGap: 12 - energy * 6, // Expansion/density increases
+      yGap: 36 - energy * 18,
+      waveAmpX: 40 + energy * 80, // Heat turbulence
+      waveAmpY: 20 + energy * 60,
+      waveSpeedX: 0.02 + energy * 0.06,
+      waveSpeedY: 0.01 + energy * 0.04,
+      tension: 0.01 + energy * 0.03, // Pressure
+      friction: 0.9 - energy * 0.05, // More erratic
+      maxCursorMove: 150
+    };
+  };
+
+  // Brew specific physics (Water / Flow / Vortex)
   const getBrewPhysics = () => {
     let p = {
       xGap: 16, yGap: 16,
-      waveAmpX: 60 - brewProgress * 20,
+      waveAmpX: 60 - brewProgress * 20, // settles as it extracts
       waveAmpY: 15 + brewProgress * 10,
       waveSpeedX: 0.04 + brewProgress * 0.03,
       waveSpeedY: 0.005,
@@ -93,13 +86,16 @@ export default function ReactiveField() {
       maxCursorMove: 120
     };
     if (brewMethod === 'espresso') {
-      p = { ...p, xGap: 8, yGap: 8, waveAmpX: 40, waveAmpY: 40, waveSpeedX: 0.06, waveSpeedY: 0.04, tension: 0.02, friction: 0.9 };
+      // High pressure, tight vortex
+      p = { ...p, xGap: 6, yGap: 6, waveAmpX: 40, waveAmpY: 40, waveSpeedX: 0.06, waveSpeedY: 0.04, tension: 0.02, friction: 0.9 };
     } else if (brewMethod === 'french-press') {
-      p = { ...p, xGap: 20, yGap: 20, waveSpeedX: 0.01, waveSpeedY: 0.01, waveAmpX: 30, waveAmpY: 30, friction: 0.92 };
+      // Slow immersion
+      p = { ...p, xGap: 24, yGap: 24, waveSpeedX: 0.008, waveSpeedY: 0.008, waveAmpX: 30, waveAmpY: 30, friction: 0.92 };
     }
     return p;
   };
 
+  // Shop physics (Restrained)
   const getShopPhysics = () => ({
     xGap: 32, yGap: 32,
     waveAmpX: 10, waveAmpY: 5,
@@ -107,24 +103,10 @@ export default function ReactiveField() {
     tension: 0.002, friction: 0.85, maxCursorMove: 60
   });
 
-  // Composition Rule:
-  // If multiple are open, active world has 70% weight, inactive open world has 30% weight
-  const hasRoast = openForks.includes('roast');
-  const hasBrew = openForks.includes('brew');
-  
-  if (hasRoast && hasBrew) {
-    const roastP = getRoastPhysics();
-    const brewP = getBrewPhysics();
-    const weightRoast = activeWorld === 'roast' ? 0.7 : 0.3;
-    
-    xGap = lerp(brewP.xGap, roastP.xGap, weightRoast);
-    yGap = lerp(brewP.yGap, roastP.yGap, weightRoast);
-    waveAmpX = lerp(brewP.waveAmpX, roastP.waveAmpX, weightRoast);
-    waveAmpY = lerp(brewP.waveAmpY, roastP.waveAmpY, weightRoast);
-    waveSpeedX = lerp(brewP.waveSpeedX, roastP.waveSpeedX, weightRoast);
-    waveSpeedY = lerp(brewP.waveSpeedY, roastP.waveSpeedY, weightRoast);
-    tension = lerp(brewP.tension, roastP.tension, weightRoast);
-    friction = lerp(brewP.friction, roastP.friction, weightRoast);
+  // Apply physics based on active world (driving it by coffee state)
+  if (activeWorld === 'origin') {
+    const p = getOriginPhysics();
+    ({ xGap, yGap, waveAmpX, waveAmpY, waveSpeedX, waveSpeedY, tension, friction, maxCursorMove } = p);
   } else if (activeWorld === 'roast') {
     const p = getRoastPhysics();
     ({ xGap, yGap, waveAmpX, waveAmpY, waveSpeedX, waveSpeedY, tension, friction, maxCursorMove } = p);
