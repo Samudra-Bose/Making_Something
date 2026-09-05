@@ -16,10 +16,20 @@ export default function GlobalNavigation() {
   const closeFork = useExperienceStore((state) => state.closeFork);
   const focusFork = useExperienceStore((state) => state.focusFork);
   const hasEntered = useExperienceStore((state) => state.hasEntered);
+  const globalProgress = useExperienceStore((state) => state.globalProgress);
 
   if (!hasEntered) return null;
 
   return (
+    <>
+      {/* Story progress line at very top */}
+      <div className="fixed top-0 left-0 w-full h-[2px] z-[60] bg-drift-border/20 pointer-events-none">
+        <motion.div
+          className="h-full bg-drift-accent origin-left"
+          style={{ scaleX: globalProgress }}
+          transition={{ type: 'spring', stiffness: 60, damping: 20 }}
+        />
+      </div>
     <motion.div 
       className="fixed top-0 left-0 w-full p-6 lg:p-12 z-50 flex justify-between items-start pointer-events-none"
       initial={{ opacity: 0, y: -20 }}
@@ -87,6 +97,7 @@ export default function GlobalNavigation() {
         <CartToggle />
       </div>
     </motion.div>
+    </>
   );
 }
 
