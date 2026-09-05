@@ -20,9 +20,7 @@ export default function Brew() {
   const setBrewTemperature = useExperienceStore((state) => state.setBrewTemperature);
   const setBrewRatio = useExperienceStore((state) => state.setBrewRatio);
   const setBrewProgress = useExperienceStore((state) => state.setBrewProgress);
-  const setPointerVelocity = useExperienceStore((state) => state.setPointerVelocity);
 
-  // Recommendations based on Roast Level
   const getRecommendation = () => {
     switch(roastLevel) {
       case 'light': return { method: 'v60', temp: 96, ratio: 16 };
@@ -34,83 +32,54 @@ export default function Brew() {
   };
 
   useEffect(() => {
-    // Apply recommended initial settings
     const rec = getRecommendation();
     setBrewMethod(rec.method as any);
     setBrewTemperature(rec.temp);
     setBrewRatio(rec.ratio);
-  }, [roastLevel]); // Update if roast changes
+  }, [roastLevel]);
 
-  // Scroll sequence choreography
   useEffect(() => {
     if (!containerRef.current) return;
     const scroller = containerRef.current;
     
-    // Create scroll trigger for the ritual progression (State Updater - Keep out of matchMedia)
-    const scrollSections = gsap.utils.toArray('.brew-stage') as HTMLElement[];
-    const triggers: ScrollTrigger[] = [];
-    
-    scrollSections.forEach((section, i) => {
-      const st = ScrollTrigger.create({
-        trigger: section,
-        scroller: scroller,
-        start: 'top center',
-        end: 'bottom center',
-        onUpdate: (self) => {
-          const totalProgress = (i + self.progress) / scrollSections.length;
-          setBrewProgress(totalProgress);
-        }
-      });
-      triggers.push(st);
+    // Overall Brew Progress
+    const st = ScrollTrigger.create({
+      trigger: scroller.querySelector('.st-brew-sequence'),
+      scroller: scroller,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: (self) => {
+        setBrewProgress(self.progress);
+      }
     });
 
     const mm = gsap.matchMedia(scroller);
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      scrollSections.forEach((section, i) => {
-        ScrollTrigger.create({
-          trigger: section,
-          scroller: scroller,
-          start: 'top center',
-          end: 'bottom center',
-          onEnter: () => {
-            gsap.to(section, { opacity: 1, y: 0, duration: 1, ease: 'power3.out' });
-          },
-          onLeaveBack: () => {
-            gsap.to(section, { opacity: 0.3, y: 20, duration: 1, ease: 'power3.out' });
-          }
-        });
-      });
-
-      gsap.fromTo('.st-brew-image-reveal',
-        { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
-        {
-          clipPath: 'inset(0% 0% 0% 0%)',
-          scale: 1,
-          scrollTrigger: {
-            trigger: '.st-brew-image-reveal',
-            scroller: scroller,
-            start: 'top 90%',
-            end: 'top 40%',
-            scrub: 1
-          }
-        }
-      );
-
-      gsap.fromTo('.st-brew-image-parallax',
-        { y: -30, scale: 1.1 },
-        {
-          y: 30,
-          scrollTrigger: {
-            trigger: '.st-brew-image-reveal',
-            scroller: scroller,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true
-          }
-        }
+      // Grind interactions
+      gsap.fromTo('.st-grind-img', 
+        { scale: 1.2, rotation: 5 }, 
+        { scale: 1, rotation: 0, scrollTrigger: { trigger: '.st-grind', scroller: scroller, scrub: true } }
       );
       
+      // Water interactions
+      gsap.fromTo('.st-water-level',
+        { yPercent: 100 },
+        { yPercent: 0, scrollTrigger: { trigger: '.st-water', scroller: scroller, start: 'top center', end: 'bottom center', scrub: true } }
+      );
+
+      // Bloom interactions
+      gsap.fromTo('.st-bloom-expand',
+        { scale: 0.8, filter: 'brightness(1.5)' },
+        { scale: 1.1, filter: 'brightness(0.8)', scrollTrigger: { trigger: '.st-bloom', scroller: scroller, start: 'top center', end: 'center center', scrub: true } }
+      );
+
+      // Pour interactions
+      gsap.fromTo('.st-pour-stream',
+        { scaleY: 0, transformOrigin: 'top' },
+        { scaleY: 1, scrollTrigger: { trigger: '.st-pour', scroller: scroller, start: 'top center', end: 'center center', scrub: true } }
+      );
+
       // Auto-transition to Shop at the bottom
       ScrollTrigger.create({
         trigger: '.st-transition-trigger',
@@ -129,195 +98,199 @@ export default function Brew() {
     });
 
     return () => {
-      triggers.forEach(t => t.kill());
+      st.kill();
       mm.revert();
       setBrewProgress(0);
     };
   }, []);
 
-  // Pour interaction (directional flow)
-  const handlePourPointerMove = (e: React.PointerEvent) => {
-    if (e.buttons > 0) { // If pointer down/dragging
-      // Emulate turbulence and flow
-      setPointerVelocity(e.movementX * 3, e.movementY * 3);
-      
-      // Dispatch a pour event that ReactiveField could optionally listen to
-      window.dispatchEvent(new CustomEvent('drift:pour', { 
-        detail: { x: e.clientX, y: e.clientY, intensity: Math.abs(e.movementY) } 
-      }));
-    }
-  };
-
   return (
-    <div ref={containerRef} className="w-full h-full overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar pb-[50vh]">
+    <div ref={containerRef} className="w-full h-full overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar text-drift-foreground bg-drift-bg pb-[30vh]">
       
       {/* Intro / Hero */}
-      <div className="brew-stage min-h-[70vh] flex flex-col justify-center px-8 lg:px-16 pt-24">
-        <h2 className="text-4xl lg:text-6xl font-display font-medium tracking-tight mb-6">Ritual</h2>
-        <div className="flex flex-col gap-2 text-drift-foreground-muted font-sans text-sm tracking-widest uppercase">
-          <p>Selected: <span className="text-drift-foreground">{coffeeOrigin}</span></p>
-          <p>Profile: <span className="text-drift-foreground">{roastLevel}</span></p>
-        </div>
-      </div>
-
-      {/* EDITORIAL IMAGE */}
-      <div className="w-full px-8 lg:px-16 mb-24">
-        <div className="w-full h-[60vh] md:h-[70vh] overflow-hidden border border-drift-border p-2 bg-drift-surface relative group">
-          <div className="w-full h-full overflow-hidden st-brew-image-reveal">
-            <img 
-              src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop" 
-              alt="Pouring Coffee" 
-              className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-1000 st-brew-image-parallax"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Preparation / Method Selection */}
-      <div className="brew-stage min-h-[80vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8">
-        <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-12">01. Prepare</h3>
+      <section className="min-h-screen flex flex-col justify-center px-8 lg:px-16 relative">
+        <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-4">
+          {coffeeOrigin} • {roastLevel}
+        </h4>
+        <h2 className="text-6xl md:text-8xl lg:text-9xl font-display font-medium tracking-tight mb-8 leading-[0.9]">
+          The<br/>Extraction
+        </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
+        {/* Method Selector */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mt-12 relative z-10">
           {(['v60', 'espresso', 'french-press'] as const).map(method => {
             const isSelected = brewMethod === method;
-            const isRecommended = getRecommendation().method === method;
-            
             return (
-              <motion.button
+              <button
                 key={method}
                 onClick={() => setBrewMethod(method)}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                className={`flex flex-col items-start p-6 rounded-sm border transition-all duration-500 ${
-                  isSelected 
-                    ? 'border-drift-foreground bg-drift-surface shadow-xl' 
-                    : 'border-drift-border hover:border-drift-foreground/30 bg-drift-surface'
+                className={`text-left p-4 border-b transition-all duration-300 ${
+                  isSelected ? 'border-drift-foreground text-drift-foreground' : 'border-drift-border text-drift-foreground-muted hover:border-drift-foreground/50'
                 }`}
               >
-                <span className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-4 flex items-center justify-between w-full">
-                  {method}
-                  {isRecommended && <span className="text-[10px] text-drift-accent">Rec</span>}
-                </span>
-                <span className={`font-display text-xl transition-colors duration-500 ${isSelected ? 'text-drift-foreground' : 'text-drift-foreground-muted'}`}>
-                  {method === 'v60' ? 'Pour Over' : method === 'espresso' ? 'Pressure' : 'Immersion'}
-                </span>
-              </motion.button>
+                <div className="text-[10px] tracking-widest uppercase mb-2">Method</div>
+                <div className="font-display text-xl">{method === 'v60' ? 'Pour Over' : method === 'espresso' ? 'Espresso' : 'Immersion'}</div>
+              </button>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Variables: Temperature & Ratio */}
-      <div className="brew-stage min-h-[80vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8">
-        <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-12">02. Calibration</h3>
+      <div className="st-brew-sequence">
         
-        <div className="flex flex-col md:flex-row gap-16 max-w-4xl">
-          {/* Temperature */}
-          <div className="flex-1">
-            <div className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-4">Water Temp</div>
-            <div className="font-display text-5xl lg:text-7xl tabular-nums text-drift-foreground tracking-tighter flex items-end">
-              {brewTemperature}<span className="text-2xl lg:text-4xl text-drift-foreground-muted mb-2 ml-1">°C</span>
+        {/* SECTION 01: GRIND */}
+        <section className="st-grind min-h-[120vh] flex flex-col justify-center px-8 lg:px-16 relative">
+          <div className="w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+            <div className="flex-1 w-full overflow-hidden border border-drift-border p-2 bg-drift-surface">
+              <img 
+                src="https://images.unsplash.com/photo-1495474472205-51f75f23b1fb?q=80&w=2070&auto=format&fit=crop" 
+                alt="Coffee Beans" 
+                className="st-grind-img w-full aspect-square object-cover grayscale contrast-125 saturate-50 mix-blend-multiply"
+              />
             </div>
-            <input 
-              type="range" 
-              min="85" max="100" 
-              value={brewTemperature} 
-              onChange={(e) => setBrewTemperature(parseInt(e.target.value))}
-              className="w-full mt-8 accent-drift-foreground bg-drift-surface-hover h-1 rounded-sm appearance-none outline-none" 
+            <div className="flex-1 w-full flex flex-col justify-center">
+              <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mb-4">01 — Preparation</div>
+              <h3 className="text-4xl lg:text-6xl font-display mb-6">Grind</h3>
+              <p className="text-sm font-sans leading-relaxed text-drift-foreground/80 max-w-md">
+                Increasing the surface area is the first step of extraction. 
+                {brewMethod === 'espresso' ? ' A fine, uniform grind creates the necessary resistance for high pressure.' : 
+                 brewMethod === 'french-press' ? ' A coarse grind allows for slow, even immersion without over-extracting bitter compounds.' : 
+                 ' A medium-fine grind allows water to flow through the bed evenly, pulling clarity and sweetness.'}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 02: WATER */}
+        <section className="st-water min-h-[120vh] flex flex-col justify-center px-8 lg:px-16 relative overflow-hidden bg-drift-surface border-y border-drift-border">
+          <div className="absolute inset-0 z-0">
+             <div className="st-water-level absolute inset-x-0 bottom-0 top-1/2 bg-drift-bg/50 border-t border-drift-border"></div>
+          </div>
+          <div className="w-full max-w-4xl mx-auto relative z-10 flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-24">
+            <div className="flex-1 w-full overflow-hidden p-2">
+              <img 
+                src="https://images.unsplash.com/photo-1610632380989-680fe0c80b27?q=80&w=2187&auto=format&fit=crop" 
+                alt="Water" 
+                className="w-full aspect-[4/3] object-cover grayscale contrast-[1.1] opacity-90 mix-blend-multiply"
+              />
+            </div>
+            <div className="flex-1 w-full flex flex-col justify-center">
+              <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mb-4">02 — Solvent</div>
+              <h3 className="text-4xl lg:text-6xl font-display mb-6">Water</h3>
+              <div className="font-display text-7xl lg:text-9xl tabular-nums text-drift-foreground tracking-tighter my-8 border-b border-drift-border pb-4 w-max">
+                {brewTemperature}<span className="text-3xl text-drift-foreground-muted">°C</span>
+              </div>
+              <p className="text-sm font-sans leading-relaxed text-drift-foreground/80 max-w-md">
+                Temperature dictates solubility. Higher heat extracts rapidly, pulling acids first, then sugars, and finally bitter compounds.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 03: BLOOM */}
+        <section className="st-bloom min-h-[120vh] flex flex-col justify-center px-8 lg:px-16 relative">
+          <div className="w-full h-screen absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1542181514-69974204859a?q=80&w=1968&auto=format&fit=crop" 
+              alt="Bloom Texture"
+              className="st-bloom-expand w-[120vw] h-[120vh] object-cover mix-blend-multiply"
             />
           </div>
-          
-          {/* Ratio */}
-          <div className="flex-1">
-            <div className="text-xs tracking-widest uppercase text-drift-foreground-muted mb-4">Ratio (Coffee : Water)</div>
-            <div className="font-display text-5xl lg:text-7xl tabular-nums text-drift-foreground tracking-tighter">
-              1 : {brewRatio}
+          <div className="max-w-2xl mx-auto text-center relative z-10">
+            <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mb-4">03 — Awakening</div>
+            <h3 className="text-5xl lg:text-8xl font-display mb-8">Bloom</h3>
+            <p className="text-lg font-sans leading-relaxed text-drift-foreground max-w-md mx-auto">
+              As water hits the grounds, trapped carbon dioxide violently escapes. The bed expands, releasing the first intense wave of aromatics.
+            </p>
+          </div>
+        </section>
+
+        {/* SECTION 04: POUR */}
+        <section className="st-pour min-h-[150vh] flex flex-col justify-center px-8 lg:px-16 relative">
+           <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
+             <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mb-4 self-start">04 — Agitation</div>
+             <div className="flex w-full justify-between items-end mb-12 border-b border-drift-border pb-8">
+               <h3 className="text-4xl lg:text-7xl font-display">The Pour</h3>
+               <div className="text-right">
+                 <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mb-2">Ratio</div>
+                 <div className="font-display text-4xl lg:text-6xl tracking-tight text-drift-foreground">1:{brewRatio}</div>
+               </div>
+             </div>
+             
+             <div className="w-full aspect-[21/9] border border-drift-border relative overflow-hidden bg-drift-surface">
+               <div className="absolute top-0 left-1/2 w-[2px] h-[30%] bg-drift-foreground/30 -translate-x-1/2 st-pour-stream origin-top"></div>
+               <img 
+                 src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop" 
+                 alt="Pouring" 
+                 className="w-full h-full object-cover filter grayscale contrast-125 mix-blend-multiply opacity-80"
+               />
+             </div>
+           </div>
+        </section>
+
+        {/* SECTION 05: EXTRACTION */}
+        <section className="min-h-[120vh] flex flex-col justify-center px-8 lg:px-16 bg-drift-surface border-y border-drift-border relative">
+          <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div>
+              <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mb-4">05 — Chemistry</div>
+              <h3 className="text-4xl lg:text-6xl font-display mb-8">Extraction</h3>
+              <p className="text-sm font-sans leading-relaxed text-drift-foreground/80 mb-12">
+                Water acts as a solvent, pulling soluble compounds from the cellular structure of the roasted seed into the liquid. Too fast, it is sour and empty. Too slow, it becomes bitter and astringent.
+              </p>
             </div>
-            <input 
-              type="range" 
-              min="2" max="20" step="0.5"
-              value={brewRatio} 
-              onChange={(e) => setBrewRatio(parseFloat(e.target.value))}
-              className="w-full mt-8 accent-drift-foreground bg-drift-surface-hover h-1 rounded-sm appearance-none outline-none" 
+            <div className="flex flex-col justify-center items-end">
+              <div className="font-display text-[12vw] md:text-[8vw] leading-none text-drift-foreground tracking-tighter">
+                {Math.floor(brewProgress * 100)}<span className="text-4xl text-drift-foreground-muted ml-2">%</span>
+              </div>
+              <div className="w-full h-[1px] bg-drift-border mt-4 relative">
+                <div className="absolute top-0 right-0 h-full bg-drift-foreground" style={{ width: `${brewProgress * 100}%` }}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 06: CUP */}
+        <section className="min-h-[120vh] flex flex-col justify-center px-8 lg:px-16 relative">
+          <AntiGravity depth={0.5} className="w-full max-w-xl mx-auto aspect-[3/4] border border-drift-border p-3 bg-drift-bg shadow-2xl z-10">
+            <img 
+              src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" 
+              alt="The Cup" 
+              className="w-full h-full object-cover filter contrast-125 saturate-50"
             />
+          </AntiGravity>
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full text-center pointer-events-none">
+            <h3 className="text-[12vw] font-display text-drift-foreground/5 opacity-50 tracking-tighter uppercase whitespace-nowrap mix-blend-multiply">
+              The Ritual Resolves
+            </h3>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* The Pour / Interaction */}
-      <div className="brew-stage min-h-[90vh] flex flex-col justify-center items-center px-8 lg:px-16 opacity-30 translate-y-8">
-        <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-8 self-start w-full max-w-3xl">03. The Pour</h3>
-        
-        <motion.div 
-          className="w-full max-w-3xl aspect-[16/9] border border-drift-border rounded-sm flex items-center justify-center relative cursor-ns-resize overflow-hidden group bg-drift-surface/50"
-          onPointerMove={handlePourPointerMove}
-          whileHover={{ borderColor: 'var(--color-drift-foreground)' }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-drift-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-          <div className="text-center pointer-events-none z-10">
-            <div className="font-display text-2xl md:text-4xl text-drift-foreground/50 group-hover:text-drift-foreground transition-colors duration-500">
-              Hold and drag to pour
-            </div>
-            <div className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground-muted mt-4">
-              Movement creates turbulence
-            </div>
+        {/* SECTION 07: TASTE / CHARACTER */}
+        <section className="st-transition-trigger min-h-screen flex flex-col justify-center px-8 lg:px-16 relative bg-drift-foreground text-drift-bg">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-bg/50 mb-12">07 — Character</div>
+            <h3 className="text-5xl md:text-7xl lg:text-8xl font-display mb-12 leading-tight">
+              {roastLevel === 'light' ? 'Jasmine, Citrus & Bright Acidity.' : 
+               roastLevel === 'medium' ? 'Stone Fruit, Caramel & Balanced Sweetness.' : 
+               'Dark Cocoa, Toasted Nuts & Heavy Body.'}
+            </h3>
+            
+            <button 
+              onClick={() => {
+                const state = useExperienceStore.getState();
+                if (!state.openForks.includes('shop')) {
+                  state.openFork('shop');
+                }
+                state.focusFork('shop');
+              }}
+              className="mt-24 text-xs font-sans tracking-[0.2em] uppercase text-drift-bg border-b border-drift-bg/30 pb-2 hover:border-drift-bg transition-colors"
+            >
+              Acquire in Shop
+            </button>
           </div>
-        </motion.div>
-      </div>
+        </section>
 
-      {/* Extraction Visualization */}
-      <div className="brew-stage min-h-[90vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8 relative">
-        <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-12">04. Extraction</h3>
-        
-        <div className="font-display text-7xl lg:text-9xl text-drift-foreground tabular-nums tracking-tighter">
-          {Math.min(100, Math.floor(brewProgress * 130))}%
-        </div>
-        <div className="text-sm font-sans tracking-widest uppercase text-drift-foreground-muted mt-4">
-          Dissolving sensory compounds
-        </div>
-        
-        <div className="w-full h-1 bg-drift-border mt-12 max-w-2xl rounded-sm overflow-hidden">
-          <motion.div 
-            className="h-full bg-drift-foreground" 
-            style={{ width: `${Math.min(100, brewProgress * 130)}%` }}
-            layout
-          />
-        </div>
       </div>
-
-      {/* EDITORIAL IMAGE */}
-      <div className="w-full px-8 lg:px-16 mb-32 flex justify-center">
-        <AntiGravity depth={0.6} className="w-full max-w-2xl h-[50vh] overflow-hidden border border-drift-border p-2 bg-drift-surface relative shadow-xl">
-          <img 
-            src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" 
-            alt="Brewed Coffee" 
-            className="w-full h-full object-cover filter contrast-125 saturate-50"
-          />
-        </AntiGravity>
-      </div>
-
-      {/* Finish */}
-      <div className="st-transition-trigger brew-stage min-h-[70vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8">
-        <h2 className="text-4xl lg:text-6xl font-display font-medium tracking-tight mb-6">The Cup</h2>
-        <p className="max-w-md text-drift-foreground-muted font-sans leading-relaxed">
-          The ritual resolves. Aroma, body, and acidity stabilize into their final form.
-        </p>
-        <div className="mt-12">
-          <button 
-            onClick={() => {
-              const state = useExperienceStore.getState();
-              if (!state.openForks.includes('shop')) {
-                state.openFork('shop');
-              }
-              state.focusFork('shop');
-            }}
-            className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground border-b border-drift-border pb-1 hover:border-drift-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground"
-          >
-            Experience Shop
-          </button>
-        </div>
-      </div>
-
     </div>
   );
 }
