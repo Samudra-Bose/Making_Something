@@ -3,6 +3,7 @@ import { useExperienceStore } from '../experience/store';
 import DotGrid from './DotGrid';
 import Waves from './Waves';
 import { motion, AnimatePresence } from 'motion/react';
+import { useScrollVelocity } from './useScrollVelocity';
 
 export default function ReactiveField() {
   const activeWorld = useExperienceStore((state) => state.activeWorld);
@@ -255,8 +256,16 @@ export default function ReactiveField() {
   // Scroll-driven deformation
   // A subtle breathing or distortion based on scroll velocity/position
   const scrollFactor = Math.min(1, scroll / 2000);
-  waveAmpY += scrollFactor * 30;
+  const velocity = useScrollVelocity(scroll);
+  
+  // Velocity accelerates environment
+  const velocityFactor = Math.min(1, velocity * 2);
+  
+  waveAmpY += scrollFactor * 30 + velocityFactor * 50;
+  waveAmpX += velocityFactor * 20;
   tension -= scrollFactor * 0.005;
+  tension += velocityFactor * 0.02; // Tenses up when scrolling fast
+  friction = Math.max(0.7, friction - velocityFactor * 0.1); // Becomes more fluid
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
