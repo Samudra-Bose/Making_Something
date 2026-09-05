@@ -87,29 +87,31 @@ export default function ForkPane({ world, isActive, isExpanded, layoutState, chi
         
         <div className="flex items-center gap-4">
           <button 
-            className="text-drift-foreground-muted hover:text-drift-foreground transition-colors p-1"
+            className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground transition-colors p-1"
             onClick={toggleExpand}
             title={isExpanded ? "Collapse" : "Expand"}
+            aria-label={isExpanded ? `Collapse ${world}` : `Expand ${world}`}
           >
             {isExpanded ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" />
               </svg>
             ) : (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
               </svg>
             )}
           </button>
           <button 
-            className="text-drift-foreground-muted hover:text-drift-foreground transition-colors p-1"
+            className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground transition-colors p-1"
             onClick={(e) => {
               e.stopPropagation();
               closeFork(world as World);
             }}
             title="Close"
+            aria-label={`Close ${world}`}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>

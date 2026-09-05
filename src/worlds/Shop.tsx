@@ -38,13 +38,14 @@ function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 pb-32">
         {DRIFT_COLLECTION.map((product, index) => (
-          <motion.div
+          <motion.button
             key={product.id}
             whileHover={{ y: -8 }}
-            className="group flex flex-col cursor-pointer border border-drift-border hover:border-drift-foreground/50 bg-drift-surface p-6 lg:p-8 transition-colors duration-500 rounded-sm shadow-md hover:shadow-xl"
+            className="group flex flex-col text-left cursor-pointer border border-drift-border hover:border-drift-foreground/50 bg-drift-surface p-6 lg:p-8 transition-colors duration-500 rounded-sm shadow-md hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-drift-accent"
             onClick={() => onSelect(product.id)}
+            aria-label={`View ${product.name}`}
           >
-            <div className="flex justify-between items-start mb-8">
+            <div className="flex justify-between items-start mb-8 w-full">
               <span className="text-[10px] tracking-[0.2em] text-drift-foreground-muted uppercase border border-drift-border px-2 py-1 rounded-sm">
                 No. 0{index + 1}
               </span>
@@ -80,7 +81,7 @@ function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
                 <span className="text-xs text-drift-foreground capitalize">{product.roast}</span>
               </div>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
     </motion.div>
@@ -142,9 +143,10 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
     >
       <button 
         onClick={onBack}
-        className="self-start text-[10px] tracking-[0.2em] uppercase text-drift-foreground-muted hover:text-drift-foreground transition-colors mb-12 flex items-center gap-2"
+        className="self-start text-[10px] tracking-[0.2em] uppercase text-drift-foreground-muted hover:text-drift-foreground transition-colors mb-12 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1"
+        aria-label="Return to Collection"
       >
-        <span>←</span> Return to Collection
+        <span aria-hidden="true">←</span> Return to Collection
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
@@ -206,11 +208,13 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
                   <button
                     key={v.id}
                     onClick={() => setSelectedVariant(v.id)}
-                    className={`py-3 text-xs tracking-widest uppercase transition-colors rounded-sm border ${
+                    className={`py-3 text-xs tracking-widest uppercase transition-colors rounded-sm border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-drift-accent ${
                       selectedVariant === v.id
                         ? 'border-drift-foreground bg-drift-foreground text-drift-bg'
                         : 'border-drift-border hover:border-drift-foreground text-drift-foreground-muted'
                     }`}
+                    aria-label={`Select ${v.label} weight`}
+                    aria-pressed={selectedVariant === v.id}
                   >
                     {v.label}
                   </button>
@@ -222,7 +226,8 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleAddToCart}
-              className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm transition-colors opacity-90 hover:opacity-100"
+              className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm transition-colors opacity-90 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-drift-accent focus-visible:ring-offset-2 focus-visible:ring-offset-drift-surface"
+              aria-label={`Add ${product.name} to cart`}
             >
               Add to Cart
             </motion.button>
@@ -237,7 +242,8 @@ function ContextLink({ label, world, onClick }: { label: string, world: string, 
   return (
     <button 
       onClick={onClick}
-      className="flex items-center justify-between p-4 border border-drift-border hover:border-drift-foreground bg-drift-surface transition-all text-left group rounded-sm"
+      className="flex items-center justify-between p-4 border border-drift-border hover:border-drift-foreground bg-drift-surface transition-all text-left group rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground"
+      aria-label={`Go to ${label}`}
     >
       <span className="text-xs tracking-widest uppercase text-drift-foreground group-hover:text-drift-foreground transition-colors">
         {label}

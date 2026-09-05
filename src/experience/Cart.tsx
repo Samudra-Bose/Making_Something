@@ -54,7 +54,7 @@ export default function Cart() {
             <header className="p-8 border-b border-drift-border flex justify-between items-center">
               <div className="flex items-center gap-4">
                 {isCheckout && !isSuccess && (
-                  <button onClick={() => setIsCheckout(false)} className="text-drift-foreground-muted hover:text-drift-foreground">
+                  <button onClick={() => setIsCheckout(false)} className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1" aria-label="Back to Cart">
                     ←
                   </button>
                 )}
@@ -64,7 +64,8 @@ export default function Cart() {
               </div>
               <button 
                 onClick={() => setIsCartOpen(false)}
-                className="text-xs uppercase tracking-widest text-drift-foreground-muted hover:text-drift-foreground transition-colors"
+                className="text-xs uppercase tracking-widest text-drift-foreground-muted hover:text-drift-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1"
+                aria-label="Close Cart"
               >
                 Close
               </button>
@@ -138,17 +139,20 @@ export default function Cart() {
                               <div className="flex items-center border border-drift-border/50 rounded-sm">
                                 <button 
                                   onClick={() => updateCartQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                  className="px-3 py-1 text-drift-foreground-muted hover:text-drift-foreground"
+                                  className="px-3 py-1 text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:bg-drift-border/50"
+                                  aria-label={`Decrease quantity of ${product.name}`}
                                 >-</button>
-                                <span className="text-xs tabular-nums w-4 text-center">{item.quantity}</span>
+                                <span className="text-xs tabular-nums w-4 text-center" aria-live="polite">{item.quantity}</span>
                                 <button 
                                   onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
-                                  className="px-3 py-1 text-drift-foreground-muted hover:text-drift-foreground"
+                                  className="px-3 py-1 text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:bg-drift-border/50"
+                                  aria-label={`Increase quantity of ${product.name}`}
                                 >+</button>
                               </div>
                               <button 
                                 onClick={() => removeFromCart(item.id)}
-                                className="text-[10px] uppercase tracking-widest text-drift-foreground-muted hover:text-red-400/80 transition-colors"
+                                className="text-[10px] uppercase tracking-widest text-drift-foreground-muted hover:text-red-400/80 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1"
+                                aria-label={`Remove ${product.name} from cart`}
                               >
                                 Remove
                               </button>
@@ -174,14 +178,14 @@ export default function Cart() {
                 {isCheckout ? (
                   <button 
                     onClick={handleCheckoutComplete}
-                    className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-opacity"
+                    className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-drift-accent focus-visible:ring-offset-2 focus-visible:ring-offset-drift-surface"
                   >
                     Confirm Purchase
                   </button>
                 ) : (
                   <button 
                     onClick={() => setIsCheckout(true)}
-                    className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-opacity"
+                    className="w-full bg-drift-foreground text-drift-bg py-4 text-xs font-medium tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-drift-accent focus-visible:ring-offset-2 focus-visible:ring-offset-drift-surface"
                   >
                     Proceed to Checkout
                   </button>

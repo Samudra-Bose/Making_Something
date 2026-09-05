@@ -35,7 +35,7 @@ export default function GlobalNavigation() {
         </div>
       </div>
 
-      <div className="flex gap-6 lg:gap-12 pointer-events-auto">
+      <div className="flex gap-4 md:gap-6 lg:gap-12 pointer-events-auto">
         {worlds.map((world) => {
           const isOpen = openForks.includes(world.id);
           const isActive = activeFork === world.id;
@@ -54,15 +54,17 @@ export default function GlobalNavigation() {
                   openFork(world.id);
                 }
               }}
-              className="group relative flex flex-col items-end gap-2"
+              className="group relative flex flex-col items-end gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1"
               whileHover={{ y: -2 }}
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              aria-label={isOpen ? (isActive ? `Close ${world.label}` : `Focus ${world.label}`) : `Open ${world.label}`}
+              aria-current={isActive ? 'page' : undefined}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 <span className={`text-[10px] tracking-widest transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted/50 group-hover:text-drift-foreground/70'}`}>
                   {world.number}
                 </span>
-                <span className={`text-[10px] tracking-[0.15em] uppercase transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted group-hover:text-drift-foreground/80'}`}>
+                <span className={`hidden md:inline text-[10px] tracking-[0.15em] uppercase transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted group-hover:text-drift-foreground/80'}`}>
                   {world.label}
                 </span>
               </div>
@@ -97,12 +99,16 @@ function CartToggle() {
   return (
     <motion.button
       onClick={() => setIsCartOpen(true)}
-      className="group relative flex flex-col items-end gap-2 ml-4 lg:ml-12 pointer-events-auto"
+      className="group relative flex flex-col items-end gap-2 ml-2 md:ml-4 lg:ml-12 pointer-events-auto focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1"
       whileHover={{ y: -2 }}
+      aria-label={`Open Cart, ${count} items`}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-[10px] tracking-[0.15em] uppercase text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
+      <div className="flex items-center gap-2 md:gap-3">
+        <span className="hidden md:inline text-[10px] tracking-[0.15em] uppercase text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
           Cart
+        </span>
+        <span className="md:hidden text-[10px] tracking-[0.15em] uppercase text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
+          C
         </span>
         {count > 0 && (
           <span className="text-[10px] tabular-nums tracking-widest text-drift-bg bg-drift-foreground px-2 py-0.5 rounded-sm">

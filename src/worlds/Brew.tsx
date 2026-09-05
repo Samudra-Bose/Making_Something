@@ -43,64 +43,78 @@ export default function Brew() {
   // Scroll sequence choreography
   useEffect(() => {
     if (!containerRef.current) return;
+    const scroller = containerRef.current;
     
-    // Create scroll trigger for the ritual progression
+    // Create scroll trigger for the ritual progression (State Updater - Keep out of matchMedia)
     const scrollSections = gsap.utils.toArray('.brew-stage') as HTMLElement[];
+    const triggers: ScrollTrigger[] = [];
     
     scrollSections.forEach((section, i) => {
-      ScrollTrigger.create({
+      const st = ScrollTrigger.create({
         trigger: section,
-        scroller: containerRef.current, // Target the pane scroll container
+        scroller: scroller,
         start: 'top center',
         end: 'bottom center',
         onUpdate: (self) => {
-          // Progress across the entire brew sequence
           const totalProgress = (i + self.progress) / scrollSections.length;
           setBrewProgress(totalProgress);
-        },
-        onEnter: () => {
-          gsap.to(section, { opacity: 1, y: 0, duration: 1, ease: 'power3.out' });
-        },
-        onLeaveBack: () => {
-          // Fade out slightly when scrolling up
-          gsap.to(section, { opacity: 0.3, y: 20, duration: 1, ease: 'power3.out' });
         }
       });
+      triggers.push(st);
     });
 
-    gsap.fromTo('.st-brew-image-reveal',
-      { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
-      {
-        clipPath: 'inset(0% 0% 0% 0%)',
-        scale: 1,
-        scrollTrigger: {
-          trigger: '.st-brew-image-reveal',
-          scroller: containerRef.current,
-          start: 'top 90%',
-          end: 'top 40%',
-          scrub: 1
-        }
-      }
-    );
+    const mm = gsap.matchMedia(scroller);
 
-    gsap.fromTo('.st-brew-image-parallax',
-      { y: -30, scale: 1.1 },
-      {
-        y: 30,
-        scrollTrigger: {
-          trigger: '.st-brew-image-reveal',
-          scroller: containerRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      scrollSections.forEach((section, i) => {
+        ScrollTrigger.create({
+          trigger: section,
+          scroller: scroller,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => {
+            gsap.to(section, { opacity: 1, y: 0, duration: 1, ease: 'power3.out' });
+          },
+          onLeaveBack: () => {
+            gsap.to(section, { opacity: 0.3, y: 20, duration: 1, ease: 'power3.out' });
+          }
+        });
+      });
+
+      gsap.fromTo('.st-brew-image-reveal',
+        { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
+        {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          scale: 1,
+          scrollTrigger: {
+            trigger: '.st-brew-image-reveal',
+            scroller: scroller,
+            start: 'top 90%',
+            end: 'top 40%',
+            scrub: 1
+          }
         }
-      }
-    );
+      );
+
+      gsap.fromTo('.st-brew-image-parallax',
+        { y: -30, scale: 1.1 },
+        {
+          y: 30,
+          scrollTrigger: {
+            trigger: '.st-brew-image-reveal',
+            scroller: scroller,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        }
+      );
+    });
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => {
-        if (t.scroller === containerRef.current) t.kill();
-      });
+      triggers.forEach(t => t.kill());
+      mm.revert();
+      setBrewProgress(0);
     };
   }, []);
 

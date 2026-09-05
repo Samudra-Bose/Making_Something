@@ -17,7 +17,7 @@ export default function Roast() {
     if (!containerRef.current) return;
     const scroller = containerRef.current;
     
-    // We create a ScrollTrigger that updates the store's roast development 
+    // State updater - must run regardless of motion preferences
     const st = ScrollTrigger.create({
       trigger: scroller.querySelector('.st-roast-sequence'),
       scroller: scroller,
@@ -28,34 +28,38 @@ export default function Roast() {
       }
     });
 
-    gsap.fromTo('.st-roast-image-reveal',
-      { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
-      {
-        clipPath: 'inset(0% 0% 0% 0%)',
-        scale: 1,
-        scrollTrigger: {
-          trigger: '.st-roast-image-reveal',
-          scroller: scroller,
-          start: 'top 90%',
-          end: 'top 40%',
-          scrub: 1
-        }
-      }
-    );
+    const mm = gsap.matchMedia(scroller);
 
-    gsap.fromTo('.st-roast-image-parallax',
-      { y: -30, scale: 1.1 },
-      {
-        y: 30,
-        scrollTrigger: {
-          trigger: '.st-roast-image-reveal',
-          scroller: scroller,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo('.st-roast-image-reveal',
+        { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
+        {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          scale: 1,
+          scrollTrigger: {
+            trigger: '.st-roast-image-reveal',
+            scroller: scroller,
+            start: 'top 90%',
+            end: 'top 40%',
+            scrub: 1
+          }
         }
-      }
-    );
+      );
+
+      gsap.fromTo('.st-roast-image-parallax',
+        { y: -30, scale: 1.1 },
+        {
+          y: 30,
+          scrollTrigger: {
+            trigger: '.st-roast-image-reveal',
+            scroller: scroller,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        }
+      );
+    });
 
     const timeout = setTimeout(() => {
       ScrollTrigger.refresh();
@@ -64,6 +68,7 @@ export default function Roast() {
     return () => {
       clearTimeout(timeout);
       st.kill();
+      mm.revert();
       setRoastDevelopment(0);
     };
   }, [setRoastDevelopment]);
