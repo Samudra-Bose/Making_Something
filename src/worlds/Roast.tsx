@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from "react";
-import { useExperienceStore } from "../experience/store";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, useScroll, useTransform } from "motion/react";
-import { AntiGravity } from "../reactive/AntiGravity";
-import { useShockwave } from "../reactive/useShockwave";
+import React, { useRef, useEffect } from 'react';
+import { useExperienceStore } from '../experience/store';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { AntiGravity } from '../reactive/AntiGravity';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface RoastProps {
   isJourney?: boolean;
@@ -12,370 +12,160 @@ interface RoastProps {
 
 export default function Roast({ isJourney }: RoastProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const coffeeOrigin = useExperienceStore((state) => state.coffeeOrigin);
-  const setRoastDevelopment = useExperienceStore((state) => state.setRoastDevelopment);
-  const roastDevelopment = useExperienceStore((state) => state.roastDevelopment);
-  const roastLevel = useExperienceStore((state) => state.roastLevel);
-  const setRoastLevel = useExperienceStore((state) => state.setRoastLevel);
-  const activeFork = useExperienceStore((state) => state.activeFork);
-  const setScroll = useExperienceStore((state) => state.setScroll);
-  const triggerShockwave = useShockwave();
-  const shockwaveFired = useRef(false);
+  const activeFork = useExperienceStore(s => s.activeFork);
+  const setScroll = useExperienceStore(s => s.setScroll);
+
+  const isActive = isJourney || activeFork === 'roast';
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !isActive) return;
     const scroller = isJourney ? window : containerRef.current;
     
-    // Core Narrative Scroll Sequence (0 to 1 progress maps to roastDevelopment)
-    const st = ScrollTrigger.create({
-      trigger: ".st-roast-narrative",
-      scroller: scroller,
-      start: "top top",
-      end: "bottom bottom",
-      onEnter: () => {
-        // Sync activeWorld when Roast becomes the focused world
-        useExperienceStore.getState().setActiveWorld('roast');
-      },
-      onEnterBack: () => {
-        useExperienceStore.getState().setActiveWorld('roast');
-      },
-      onUpdate: (self) => {
-        setRoastDevelopment(self.progress);
-        // Roast occupies global story 0.25 → 0.55
-        if (!isJourney) {
-          useExperienceStore.getState().setGlobalProgress(0.25 + self.progress * 0.30);
-        }
-        // Also update store scroll so ReactiveField velocity is correct
-        useExperienceStore.getState().setScroll(scroller.scrollTop);
-        
-        // Fire shockwave precisely at First Crack (progress ~0.5)
-        if (self.progress > 0.48 && self.progress < 0.52 && !shockwaveFired.current) {
-          triggerShockwave(window.innerWidth / 2, window.innerHeight / 2, 2.5);
-          shockwaveFired.current = true;
-        } else if (self.progress < 0.45 || self.progress > 0.55) {
-          shockwaveFired.current = false;
-        }
-      }
-    });
+    ScrollTrigger.getAll().filter(t => t.scroller === scroller && (t.vars.trigger === '.st-roast-pin' || t.vars.trigger === '.st-first-crack')).forEach(t => t.kill());
 
     const mm = gsap.matchMedia(scroller);
 
-      // Horizontal Scroll Sequence and Transition
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".st-roast-narrative",
-          scroller: scroller,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-          invalidateOnRefresh: true,
-        }
-      });
-
-      tl.to(".st-roast-horizontal-container", {
-        x: () => -(document.querySelector('.st-roast-horizontal-container') as HTMLElement)?.scrollWidth + window.innerWidth,
-        ease: "none",
-        duration: 1
-      });
-
-      // We can trigger the transition effects concurrently as we reach the end
-      // 0.8 to 1.0 of the timeline represents the last section (Handoff)
-      tl.to(".st-bean-expand", {
-        scale: 10,
-        opacity: 0,
-        ease: "power2.in",
-        duration: 0.15
-      }, 0.85);
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
       
-      tl.to(".st-brew-emerge", {
-        opacity: 1,
-        y: -50,
-        ease: "power2.out",
-        duration: 0.1
-      }, 0.9);
-
-      tl.to(".st-brew-emerge-sub", {
-        opacity: 1,
-        y: -30,
-        ease: "power2.out",
-        duration: 0.05
-      }, 0.95);
-
-      // Auto-transition to Brew at the very end of the narrative scroll
-      ScrollTrigger.create({
-        trigger: ".st-roast-narrative",
-        scroller: scroller,
-        start: "bottom bottom",
-        onEnter: () => {
-          const state = useExperienceStore.getState();
-          if (!state.openForks.includes("brew") && !isJourney) {
-            state.openFork("brew");
-            setTimeout(() => {
-               state.focusFork("brew");
-            }, 100);
+      // 1. ORIGIN -> ROAST TRANSITION & HORIZONTAL SEQUENCE
+      const roastTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.st-roast-pin',
+          scroller: scroller,
+          start: 'top top',
+          end: '+=600%', // Long pin for horizontal progression
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          onEnter: () => useExperienceStore.getState().setActiveWorld('roast'),
+          onEnterBack: () => useExperienceStore.getState().setActiveWorld('roast'),
+          onUpdate: (self) => {
+            if (isActive && !isJourney) {
+              useExperienceStore.getState().setGlobalProgress(0.25 + self.progress * 0.30);
+            }
           }
         }
       });
+
+      // Initially, Roast container is hidden via clip-path
+      gsap.set('.st-roast-reveal', { clipPath: 'circle(0% at 50% 50%)' });
+      
+      // 0-10%: Transition Reveal (Origin -> Roast)
+      roastTl.to('.st-roast-reveal', { clipPath: 'circle(150% at 50% 50%)', duration: 1 })
+             .fromTo('.st-roast-bg', { scale: 1.2 }, { scale: 1, duration: 1 }, 0);
+
+      // 10-80%: Horizontal Roast Sequence
+      // We will move the inner track horizontally
+      roastTl.to('.st-roast-track', { x: '-80vw', duration: 7 }, 1)
+             .to('.st-roast-bean', { rotate: 360, duration: 7 }, 1)
+             .to('.st-roast-bg', { filter: 'sepia(80%) hue-rotate(-20deg) saturate(2) brightness(0.6)', duration: 7 }, 1)
+             // Typographic choreography
+             .to('.st-roast-word-green', { opacity: 0, x: -100, duration: 1 }, 1)
+             .to('.st-roast-word-yellow', { opacity: 1, scale: 1.1, duration: 1 }, 2)
+             .to('.st-roast-word-yellow', { opacity: 0, scale: 0.9, duration: 1 }, 3)
+             .to('.st-roast-word-gold', { opacity: 1, scale: 1.2, duration: 1 }, 4)
+             .to('.st-roast-word-gold', { opacity: 0, scale: 0.9, duration: 1 }, 5)
+             .to('.st-roast-word-brown', { opacity: 1, scale: 1.3, duration: 1 }, 6)
+             .to('.st-roast-word-brown', { opacity: 0, scale: 0.9, duration: 1 }, 7);
+
+      // 80-100%: Setup for First Crack
+      roastTl.to('.st-roast-bean', { scale: 1.2, duration: 2 }, 8)
+             .to('.st-roast-bg', { scale: 1.05, duration: 2 }, 8);
+
+
+      // 2. FIRST CRACK MOMENT
+      const crackTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.st-first-crack',
+          scroller: scroller,
+          start: 'top top',
+          end: '+=150%',
+          scrub: 0, // No scrub smoothing to make it feel abrupt
+          pin: true
+        }
+      });
+
+      // Build tension
+      crackTl.fromTo('.st-crack-text', { letterSpacing: '-0.05em', scale: 0.9 }, { letterSpacing: '0.1em', scale: 1, duration: 1 })
+             // Abrupt crack
+             .to('.st-crack-text', { scale: 1.5, letterSpacing: '0.5em', filter: 'blur(2px)', duration: 0.1, ease: 'rough' })
+             .to('.st-crack-bg', { scale: 1.2, filter: 'contrast(1.5) brightness(1.2)', duration: 0.1 })
+             .to('.st-crack-particles', { opacity: 1, scale: 1.5, duration: 0.1 })
+             // Settle
+             .to('.st-crack-text', { scale: 1.2, letterSpacing: '0.2em', filter: 'blur(0px)', duration: 0.8 })
+             .to('.st-crack-bg', { scale: 1.1, filter: 'contrast(1) brightness(0.8)', duration: 0.8 })
+             .to('.st-crack-particles', { opacity: 0, scale: 2, duration: 0.8 });
+
     });
 
-    const timeout = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
-
-    return () => {
-      clearTimeout(timeout);
-      st.kill();
-      mm.revert();
-    };
-  }, [setRoastDevelopment, triggerShockwave]);
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (activeFork === "roast") {
-      setScroll(e.currentTarget.scrollTop);
-    }
-  };
+    return () => mm.revert();
+  }, [isActive, isJourney]);
 
   return (
     <div 
       ref={containerRef} 
-      onScroll={handleScroll}
-      className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'} text-drift-foreground bg-transparent`}
+      onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
+      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
       data-world="roast"
+      style={{ zIndex: 20 }} // Higher z-index to overlay Origin
     >
-      {/* Narrative Scroll Container (Height determines the physical length of the roast) */}
-      <div className="st-roast-narrative relative" style={{ height: "700vh" }}>
-        
-        {/* Sticky Background / Atmosphere */}
-        <div className="sticky top-0 w-full h-screen overflow-hidden pointer-events-none flex items-center justify-center -z-10">
-           <RoastAtmosphere dev={roastDevelopment} />
-        </div>
-
-        {/* --- HORIZONTAL SECTIONS OVERLAY --- */}
-        <div className="st-roast-horizontal-container sticky top-0 left-0 w-fit h-screen pointer-events-none flex flex-row items-center">
+      <div className="st-roast-pin w-full h-screen relative">
+        <div className="st-roast-reveal w-full h-full relative overflow-hidden bg-[#2D1B11]">
           
-          {/* SECTION 01 - GREEN (0-15%) */}
-          <section className="w-screen h-screen flex items-center px-8 lg:px-16 relative">
-            <div className="max-w-xl pointer-events-auto z-10">
-              <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">01 - Green</h4>
-              <h2 className="text-5xl md:text-7xl font-display tracking-tight mb-8">This is coffee before transformation.</h2>
-              <p className="text-sm md:text-base font-sans text-drift-foreground-muted leading-relaxed">
-                Cool. Quiet. Organic. The raw green seed holds the unexpressed potential of {coffeeOrigin}. 
-                It is a physical surface waiting for energy.
-              </p>
+          {/* Background */}
+          <div className="absolute inset-0 z-0">
+             <img 
+               src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop"
+               className="w-full h-full object-cover st-roast-bg mix-blend-overlay opacity-60"
+               alt=""
+             />
+             <div className="absolute inset-0 bg-gradient-to-r from-[#8B9D83] via-[#C5A880] to-[#3B2516] mix-blend-multiply opacity-80" />
+          </div>
+
+          {/* Horizontal Track */}
+          <div className="st-roast-track absolute inset-0 z-10 flex items-center w-[200vw]">
+            
+            {/* The Bean (Moves with track but rotates) */}
+            <div className="absolute left-[30vw] top-1/2 -translate-y-1/2 w-[30vw] h-[30vw] st-roast-bean mix-blend-luminosity">
+              <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full shadow-2xl" />
             </div>
-            <AntiGravity depth={0.8} className="absolute right-12 lg:right-32 top-1/3 w-64 aspect-[3/4] opacity-80 pointer-events-auto shadow-2xl bg-drift-surface p-2 border border-drift-border">
-              <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover filter contrast-125 sepia-[0.3]" alt="Green Beans" />
-            </AntiGravity>
-          </section>
 
-          {/* SECTION 02 - HEAT (15-35%) */}
-          <section className="w-screen h-screen flex items-center justify-center px-8 lg:px-16 relative text-center">
-            <div className="max-w-xl pointer-events-auto z-10">
-              <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">02 - Heat</h4>
-              <h2 className="text-5xl md:text-7xl font-display tracking-tight mb-8">Energy enters the drum.</h2>
-              <p className="text-sm md:text-base font-sans text-drift-foreground-muted leading-relaxed">
-                Not a neon explosion, but physical, radiating warmth. The moisture inside the dense cellular structure 
-                begins to evaporate. Pressure builds.
-              </p>
+            {/* Typography Stations */}
+            <div className="w-[100vw] h-full flex flex-col justify-center items-center text-[#EAE7E0] font-display text-[15vw] uppercase leading-none tracking-tighter opacity-80 st-roast-word-green">
+              GREEN
             </div>
-          </section>
-
-          {/* SECTION 03 - YELLOW / CHANGE (35-50%) */}
-          <section className="w-screen h-screen flex items-center justify-end px-8 lg:px-16 relative text-right">
-             <div className="max-w-3xl pointer-events-auto z-10">
-              <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">03 - Yellow Phase</h4>
-              <h2 className="text-5xl md:text-7xl font-display tracking-tight mb-8 text-[#907A60]">The Maillard Reaction.</h2>
-              <p className="text-sm md:text-base font-sans text-drift-foreground-muted leading-relaxed ml-auto max-w-lg">
-                Green becomes straw. Straw becomes gold. Aromas shift from grassy to toasted bread. 
-                Amino acids and reducing sugars degrade into hundreds of new volatile compounds.
-              </p>
+            <div className="absolute left-[40vw] text-[#EAE7E0] font-display text-[15vw] uppercase leading-none tracking-tighter opacity-0 st-roast-word-yellow mix-blend-overlay">
+              YELLOW
             </div>
-          </section>
-
-          {/* SECTION 04 - FIRST CRACK (50-65%) */}
-          <section className="w-screen h-screen flex flex-col items-center justify-center px-8 lg:px-16 relative text-center">
-             <AntiGravity depth={1.5} className="pointer-events-auto z-10">
-               <h2 className="text-[12vw] font-display tracking-tighter leading-none mb-4 mix-blend-difference text-white">FIRST CRACK</h2>
-               <p className="text-sm tracking-[0.2em] uppercase font-sans text-drift-foreground-muted mix-blend-difference text-white">The physical structure fractures.</p>
-             </AntiGravity>
-          </section>
-
-          {/* SECTION 05 - DEVELOPMENT (65-88%) */}
-          <section className="w-screen h-screen flex items-center px-8 lg:px-16 relative">
-            <div className="w-full max-w-2xl pointer-events-auto z-10">
-              <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-12">05 - Development</h4>
-              <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-16">Determine the final character.</h2>
-              
-              <div className="flex flex-col gap-6">
-                <EditorialRoastOption 
-                  level="light" 
-                  title="Light" 
-                  desc="Floral, bright acidity. Origin terroir preserved." 
-                  current={roastLevel} 
-                  onSelect={setRoastLevel} 
-                />
-                <EditorialRoastOption 
-                  level="medium" 
-                  title="Medium" 
-                  desc="Caramelized sweetness. Equilibrium." 
-                  current={roastLevel} 
-                  onSelect={setRoastLevel} 
-                />
-                <EditorialRoastOption 
-                  level="dark" 
-                  title="Dark" 
-                  desc="Heavy body. Cocoa. Roaster's imprint." 
-                  current={roastLevel} 
-                  onSelect={setRoastLevel} 
-                />
-              </div>
+            <div className="absolute left-[60vw] text-[#EAE7E0] font-display text-[18vw] uppercase leading-none tracking-tighter opacity-0 st-roast-word-gold mix-blend-overlay">
+              GOLD
             </div>
-          </section>
+            <div className="absolute left-[80vw] text-[#EAE7E0] font-display text-[20vw] uppercase leading-none tracking-tighter opacity-0 st-roast-word-brown">
+              BROWN
+            </div>
 
-          {/* SECTION 06 - CHARACTER (88-100%) */}
-          <section className="w-screen h-screen flex flex-col items-center justify-center px-8 lg:px-16 relative text-center">
-             <div className="pointer-events-auto max-w-4xl z-10">
-               <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-12">06 - Character</h4>
-               <SensoryNotes level={roastLevel} />
-             </div>
-          </section>
-          
-          {/* SECTION 07 - HANDOFF TO BREW (Cinematic Expansion) */}
-          <section className="w-screen st-transition-trigger h-screen flex flex-col justify-start relative text-center pointer-events-auto">
-             
-             {/* Sticky container for the transition effect */}
-             <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
-               
-               {/* Macro Bean expanding into grounds */}
-               <div className="absolute inset-0 z-0 flex items-center justify-center">
-                 <div className="st-bean-expand w-[30vh] h-[30vh] rounded-full overflow-hidden relative">
-                   <img 
-                     src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=2000&auto=format&fit=crop" 
-                     alt="Macro Roasted Bean Texture" 
-                     className="w-full h-full object-cover scale-150"
-                   />
-                   <div className="absolute inset-0 bg-drift-bg/20 mix-blend-overlay"></div>
-                 </div>
-               </div>
-
-               {/* Typography emerging */}
-               <div className="relative z-10 w-full flex flex-col items-center">
-                 <h2 className="st-brew-emerge text-[8vw] font-display uppercase tracking-tighter text-white mix-blend-difference opacity-0">
-                   Extraction
-                 </h2>
-                 <p className="st-brew-emerge-sub text-xs tracking-[0.3em] uppercase text-drift-foreground-muted mt-4 opacity-0">
-                   The release of solubles
-                 </p>
-               </div>
-               
-             </div>
-          </section>
+          </div>
 
         </div>
       </div>
-    </div>
-  );
-}
 
-// ---------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------
-
-function EditorialRoastOption({ level, title, desc, current, onSelect }: any) {
-  const isSelected = current === level;
-  const classes = isSelected ? "border-drift-foreground opacity-100" : "border-drift-border opacity-40 hover:opacity-70";
-  return (
-    <button 
-      onClick={() => onSelect(level)}
-      className={"group flex flex-col text-left border-l-2 py-4 pl-6 transition-all duration-500 " + classes + " focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground"}
-    >
-      <span className="text-2xl font-display mb-2">{title}</span>
-      <span className="text-sm font-sans text-drift-foreground-muted tracking-wide">{desc}</span>
-    </button>
-  );
-}
-
-function SensoryNotes({ level }: { level: string }) {
-  let notes: string[] = [];
-  if (level === "light") notes = ["JASMINE", "CITRUS", "BRIGHT"];
-  else if (level === "medium") notes = ["CARAMEL", "STONE FRUIT", "ROUND"];
-  else notes = ["COCOA", "TOASTED", "SMOKY"];
-
-  return (
-    <div className="flex flex-wrap justify-center gap-6 md:gap-12">
-      {notes.map((note, i) => (
-        <AntiGravity key={note} depth={0.5 + i * 0.2}>
-           <motion.span 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             transition={{ delay: i * 0.2, duration: 0.8 }}
-             className="text-4xl md:text-6xl lg:text-7xl font-display text-drift-foreground inline-block"
-           >
-             {note}
-           </motion.span>
-        </AntiGravity>
-      ))}
-    </div>
-  );
-}
-
-function RoastAtmosphere({ dev }: { dev: number }) {
-  // Physical representation of the roast inside the sticky container.
-  
-  // Color shifting: Green (0-0.2) -> Yellow/Straw (0.3-0.5) -> Caramel (0.6-0.8) -> Dark Brown (0.8-1.0)
-  let r = 160, g = 175, b = 150; // Greenish
-  
-  if (dev > 0.2) {
-    const f = Math.min(1, (dev - 0.2) * 4); // 0-1 over 0.2-0.45
-    r = 160 + (210 - 160) * f;
-    g = 175 + (180 - 175) * f;
-    b = 150 + (100 - 150) * f;
-  }
-  if (dev > 0.5) {
-    const f = Math.min(1, (dev - 0.5) * 2.5); // 0-1 over 0.5-0.9
-    r = 210 + (60 - 210) * f;
-    g = 180 + (40 - 180) * f;
-    b = 100 + (25 - 100) * f;
-  }
-
-  const bgColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
-  const scale = 1 + dev * 0.3;
-  const rotation = dev * 45;
-
-  // Tension during First Crack
-  const crackTension = dev > 0.45 && dev < 0.55 ? Math.sin((dev - 0.45) * 10 * Math.PI) : 0;
-  const jitterX = (Math.random() - 0.5) * crackTension * 10;
-  const jitterY = (Math.random() - 0.5) * crackTension * 10;
-
-  return (
-    <div className="w-full h-full relative flex items-center justify-center opacity-30 transition-opacity duration-1000">
-      <motion.div 
-        className="w-[150vw] h-[150vh] blur-[100px] rounded-full absolute mix-blend-multiply"
-        style={{
-          backgroundColor: bgColor,
-          scale: scale + crackTension * 0.1,
-          rotate: rotation,
-          x: jitterX,
-          y: jitterY
-        }}
-      />
-      
-      {/* Editorial Roast Temperature Readout */}
-      <div className="absolute left-8 bottom-8 font-sans text-xs tracking-widest uppercase text-drift-foreground-muted">
-        <div className="mb-1">Internal Temp</div>
-        <div className="text-2xl font-display text-drift-foreground tabular-nums">
-          {Math.floor(22 + dev * 200)}�C
-        </div>
+      {/* First Crack Section */}
+      <div className="st-first-crack w-full h-screen relative bg-[#1A100C] overflow-hidden flex items-center justify-center">
+         <div className="absolute inset-0 z-0 opacity-40">
+           <img 
+               src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop"
+               className="w-full h-full object-cover st-crack-bg filter brightness-50"
+               alt=""
+             />
+         </div>
+         <div className="st-crack-particles absolute inset-0 z-10 opacity-0 bg-[radial-gradient(circle_at_center,rgba(255,200,100,0.2)_0%,transparent_70%)]" />
+         
+         <div className="z-20 text-[#F2F0EB] font-display text-[12vw] uppercase tracking-tighter leading-none flex gap-4 st-crack-text mix-blend-difference">
+           <div>FIRST</div>
+           <div>CRACK</div>
+         </div>
       </div>
       
-      {/* Editorial Development Time */}
-      <div className="absolute right-8 bottom-8 text-right font-sans text-xs tracking-widest uppercase text-drift-foreground-muted">
-        <div className="mb-1">Time</div>
-        <div className="text-2xl font-display text-drift-foreground tabular-nums">
-          {String(Math.floor(dev * 12)).padStart(2, "0")}:{String(Math.floor((dev * 12 * 60) % 60)).padStart(2, "0")}
-        </div>
-      </div>
     </div>
   );
 }
-

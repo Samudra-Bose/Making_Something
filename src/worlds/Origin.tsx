@@ -54,7 +54,14 @@ export default function Origin({ isJourney }: OriginProps = {}) {
           end: '+=400%', 
           scrub: 1.2,
           pin: true,
-          anticipatePin: 1
+          anticipatePin: 1,
+          onEnter: () => useExperienceStore.getState().setActiveWorld('origin'),
+          onEnterBack: () => useExperienceStore.getState().setActiveWorld('origin'),
+          onUpdate: (self) => {
+            if (isActive && !isJourney) {
+              useExperienceStore.getState().setGlobalProgress(self.progress * 0.25);
+            }
+          }
         }
       });
 
