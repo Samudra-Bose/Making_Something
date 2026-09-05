@@ -3,6 +3,7 @@ import { useExperienceStore } from '../experience/store';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'motion/react';
+import { AntiGravity } from '../reactive/AntiGravity';
 
 export default function Roast() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -288,32 +289,34 @@ function RoastVisualizer() {
   return (
     <div className="w-full max-w-lg aspect-square relative flex items-center justify-center">
       {/* Abstract Representation of the Bean/Transformation */}
-      <motion.div 
-        className="w-48 h-64 rounded-[40%] flex items-center justify-center relative overflow-hidden"
-        style={{
-          scale,
-          rotate: rotation,
-          backgroundColor: bgColor,
-          boxShadow,
-          filter: `contrast(${1 + dev * 0.2}) brightness(${1 - dev * 0.2})`
-        }}
-      >
-        {/* The center cut (crease of the bean) */}
+      <AntiGravity depth={1.2}>
         <motion.div 
-          className="w-[3px] h-[80%] bg-black/40 rounded-full"
+          className="w-48 h-64 rounded-[40%] flex items-center justify-center relative overflow-hidden"
           style={{
-            scaleX: 1 + firstCrackIntensity * 2 // crease widens during crack
+            scale,
+            rotate: rotation,
+            backgroundColor: bgColor,
+            boxShadow,
+            filter: `contrast(${1 + dev * 0.2}) brightness(${1 - dev * 0.2})`
           }}
-        />
-        
-        {/* Texture overlay (noise) */}
-        <div 
-          className="absolute inset-0 opacity-20 mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='${0.8 + dev}' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-          }}
-        />
-      </motion.div>
+        >
+          {/* The center cut (crease of the bean) */}
+          <motion.div 
+            className="w-[3px] h-[80%] bg-black/40 rounded-full"
+            style={{
+              scaleX: 1 + firstCrackIntensity * 2 // crease widens during crack
+            }}
+          />
+          
+          {/* Texture overlay (noise) */}
+          <div 
+            className="absolute inset-0 opacity-20 mix-blend-overlay"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='${0.8 + dev}' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+            }}
+          />
+        </motion.div>
+      </AntiGravity>
 
       {/* Dynamic Data Overlay */}
       <div className="absolute -right-4 md:right-12 top-1/4 flex flex-col gap-2 pointer-events-auto mix-blend-difference text-white">

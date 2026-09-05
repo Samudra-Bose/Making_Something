@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'motion/react';
 import { useExperienceStore } from '../experience/store';
+import { AntiGravity } from '../reactive/AntiGravity';
 
 export default function Brew() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -286,13 +287,13 @@ export default function Brew() {
 
       {/* EDITORIAL IMAGE */}
       <div className="w-full px-8 lg:px-16 mb-32 flex justify-center">
-        <div className="w-full max-w-2xl h-[50vh] overflow-hidden border border-drift-border p-2 bg-drift-surface relative">
+        <AntiGravity depth={0.6} className="w-full max-w-2xl h-[50vh] overflow-hidden border border-drift-border p-2 bg-drift-surface relative shadow-xl">
           <img 
             src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" 
             alt="Brewed Coffee" 
             className="w-full h-full object-cover filter contrast-125 saturate-50"
           />
-        </div>
+        </AntiGravity>
       </div>
 
       {/* Finish */}

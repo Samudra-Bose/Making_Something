@@ -3,6 +3,7 @@ import { useExperienceStore } from '../experience/store';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'motion/react';
+import { AntiGravity } from '../reactive/AntiGravity';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -242,7 +243,7 @@ export default function Origin() {
                 Extreme altitude forces the plant to work harder, producing denser beans with a profoundly concentrated cellular structure and higher organic acid content.
               </p>
             </div>
-            <div className="st-plant flex-1 w-full p-10 md:p-14 bg-drift-surface border border-drift-border rounded-sm shadow-xl relative overflow-hidden group">
+            <AntiGravity depth={0.8} className="st-plant flex-1 w-full p-10 md:p-14 bg-drift-surface border border-drift-border rounded-sm shadow-xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-1000 pointer-events-none text-drift-foreground">
                 <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
                   <path d="M12 2L22 22H2L12 2Z" />
@@ -255,7 +256,7 @@ export default function Origin() {
                   Unlike genetically uniform modern crops, this coffee is a chaotic, beautiful mix of indigenous landraces—each contributing a distinct thread to the final tapestry of flavor.
                 </p>
               </div>
-            </div>
+            </AntiGravity>
           </div>
 
           {/* 4. HARVEST & PROCESS / UNDERSTANDING */}

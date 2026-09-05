@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useExperienceStore } from '../experience/store';
 import { DRIFT_COLLECTION, Product } from '../data/products';
 import { useShockwave } from '../reactive/useShockwave';
+import { AntiGravity } from '../reactive/AntiGravity';
 
 export default function Shop() {
   const selectedProductId = useExperienceStore((state) => state.selectedProductId);
@@ -156,14 +157,14 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
         {/* Left Column: Story & Data */}
         <div>
-          <div className="mb-12">
-            <div className="w-full aspect-[4/3] bg-drift-bg mb-12 overflow-hidden border border-drift-border p-2">
+          <div className="mb-12 relative">
+            <AntiGravity depth={0.4} className="w-full aspect-[4/3] bg-drift-bg mb-12 overflow-hidden border border-drift-border p-2 shadow-xl z-10 relative">
               <img 
                 src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=1600&auto=format&fit=crop" 
                 alt={product.name}
                 className="w-full h-full object-cover filter contrast-125 saturate-50 mix-blend-multiply"
               />
-            </div>
+            </AntiGravity>
 
             <h2 className="text-4xl lg:text-6xl font-display font-medium tracking-tight mb-4">{product.name}</h2>
             <p className="text-sm tracking-widest uppercase text-drift-foreground-muted mb-8">
