@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'motion/react';
 import { useExperienceStore } from '../experience/store';
 import { AntiGravity } from '../reactive/AntiGravity';
 
@@ -229,22 +230,22 @@ export default function Brew() {
       {/* Intro */}
       <section className="min-h-screen flex flex-col justify-center px-8 lg:px-16 relative z-10">
         <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-4">
-          {coffeeOrigin} • {roastLevel}
+          {coffeeOrigin} &middot; {roastLevel}
         </h4>
         <h2 className="text-7xl md:text-9xl font-display font-medium tracking-tight mb-8 leading-none">
           The<br/>Extraction
         </h2>
         
-        {/* Method Selector */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mt-12 relative z-10">
-          {(['v60', 'espresso', 'french-press'] as const).map(method => {
+        {/* Method Selector — animated with layoutId fill */}
+        <div className="flex gap-0 max-w-xl mt-12 relative z-10 border border-drift-border/40">
+          {(['v60', 'espresso', 'french-press'] as const).map((method, mi) => {
             const isSelected = brewMethod === method;
+            const label = method === 'v60' ? 'Pour Over' : method === 'espresso' ? 'Espresso' : 'Immersion';
             return (
               <button
                 key={method}
                 onClick={() => {
                   useExperienceStore.getState().setBrewMethod(method);
-                  // Update temp and ratio accordingly for local control overriding
                   if (method === 'v60') {
                     useExperienceStore.getState().setBrewTemperature(94);
                     useExperienceStore.getState().setBrewRatio(15);
@@ -256,12 +257,24 @@ export default function Brew() {
                     useExperienceStore.getState().setBrewRatio(12);
                   }
                 }}
-                className={`text-left p-4 border-b transition-all duration-300 ${
-                  isSelected ? 'border-drift-foreground text-drift-foreground' : 'border-drift-border text-drift-foreground-muted hover:border-drift-foreground/50'
-                }`}
+                className={`relative flex-1 text-left px-5 py-5 transition-colors duration-300 focus-visible:outline-none z-10 overflow-hidden ${
+                  mi < 2 ? 'border-r border-drift-border/40' : ''
+                } ${isSelected ? 'text-drift-bg' : 'text-drift-foreground-muted hover:text-drift-foreground'}`}
+                aria-pressed={isSelected}
+                aria-label={`Select ${label} brew method`}
               >
-                <div className="text-[10px] tracking-widest uppercase mb-2">Method</div>
-                <div className="font-display text-xl">{method === 'v60' ? 'Pour Over' : method === 'espresso' ? 'Espresso' : 'Immersion'}</div>
+                {/* Animated fill */}
+                {isSelected && (
+                  <motion.div
+                    layoutId="brew-method-fill"
+                    className="absolute inset-0 bg-drift-foreground z-[-1]"
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <div className={`text-[9px] tracking-widest uppercase mb-1 ${isSelected ? 'text-drift-bg/60' : 'text-drift-foreground-muted'}`}>
+                  {String(mi + 1).padStart(2, '0')}
+                </div>
+                <div className="font-display text-lg">{label}</div>
               </button>
             );
           })}

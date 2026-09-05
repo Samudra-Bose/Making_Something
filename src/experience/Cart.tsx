@@ -49,13 +49,13 @@ export default function Cart() {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-            className="fixed inset-0 md:inset-4 lg:inset-8 bg-drift-surface border border-drift-border shadow-2xl z-50 pointer-events-auto flex flex-col overflow-hidden"
+            className="fixed inset-0 md:inset-4 lg:inset-8 bg-drift-bg border border-drift-border shadow-2xl z-50 pointer-events-auto flex flex-col overflow-hidden"
           >
-            <header className="p-8 md:p-12 border-b border-drift-border flex justify-between items-center bg-drift-bg/50 backdrop-blur-md">
+            <header className="p-8 md:p-12 border-b border-drift-border flex justify-between items-center bg-drift-bg">
               <div className="flex items-center gap-4">
                 {isCheckout && !isSuccess && (
-                  <button onClick={() => setIsCheckout(false)} className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1" aria-label="Back to Cart">
-                    ←
+                  <button onClick={() => setIsCheckout(false)} className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1 transition-colors" aria-label="Back to Cart">
+                    &larr;
                   </button>
                 )}
                 <h2 className="text-3xl md:text-5xl font-display tracking-tighter text-drift-accent">
@@ -71,7 +71,7 @@ export default function Cart() {
               </button>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-8 md:p-12 lg:p-20 custom-scrollbar relative bg-drift-surface">
+            <div className="flex-1 overflow-y-auto p-8 md:p-12 lg:p-20 custom-scrollbar relative bg-drift-bg">
               <div className="max-w-4xl mx-auto h-full">
                 <AnimatePresence mode="wait">
                   {isSuccess ? (
@@ -133,7 +133,7 @@ export default function Cart() {
                           <div className="flex-1">
                             <h3 className="font-display text-lg mb-1">{product.name}</h3>
                             <div className="text-[10px] uppercase tracking-widest text-drift-foreground-muted mb-4">
-                              {item.variant} • {product.roast}
+                              {item.variant} &middot; {product.roast}
                             </div>
                             
                             <div className="flex items-center gap-4">
@@ -172,7 +172,7 @@ export default function Cart() {
           </div>
 
               {!isSuccess && cart.length > 0 && (
-                <footer className="p-8 md:p-12 border-t border-drift-border bg-drift-surface">
+                <footer className="p-8 md:p-12 border-t border-drift-border bg-drift-bg">
                   <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-end md:items-center gap-8">
                     <div className="flex justify-between items-end w-full md:w-auto md:flex-col md:items-start">
                       <span className="text-xs uppercase tracking-[0.2em] text-drift-foreground-muted mb-2">Total</span>

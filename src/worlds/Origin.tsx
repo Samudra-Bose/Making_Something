@@ -95,11 +95,11 @@ export default function Origin() {
         }
       });
 
-      // 2. LAND - Altitude reveal
+      // 2. LAND - Altitude cinematic typography reveal
       gsap.fromTo('.st-altitude', 
-        { opacity: 0, y: 50 },
+        { clipPath: 'inset(100% 0 0 0)', y: 40 },
         { 
-          opacity: 1, 
+          clipPath: 'inset(0% 0 0 0)',
           y: 0, 
           stagger: 0.15,
           scrollTrigger: {
@@ -178,7 +178,7 @@ export default function Origin() {
       );
 
       // Subtle parallax for the main hero text when scrolling down
-      gsap.to('.st-hero-text', {
+      gsap.to('.st-hero-title', {
         y: -100,
         opacity: 0,
         scrollTrigger: {
