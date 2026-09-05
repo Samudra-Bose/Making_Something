@@ -82,6 +82,19 @@ export default function Origin() {
         }
       });
 
+      // Track global narrative progress (Origin is 0.0 to 0.25)
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        scroller: scroller,
+        start: 'top top',
+        end: 'bottom bottom',
+        onUpdate: (self) => {
+          if (isActive) {
+            useExperienceStore.getState().setGlobalProgress(self.progress * 0.25);
+          }
+        }
+      });
+
       // 2. LAND - Altitude reveal
       gsap.fromTo('.st-altitude', 
         { opacity: 0, y: 50 },
