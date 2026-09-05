@@ -68,52 +68,48 @@ export default function ForkPane({ world, isActive, isExpanded, layoutState, chi
       dragMomentum={false}
       onPointerDown={handlePointerDown}
       style={{ x, y }}
-      className={`absolute flex flex-col pointer-events-auto bg-drift-surface border transition-shadow ${
+      className={`absolute flex flex-col pointer-events-auto overflow-hidden transition-shadow ${
         isActive 
-          ? 'border-drift-foreground shadow-2xl' 
-          : 'border-drift-border hover:border-drift-foreground/50 shadow-md'
+          ? 'shadow-2xl ring-1 ring-drift-foreground/15' 
+          : 'shadow-md ring-1 ring-drift-border/40 hover:ring-drift-foreground/20'
       }`}
     >
-      {/* Window Chrome / Header - Draggable Area */}
+      {/* Minimal World Header Strip — not a full window chrome */}
       <div 
-        className="w-full px-6 py-4 flex justify-between items-center z-50 select-none cursor-grab active:cursor-grabbing bg-drift-surface border-b border-drift-border"
-        onPointerDown={(e) => {
-          // ensure focus happens when clicking header too
-          handlePointerDown();
-        }}
+        className="w-full px-4 py-2 flex justify-between items-center z-50 select-none cursor-grab active:cursor-grabbing border-b border-drift-border/30 shrink-0"
+        style={{ background: 'transparent' }}
+        onPointerDown={() => handlePointerDown()}
       >
-        <div className="flex items-center gap-4">
-          <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-drift-accent' : 'bg-drift-foreground-muted'}`} />
-          <h3 className="text-[10px] font-sans tracking-[0.25em] uppercase text-drift-foreground font-medium">{world}</h3>
-        </div>
+        <span className={`text-[9px] font-sans tracking-[0.35em] uppercase transition-colors duration-300 ${
+          isActive ? 'text-drift-foreground' : 'text-drift-foreground-muted'
+        }`}>
+          {world}
+        </span>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button 
-            className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground transition-colors p-1"
+            className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none transition-colors p-1"
             onClick={toggleExpand}
-            title={isExpanded ? "Collapse" : "Expand"}
+            title={isExpanded ? 'Collapse' : 'Expand'}
             aria-label={isExpanded ? `Collapse ${world}` : `Expand ${world}`}
           >
             {isExpanded ? (
-              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" />
               </svg>
             ) : (
-              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
               </svg>
             )}
           </button>
           <button 
-            className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground transition-colors p-1"
-            onClick={(e) => {
-              e.stopPropagation();
-              closeFork(world as World);
-            }}
+            className="text-drift-foreground-muted hover:text-drift-foreground focus-visible:outline-none transition-colors p-1"
+            onClick={(e) => { e.stopPropagation(); closeFork(world as World); }}
             title="Close"
             aria-label={`Close ${world}`}
           >
-            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
