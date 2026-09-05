@@ -9,6 +9,7 @@ export default function ReactiveField() {
   const roastDevelopment = useExperienceStore((state) => state.roastDevelopment);
   const brewMethod = useExperienceStore((state) => state.brewMethod);
   const brewProgress = useExperienceStore((state) => state.brewProgress);
+  const scroll = useExperienceStore((state) => state.scroll);
   
   // Helper to interpolate between two numbers
   const lerp = (start: number, end: number, amt: number) => {
@@ -117,6 +118,12 @@ export default function ReactiveField() {
     const p = getShopPhysics();
     ({ xGap, yGap, waveAmpX, waveAmpY, waveSpeedX, waveSpeedY, tension, friction, maxCursorMove } = p);
   }
+
+  // Scroll-driven deformation
+  // A subtle breathing or distortion based on scroll velocity/position
+  const scrollFactor = Math.min(1, scroll / 2000);
+  waveAmpY += scrollFactor * 30;
+  tension -= scrollFactor * 0.005;
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">

@@ -68,6 +68,35 @@ export default function Brew() {
       });
     });
 
+    gsap.fromTo('.st-brew-image-reveal',
+      { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        scale: 1,
+        scrollTrigger: {
+          trigger: '.st-brew-image-reveal',
+          scroller: containerRef.current,
+          start: 'top 90%',
+          end: 'top 40%',
+          scrub: 1
+        }
+      }
+    );
+
+    gsap.fromTo('.st-brew-image-parallax',
+      { y: -30, scale: 1.1 },
+      {
+        y: 30,
+        scrollTrigger: {
+          trigger: '.st-brew-image-reveal',
+          scroller: containerRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
     return () => {
       ScrollTrigger.getAll().forEach(t => {
         if (t.scroller === containerRef.current) t.kill();
@@ -102,12 +131,14 @@ export default function Brew() {
 
       {/* EDITORIAL IMAGE */}
       <div className="w-full px-8 lg:px-16 mb-24">
-        <div className="w-full h-[60vh] md:h-[70vh] overflow-hidden border border-drift-border p-2 bg-drift-surface">
-          <img 
-            src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop" 
-            alt="Pouring Coffee" 
-            className="w-full h-full object-cover filter grayscale contrast-125 hover:grayscale-0 transition-all duration-1000"
-          />
+        <div className="w-full h-[60vh] md:h-[70vh] overflow-hidden border border-drift-border p-2 bg-drift-surface relative group">
+          <div className="w-full h-full overflow-hidden st-brew-image-reveal">
+            <img 
+              src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop" 
+              alt="Pouring Coffee" 
+              className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-1000 st-brew-image-parallax"
+            />
+          </div>
         </div>
       </div>
 

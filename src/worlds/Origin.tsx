@@ -83,6 +83,36 @@ export default function Origin() {
         }
       );
 
+      // 5. EDITORIAL IMAGE REVEAL & PARALLAX
+      gsap.fromTo('.st-image-reveal',
+        { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
+        {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          scale: 1,
+          scrollTrigger: {
+            trigger: '.st-image-reveal',
+            scroller: scroller,
+            start: 'top 90%',
+            end: 'top 30%',
+            scrub: 1
+          }
+        }
+      );
+
+      gsap.fromTo('.st-image-parallax',
+        { y: -30, scale: 1.1 },
+        {
+          y: 30,
+          scrollTrigger: {
+            trigger: '.st-image-reveal',
+            scroller: scroller,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        }
+      );
+
       // Subtle parallax for the main hero text when scrolling down
       gsap.to('.st-hero-text', {
         y: -100,
@@ -164,13 +194,15 @@ export default function Origin() {
           </div>
 
           {/* EDITORIAL IMAGE */}
-          <div className="w-full h-[60vh] md:h-[80vh] my-24 overflow-hidden relative group">
-            <img 
-              src="https://images.unsplash.com/photo-1524350876685-274059332603?q=80&w=2071&auto=format&fit=crop" 
-              alt="Guji Highlands" 
-              className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 origin-center scale-100 group-hover:scale-105"
-            />
-            <div className="absolute bottom-6 left-6 text-xs tracking-widest uppercase text-white/70 mix-blend-difference">
+          <div className="w-full h-[60vh] md:h-[80vh] my-24 overflow-hidden relative group border border-drift-border p-2 bg-drift-surface">
+            <div className="w-full h-full overflow-hidden st-image-reveal">
+              <img 
+                src="https://images.unsplash.com/photo-1524350876685-274059332603?q=80&w=2071&auto=format&fit=crop" 
+                alt="Guji Highlands" 
+                className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 origin-center st-image-parallax"
+              />
+            </div>
+            <div className="absolute bottom-8 left-8 text-[10px] tracking-widest uppercase text-drift-bg mix-blend-difference">
               Guji Zone, 2,100M
             </div>
           </div>

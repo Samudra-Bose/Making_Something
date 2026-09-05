@@ -66,10 +66,10 @@ export default function ForkPane({ world, isActive, isExpanded, layoutState, chi
       dragMomentum={false}
       onPointerDown={handlePointerDown}
       style={{ x, y }}
-      className={`absolute flex flex-col pointer-events-auto bg-drift-surface border shadow-2xl transition-shadow ${
+      className={`absolute flex flex-col pointer-events-auto bg-drift-surface border transition-shadow ${
         isActive 
-          ? 'border-drift-foreground/20 shadow-[0_20px_50px_rgba(0,0,0,0.15)]' 
-          : 'border-drift-border hover:border-drift-foreground/20 shadow-[0_10px_30px_rgba(0,0,0,0.05)]'
+          ? 'border-drift-foreground shadow-2xl' 
+          : 'border-drift-border hover:border-drift-foreground/50 shadow-md'
       }`}
     >
       {/* Window Chrome / Header - Draggable Area */}

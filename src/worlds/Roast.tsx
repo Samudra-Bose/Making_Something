@@ -28,6 +28,35 @@ export default function Roast() {
       }
     });
 
+    gsap.fromTo('.st-roast-image-reveal',
+      { clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 },
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        scale: 1,
+        scrollTrigger: {
+          trigger: '.st-roast-image-reveal',
+          scroller: scroller,
+          start: 'top 90%',
+          end: 'top 40%',
+          scrub: 1
+        }
+      }
+    );
+
+    gsap.fromTo('.st-roast-image-parallax',
+      { y: -30, scale: 1.1 },
+      {
+        y: 30,
+        scrollTrigger: {
+          trigger: '.st-roast-image-reveal',
+          scroller: scroller,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
     const timeout = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 100);
@@ -86,13 +115,15 @@ export default function Roast() {
 
       {/* EDITORIAL IMAGE */}
       <section className="w-full px-8 lg:px-16 mb-32">
-        <div className="w-full h-[60vh] overflow-hidden relative border border-drift-border p-2 bg-drift-surface">
-          <img 
-            src="https://images.unsplash.com/photo-1517488629431-6427e028c037?q=80&w=2069&auto=format&fit=crop" 
-            alt="Coffee Roasting" 
-            className="w-full h-full object-cover filter contrast-125 sepia-[0.3]"
-          />
-          <div className="absolute bottom-8 left-8 text-xs tracking-widest uppercase text-white/90 drop-shadow-md">
+        <div className="w-full h-[60vh] overflow-hidden relative border border-drift-border p-2 bg-drift-surface group">
+          <div className="w-full h-full overflow-hidden st-roast-image-reveal">
+            <img 
+              src="https://images.unsplash.com/photo-1517488629431-6427e028c037?q=80&w=2069&auto=format&fit=crop" 
+              alt="Coffee Roasting" 
+              className="w-full h-full object-cover filter contrast-125 sepia-[0.3] st-roast-image-parallax"
+            />
+          </div>
+          <div className="absolute bottom-8 left-8 text-[10px] tracking-widest uppercase text-white/90 drop-shadow-md">
             The Maillard Reaction
           </div>
         </div>
