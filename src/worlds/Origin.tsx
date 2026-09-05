@@ -30,7 +30,9 @@ export default function Origin() {
     // Only setup scroll narrative if focused or expanded
     if (scale === 'compact') return;
 
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia(scroller);
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
       // 2. LAND - Altitude reveal
       gsap.fromTo('.st-altitude', 
         { opacity: 0, y: 50 },
@@ -125,10 +127,10 @@ export default function Origin() {
           scrub: true
         }
       });
-    }, scroller);
+    });
 
     return () => {
-      ctx.revert();
+      mm.revert();
     };
   }, [scale]);
 
