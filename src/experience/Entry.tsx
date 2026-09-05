@@ -14,6 +14,7 @@ export default function Entry() {
     
     // Trigger transition
     setHasEntered(true);
+    useExperienceStore.getState().openFork('origin');
   };
 
   if (hasEntered) return null;

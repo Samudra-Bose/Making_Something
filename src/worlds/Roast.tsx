@@ -59,6 +59,22 @@ export default function Roast() {
           }
         }
       );
+      
+      // Auto-transition to Brew at the bottom
+      ScrollTrigger.create({
+        trigger: '.st-transition-trigger',
+        scroller: scroller,
+        start: 'bottom bottom',
+        onEnter: () => {
+          const state = useExperienceStore.getState();
+          if (!state.openForks.includes('brew')) {
+            state.openFork('brew');
+            setTimeout(() => {
+               state.focusFork('brew');
+            }, 100);
+          }
+        }
+      });
     });
 
     const timeout = setTimeout(() => {
@@ -181,7 +197,7 @@ export default function Roast() {
           </div>
           
           <motion.div 
-            className="mt-24 pt-8 border-t border-drift-border flex flex-col items-start gap-8"
+            className="st-transition-trigger mt-24 pt-8 border-t border-drift-border flex flex-col items-start gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -191,8 +207,11 @@ export default function Roast() {
             </p>
             <button 
               onClick={() => {
-                useExperienceStore.getState().openFork('brew');
-                useExperienceStore.getState().focusFork('brew');
+                const state = useExperienceStore.getState();
+                if (!state.openForks.includes('brew')) {
+                  state.openFork('brew');
+                }
+                state.focusFork('brew');
               }}
               className="group relative px-10 py-5 border border-drift-border rounded-sm hover:bg-drift-foreground/5 transition-colors overflow-hidden cursor-pointer"
             >

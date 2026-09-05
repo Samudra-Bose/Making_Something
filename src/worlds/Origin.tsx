@@ -127,6 +127,22 @@ export default function Origin() {
           scrub: true
         }
       });
+
+      // Auto-transition to Roast at the bottom
+      ScrollTrigger.create({
+        trigger: '.st-transition-trigger',
+        scroller: scroller,
+        start: 'bottom bottom',
+        onEnter: () => {
+          const state = useExperienceStore.getState();
+          if (!state.openForks.includes('roast')) {
+            state.openFork('roast');
+            setTimeout(() => {
+               state.focusFork('roast');
+            }, 100);
+          }
+        }
+      });
     });
 
     return () => {
@@ -285,14 +301,17 @@ export default function Origin() {
           </div>
 
           {/* 5. CONNECTION (Leads to Roast) */}
-          <div className="min-h-[50vh] flex flex-col justify-center items-center text-center mt-32 mb-20">
+          <div className="st-transition-trigger min-h-[50vh] flex flex-col justify-center items-center text-center mt-32 mb-20">
             <p className="text-drift-foreground-muted text-xs md:text-sm tracking-[0.2em] uppercase mb-10 max-w-md leading-relaxed">
               The raw material is complete. Its true potential now relies on the application of heat.
             </p>
             <button 
               onClick={() => {
-                useExperienceStore.getState().openFork('roast');
-                useExperienceStore.getState().focusFork('roast');
+                const state = useExperienceStore.getState();
+                if (!state.openForks.includes('roast')) {
+                  state.openFork('roast');
+                }
+                state.focusFork('roast');
               }}
               className="group relative px-10 py-5 border border-drift-border rounded-sm hover:bg-drift-foreground/5 transition-colors overflow-hidden cursor-pointer"
             >

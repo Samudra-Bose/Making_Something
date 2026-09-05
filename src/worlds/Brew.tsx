@@ -109,6 +109,22 @@ export default function Brew() {
           }
         }
       );
+      
+      // Auto-transition to Shop at the bottom
+      ScrollTrigger.create({
+        trigger: '.st-transition-trigger',
+        scroller: scroller,
+        start: 'bottom bottom',
+        onEnter: () => {
+          const state = useExperienceStore.getState();
+          if (!state.openForks.includes('shop')) {
+            state.openFork('shop');
+            setTimeout(() => {
+               state.focusFork('shop');
+            }, 100);
+          }
+        }
+      });
     });
 
     return () => {
@@ -280,7 +296,7 @@ export default function Brew() {
       </div>
 
       {/* Finish */}
-      <div className="brew-stage min-h-[70vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8">
+      <div className="st-transition-trigger brew-stage min-h-[70vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8">
         <h2 className="text-4xl lg:text-6xl font-display font-medium tracking-tight mb-6">The Cup</h2>
         <p className="max-w-md text-drift-foreground-muted font-sans leading-relaxed">
           The ritual resolves. Aroma, body, and acidity stabilize into their final form.
@@ -288,10 +304,13 @@ export default function Brew() {
         <div className="mt-12">
           <button 
             onClick={() => {
-              useExperienceStore.getState().openFork('shop');
-              useExperienceStore.getState().focusFork('shop');
+              const state = useExperienceStore.getState();
+              if (!state.openForks.includes('shop')) {
+                state.openFork('shop');
+              }
+              state.focusFork('shop');
             }}
-            className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground border-b border-drift-border pb-1 hover:border-drift-foreground transition-colors"
+            className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground border-b border-drift-border pb-1 hover:border-drift-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground"
           >
             Experience Shop
           </button>
