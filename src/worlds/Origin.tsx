@@ -205,7 +205,7 @@ export default function Origin({ isJourney }: OriginProps = {}) {
         start: 'top 80%',
         onEnter: () => {
           const state = useExperienceStore.getState();
-          if (!state.openForks.includes('roast')) {
+          if (!state.openForks.includes('roast') && !isJourney) {
             state.openFork('roast');
             
             // If we are expanded, we pass the expanded state to Roast to maintain flow
@@ -214,6 +214,7 @@ export default function Origin({ isJourney }: OriginProps = {}) {
             } else {
                state.focusFork('roast');
             }
+            state.closeFork('origin');
           }
         }
       });

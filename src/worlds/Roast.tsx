@@ -56,6 +56,20 @@ export default function Roast({ isJourney }: RoastProps = {}) {
     const mm = gsap.matchMedia(scroller);
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Horizontal Scroll Sequence
+      gsap.to(".st-roast-horizontal-container", {
+        x: () => -(document.querySelector('.st-roast-horizontal-container') as HTMLElement)?.scrollWidth + window.innerWidth,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".st-roast-narrative",
+          scroller: scroller,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+          invalidateOnRefresh: true,
+        }
+      });
+
       // Transition cinematic effect
       gsap.to(".st-bean-expand", {
         scale: 10,
@@ -100,7 +114,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
         start: "bottom bottom",
         onEnter: () => {
           const state = useExperienceStore.getState();
-          if (!state.openForks.includes("brew")) {
+          if (!state.openForks.includes("brew") && !isJourney) {
             state.openFork("brew");
             setTimeout(() => {
                state.focusFork("brew");
@@ -142,11 +156,11 @@ export default function Roast({ isJourney }: RoastProps = {}) {
            <RoastAtmosphere dev={roastDevelopment} />
         </div>
 
-        {/* --- SECTIONS OVERLAY --- */}
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col justify-between">
+        {/* --- HORIZONTAL SECTIONS OVERLAY --- */}
+        <div className="st-roast-horizontal-container absolute top-0 left-0 w-fit h-screen pointer-events-none flex flex-row items-center">
           
           {/* SECTION 01 - GREEN (0-15%) */}
-          <section className="h-screen flex items-center px-8 lg:px-16 relative">
+          <section className="w-screen h-screen flex items-center px-8 lg:px-16 relative">
             <div className="max-w-xl pointer-events-auto z-10">
               <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">01 - Green</h4>
               <h2 className="text-5xl md:text-7xl font-display tracking-tight mb-8">This is coffee before transformation.</h2>
@@ -161,7 +175,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
           </section>
 
           {/* SECTION 02 - HEAT (15-35%) */}
-          <section className="h-screen flex items-center justify-end px-8 lg:px-16 relative text-right">
+          <section className="w-screen h-screen flex items-center justify-center px-8 lg:px-16 relative text-center">
             <div className="max-w-xl pointer-events-auto z-10">
               <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">02 - Heat</h4>
               <h2 className="text-5xl md:text-7xl font-display tracking-tight mb-8">Energy enters the drum.</h2>
@@ -173,11 +187,11 @@ export default function Roast({ isJourney }: RoastProps = {}) {
           </section>
 
           {/* SECTION 03 - YELLOW / CHANGE (35-50%) */}
-          <section className="h-screen flex items-center px-8 lg:px-16 relative">
+          <section className="w-screen h-screen flex items-center justify-end px-8 lg:px-16 relative text-right">
              <div className="max-w-3xl pointer-events-auto z-10">
               <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">03 - Yellow Phase</h4>
               <h2 className="text-5xl md:text-7xl font-display tracking-tight mb-8 text-[#907A60]">The Maillard Reaction.</h2>
-              <p className="text-sm md:text-base font-sans text-drift-foreground-muted leading-relaxed max-w-lg">
+              <p className="text-sm md:text-base font-sans text-drift-foreground-muted leading-relaxed ml-auto max-w-lg">
                 Green becomes straw. Straw becomes gold. Aromas shift from grassy to toasted bread. 
                 Amino acids and reducing sugars degrade into hundreds of new volatile compounds.
               </p>
@@ -185,7 +199,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
           </section>
 
           {/* SECTION 04 - FIRST CRACK (50-65%) */}
-          <section className="h-screen flex flex-col items-center justify-center px-8 lg:px-16 relative text-center">
+          <section className="w-screen h-screen flex flex-col items-center justify-center px-8 lg:px-16 relative text-center">
              <AntiGravity depth={1.5} className="pointer-events-auto z-10">
                <h2 className="text-[12vw] font-display tracking-tighter leading-none mb-4 mix-blend-difference text-white">FIRST CRACK</h2>
                <p className="text-sm tracking-[0.2em] uppercase font-sans text-drift-foreground-muted mix-blend-difference text-white">The physical structure fractures.</p>
@@ -193,7 +207,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
           </section>
 
           {/* SECTION 05 - DEVELOPMENT (65-88%) */}
-          <section className="min-h-screen flex items-center px-8 lg:px-16 relative">
+          <section className="w-screen h-screen flex items-center px-8 lg:px-16 relative">
             <div className="w-full max-w-2xl pointer-events-auto z-10">
               <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-12">05 - Development</h4>
               <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-16">Determine the final character.</h2>
@@ -225,7 +239,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
           </section>
 
           {/* SECTION 06 - CHARACTER (88-100%) */}
-          <section className="h-screen flex flex-col items-center justify-center px-8 lg:px-16 relative text-center">
+          <section className="w-screen h-screen flex flex-col items-center justify-center px-8 lg:px-16 relative text-center">
              <div className="pointer-events-auto max-w-4xl z-10">
                <h4 className="text-xs font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-12">06 - Character</h4>
                <SensoryNotes level={roastLevel} />
@@ -233,7 +247,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
           </section>
           
           {/* SECTION 07 - HANDOFF TO BREW (Cinematic Expansion) */}
-          <section className="st-transition-trigger h-[150vh] flex flex-col justify-start relative text-center pointer-events-auto">
+          <section className="w-screen st-transition-trigger h-screen flex flex-col justify-start relative text-center pointer-events-auto">
              
              {/* Sticky container for the transition effect */}
              <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
