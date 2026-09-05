@@ -60,18 +60,99 @@ export default function ReactiveField() {
 
   // Roast specific physics based on Development (Heat / Expansion / Pressure)
   const getRoastPhysics = () => {
-    const energy = Math.sin(roastDevelopment * Math.PI); // Peaks at 0.5 (first crack)
-    return {
-      xGap: 12 - energy * 6, // Expansion/density increases
-      yGap: 36 - energy * 18,
-      waveAmpX: 40 + energy * 80, // Heat turbulence
-      waveAmpY: 20 + energy * 60,
-      waveSpeedX: 0.02 + energy * 0.06,
-      waveSpeedY: 0.01 + energy * 0.04,
-      tension: 0.01 + energy * 0.03, // Pressure
-      friction: 0.9 - energy * 0.05, // More erratic
-      maxCursorMove: 150
+    // defaults
+    let p = {
+      xGap: 12, yGap: 36,
+      waveAmpX: 40, waveAmpY: 20,
+      waveSpeedX: 0.02, waveSpeedY: 0.01,
+      tension: 0.01, friction: 0.9, maxCursorMove: 120
     };
+    
+    // GREEN: 0 to 0.15 (granular, quiet)
+    if (roastDevelopment < 0.15) {
+      const stageP = roastDevelopment / 0.15;
+      p.xGap = lerp(4, 6, stageP);
+      p.yGap = lerp(4, 6, stageP);
+      p.waveAmpX = lerp(5, 15, stageP);
+      p.waveAmpY = lerp(5, 10, stageP);
+      p.waveSpeedX = 0.002;
+      p.waveSpeedY = 0.002;
+      p.friction = 0.8;
+      p.tension = 0.05;
+    }
+    // HEAT: 0.15 to 0.35 (increasing turbulence)
+    else if (roastDevelopment < 0.35) {
+      const stageP = (roastDevelopment - 0.15) / 0.20;
+      p.xGap = lerp(6, 12, stageP);
+      p.yGap = lerp(6, 16, stageP);
+      p.waveAmpX = lerp(15, 60, stageP);
+      p.waveAmpY = lerp(10, 30, stageP);
+      p.waveSpeedX = lerp(0.002, 0.04, stageP);
+      p.waveSpeedY = lerp(0.002, 0.02, stageP);
+      p.tension = lerp(0.05, 0.015, stageP);
+    }
+    // YELLOW: 0.35 to 0.50 (more directional)
+    else if (roastDevelopment < 0.50) {
+      const stageP = (roastDevelopment - 0.35) / 0.15;
+      p.xGap = lerp(12, 8, stageP);
+      p.yGap = lerp(16, 40, stageP); // Stretch Y
+      p.waveAmpX = lerp(60, 30, stageP);
+      p.waveAmpY = lerp(30, 80, stageP);
+      p.waveSpeedX = 0.01;
+      p.waveSpeedY = lerp(0.02, 0.08, stageP);
+      p.tension = 0.01;
+    }
+    // FIRST CRACK: 0.50 to 0.65 (brief spatial disturbance)
+    else if (roastDevelopment < 0.65) {
+      const stageP = (roastDevelopment - 0.50) / 0.15;
+      const crackIntensity = Math.sin(stageP * Math.PI); // Peaks at middle of first crack
+      p.xGap = lerp(8, 20, stageP) - crackIntensity * 4;
+      p.yGap = lerp(40, 20, stageP) - crackIntensity * 4;
+      p.waveAmpX = 30 + crackIntensity * 100;
+      p.waveAmpY = 30 + crackIntensity * 100;
+      p.waveSpeedX = 0.02 + crackIntensity * 0.1;
+      p.waveSpeedY = 0.02 + crackIntensity * 0.1;
+      p.tension = 0.01 + crackIntensity * 0.05;
+      p.friction = 0.9 - crackIntensity * 0.1;
+    }
+    // DEVELOPMENT: 0.65 to 0.88 (deeper, denser)
+    else if (roastDevelopment < 0.88) {
+      const stageP = (roastDevelopment - 0.65) / 0.23;
+      p.xGap = lerp(20, 10, stageP);
+      p.yGap = lerp(20, 10, stageP);
+      p.waveAmpX = lerp(30, 50, stageP);
+      p.waveAmpY = lerp(30, 20, stageP);
+      p.waveSpeedX = lerp(0.02, 0.005, stageP);
+      p.waveSpeedY = lerp(0.02, 0.005, stageP);
+      p.friction = lerp(0.9, 0.95, stageP);
+      p.tension = 0.01;
+    }
+    // CHARACTER: 0.88 to 1.0 (slow settling)
+    else {
+      const stageP = (roastDevelopment - 0.88) / 0.12;
+      p.xGap = lerp(10, 16, stageP);
+      p.yGap = lerp(10, 16, stageP);
+      p.waveAmpX = lerp(50, 15, stageP);
+      p.waveAmpY = lerp(20, 15, stageP);
+      p.waveSpeedX = lerp(0.005, 0.001, stageP);
+      p.waveSpeedY = lerp(0.005, 0.001, stageP);
+      p.friction = 0.95;
+      p.tension = lerp(0.01, 0.002, stageP);
+    }
+    
+    // Roast level affects late-stage density and tension
+    if (roastDevelopment > 0.65) {
+      if (roastLevel === 'light') {
+        p.waveAmpX *= 1.2;
+        p.tension *= 1.5;
+      } else if (roastLevel === 'dark') {
+        p.xGap *= 0.8;
+        p.yGap *= 0.8;
+        p.friction *= 1.02; // More sluggish/heavy
+      }
+    }
+    
+    return p;
   };
 
   // Brew specific physics (Water / Flow / Vortex)
