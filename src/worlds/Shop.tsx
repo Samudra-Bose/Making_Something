@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useExperienceStore } from '../experience/store';
 import { DRIFT_COLLECTION, Product } from '../data/products';
+import { useShockwave } from '../reactive/useShockwave';
 
 export default function Shop() {
   const selectedProductId = useExperienceStore((state) => state.selectedProductId);
@@ -118,14 +119,17 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
 
   const currentVariant = variants.find(v => v.id === selectedVariant) || variants[0];
   const finalPrice = Math.floor(product.price * currentVariant.multiplier);
+  
+  const triggerShockwave = useShockwave();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     addToCart({
       productId: product.id,
       variant: currentVariant.id,
       quantity: 1,
       price: finalPrice
     });
+    triggerShockwave(e.clientX, e.clientY, 1.5);
   };
 
   const navigateContext = (world: 'origin' | 'roast' | 'brew') => {

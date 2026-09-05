@@ -50,10 +50,21 @@ export default function DotGrid() {
       }
     };
 
+    const handleCustomRipple = (e: CustomEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      ripples.push({ 
+        x: e.detail.x - rect.left, 
+        y: e.detail.y - rect.top, 
+        radius: 0, 
+        life: e.detail.intensity || 1 
+      });
+    };
+
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('click', handleClick);
+    window.addEventListener('drift:ripple', handleCustomRipple as EventListener);
     resize();
 
     const draw = () => {
@@ -229,6 +240,7 @@ export default function DotGrid() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('click', handleClick);
+      window.removeEventListener('drift:ripple', handleCustomRipple as EventListener);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

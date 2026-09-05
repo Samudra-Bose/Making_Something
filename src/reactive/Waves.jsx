@@ -374,6 +374,16 @@ const Waves = ({
       });
     }
 
+    function onCustomRipple(e) {
+      const b = boundingRef.current;
+      ripples.push({ 
+        x: e.detail.x - b.left, 
+        y: e.detail.y - b.top, 
+        radius: 0, 
+        life: e.detail.intensity || 1 
+      });
+    }
+
     setSize();
     setLines();
     frameIdRef.current = requestAnimationFrame(tick);
@@ -381,12 +391,14 @@ const Waves = ({
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('click', onClick);
+    window.addEventListener('drift:ripple', onCustomRipple);
 
     return () => {
       window.removeEventListener('resize', onResize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('click', onClick);
+      window.removeEventListener('drift:ripple', onCustomRipple);
       cancelAnimationFrame(frameIdRef.current);
     };
   }, []);
