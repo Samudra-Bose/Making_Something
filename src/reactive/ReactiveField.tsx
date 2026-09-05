@@ -78,21 +78,73 @@ export default function ReactiveField() {
   const getBrewPhysics = () => {
     let p = {
       xGap: 16, yGap: 16,
-      waveAmpX: 60 - brewProgress * 20, // settles as it extracts
-      waveAmpY: 15 + brewProgress * 10,
-      waveSpeedX: 0.04 + brewProgress * 0.03,
-      waveSpeedY: 0.005,
-      tension: 0.005,
-      friction: 0.96,
-      maxCursorMove: 120
+      waveAmpX: 30, waveAmpY: 15,
+      waveSpeedX: 0.02, waveSpeedY: 0.005,
+      tension: 0.005, friction: 0.96, maxCursorMove: 120
     };
-    if (brewMethod === 'espresso') {
-      // High pressure, tight vortex
-      p = { ...p, xGap: 6, yGap: 6, waveAmpX: 40, waveAmpY: 40, waveSpeedX: 0.06, waveSpeedY: 0.04, tension: 0.02, friction: 0.9 };
-    } else if (brewMethod === 'french-press') {
-      // Slow immersion
-      p = { ...p, xGap: 24, yGap: 24, waveSpeedX: 0.008, waveSpeedY: 0.008, waveAmpX: 30, waveAmpY: 30, friction: 0.92 };
+    
+    // Grind: 0 to 0.15
+    if (brewProgress < 0.15) {
+      const stageP = brewProgress / 0.15;
+      p.xGap = lerp(8, 4, stageP);
+      p.yGap = lerp(8, 4, stageP);
+      p.friction = 0.85; // granular
+      p.tension = 0.02;
+    } 
+    // Water: 0.15 to 0.3
+    else if (brewProgress < 0.3) {
+      const stageP = (brewProgress - 0.15) / 0.15;
+      p.xGap = lerp(4, 20, stageP);
+      p.yGap = lerp(4, 20, stageP);
+      p.waveAmpX = lerp(10, 60, stageP);
+      p.waveAmpY = lerp(10, 30, stageP);
+      p.waveSpeedX = 0.04; // smooth wave
     }
+    // Bloom: 0.3 to 0.45
+    else if (brewProgress < 0.45) {
+      const stageP = (brewProgress - 0.3) / 0.15;
+      p.xGap = lerp(20, 30, stageP); // expansion
+      p.yGap = lerp(20, 30, stageP);
+      p.tension = lerp(0.005, 0.03, stageP); // pressure-like
+      p.waveAmpX = lerp(60, 20, stageP);
+    }
+    // Pour: 0.45 to 0.65
+    else if (brewProgress < 0.65) {
+      p.waveSpeedY = 0.05; // vertical/directional flow
+      p.waveAmpY = 50;
+      p.xGap = 16;
+      p.yGap = 24;
+      p.tension = 0.01;
+    }
+    // Extraction: 0.65 to 0.85
+    else if (brewProgress < 0.85) {
+      p.xGap = 16;
+      p.yGap = 16;
+      p.waveAmpX = 20;
+      p.waveAmpY = 10;
+      p.waveSpeedX = 0.02;
+      p.waveSpeedY = 0.01; // calmer flowing
+    }
+    // Cup: 0.85 to 1.0
+    else {
+      p.xGap = 24;
+      p.yGap = 24;
+      p.waveAmpX = 10;
+      p.waveAmpY = 5;
+      p.waveSpeedX = 0.005; // slower atmospheric
+      p.waveSpeedY = 0.002;
+    }
+
+    if (brewMethod === 'espresso') {
+      p.xGap = Math.max(2, p.xGap * 0.5);
+      p.yGap = Math.max(2, p.yGap * 0.5);
+      p.tension *= 2;
+    } else if (brewMethod === 'french-press') {
+      p.xGap *= 1.5;
+      p.yGap *= 1.5;
+      p.waveSpeedX *= 0.5;
+    }
+
     return p;
   };
 
