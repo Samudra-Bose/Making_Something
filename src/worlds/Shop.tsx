@@ -262,6 +262,21 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
           </div>
         </div>
       </div>
+
+      {/* Cinematic Conclusion */}
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center mt-32 border-t border-drift-border/30 pt-32 pb-32">
+        <p className="text-xs tracking-[0.4em] uppercase text-drift-foreground-muted mb-8">The Ritual Continues</p>
+        <h3 className="text-4xl md:text-5xl font-display text-drift-foreground mb-12 max-w-lg leading-tight">Coffee changes the pace of a room.</h3>
+        <button 
+          onClick={() => {
+            const container = document.querySelector('.custom-scrollbar');
+            if (container) container.scrollTo({top: 0, behavior: 'smooth'});
+          }} 
+          className="text-xs tracking-[0.2em] uppercase text-drift-foreground border-b border-drift-border pb-1 hover:border-drift-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground"
+        >
+          Return to Beginning
+        </button>
+      </div>
     </motion.div>
   );
 }
