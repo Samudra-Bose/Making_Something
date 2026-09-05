@@ -166,7 +166,7 @@ export default function Roast() {
                 <EditorialRoastOption 
                   level="dark" 
                   title="Dark" 
-                  desc="Heavy body. Cocoa. Roaster"s imprint." 
+                  desc="Heavy body. Cocoa. Roaster's imprint." 
                   current={roastLevel} 
                   onSelect={setRoastLevel} 
                 />
@@ -294,7 +294,7 @@ function RoastAtmosphere({ dev }: { dev: number }) {
       <div className="absolute left-8 bottom-8 font-sans text-xs tracking-widest uppercase text-drift-foreground-muted">
         <div className="mb-1">Internal Temp</div>
         <div className="text-2xl font-display text-drift-foreground tabular-nums">
-          {Math.floor(22 + dev * 200)}°C
+          {Math.floor(22 + dev * 200)}ï¿½C
         </div>
       </div>
       

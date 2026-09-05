@@ -133,14 +133,18 @@ export default function Origin() {
       ScrollTrigger.create({
         trigger: '.st-transition-trigger',
         scroller: scroller,
-        start: 'bottom bottom',
+        start: 'top 80%',
         onEnter: () => {
           const state = useExperienceStore.getState();
           if (!state.openForks.includes('roast')) {
             state.openFork('roast');
-            setTimeout(() => {
+            
+            // If we are expanded, we pass the expanded state to Roast to maintain flow
+            if (state.expandedFork === 'origin') {
+               state.expandFork('roast');
+            } else {
                state.focusFork('roast');
-            }, 100);
+            }
           }
         }
       });

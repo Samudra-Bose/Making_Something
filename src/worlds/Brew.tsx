@@ -135,18 +135,33 @@ export default function Brew() {
       tlCup.fromTo('.st-cup-img', { scale: 1.5, y: 100 }, { scale: 1, y: 0, duration: 1 })
            .fromTo('.st-cup-steam', { opacity: 0, y: 20 }, { opacity: 0.6, y: -20, duration: 1 }, '<0.5');
 
+      // SCENE 07: CHARACTER
+      gsap.fromTo('.st-character-text',
+        { y: 50 },
+        { y: -50, scrollTrigger: {
+            trigger: '.st-transition-trigger',
+            scroller: scroller,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        }
+      );
+
       // Auto-transition to Shop at the bottom
       ScrollTrigger.create({
         trigger: '.st-transition-trigger',
         scroller: scroller,
-        start: 'bottom bottom',
+        start: 'top 80%',
         onEnter: () => {
           const state = useExperienceStore.getState();
           if (!state.openForks.includes('shop')) {
             state.openFork('shop');
-            setTimeout(() => {
+            if (state.expandedFork === 'brew') {
+               state.expandFork('shop');
+            } else {
                state.focusFork('shop');
-            }, 100);
+            }
           }
         }
       });
