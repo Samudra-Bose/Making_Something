@@ -227,7 +227,8 @@ export default function Origin() {
     <div 
       ref={containerRef} 
       onScroll={handleScroll}
-      className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar relative px-6 md:px-12 py-20 pb-40"
+      className="h-full w-full overflow-y-auto overflow-x-hidden relative"
+      data-world="origin"
     >
       
       {/* 1. CINEMATIC HERO (Pinned Scene) */}
@@ -250,8 +251,8 @@ export default function Origin() {
                 The Source
               </div>
             </div>
-            <div className="overflow-hidden mix-blend-difference text-drift-bg">
-              <h1 className="st-hero-title text-[15vw] leading-[0.8] font-display uppercase tracking-tighter text-center whitespace-nowrap">
+            <div className="overflow-hidden">
+              <h1 className="st-hero-title text-[15vw] leading-[0.8] font-display uppercase tracking-tighter text-center whitespace-nowrap text-drift-foreground drop-shadow-[0_2px_40px_rgba(22,20,18,0.15)]">
                 ETHIOPIA
               </h1>
             </div>
@@ -280,9 +281,9 @@ export default function Origin() {
       </div>
 
       {scale !== 'compact' && (
-        <div className="relative z-10 max-w-4xl mx-auto -mt-[20vh]">
+        <div className="relative z-10 max-w-4xl mx-auto -mt-[20vh] px-6 md:px-12 pb-40">
           {/* 2. LAND / DISCOVERY */}
-          <div className="st-altitude-trigger min-h-[70vh] flex flex-col justify-center">
+          <div className="st-altitude-trigger min-h-[70vh] flex flex-col justify-center pt-20">
             <h2 className="st-altitude text-3xl md:text-5xl lg:text-6xl font-display text-drift-foreground mb-10 leading-tight">
               Every cup begins somewhere. In the Guji zone, coffee is not an industry—it is the geography itself.
             </h2>
