@@ -34,7 +34,7 @@ export default function GlobalNavigation() {
       className="fixed top-0 left-0 w-full p-6 lg:p-12 z-50 flex justify-between items-start pointer-events-none"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 1.5, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex flex-col gap-2 pointer-events-auto">
         <h1 className="text-xl md:text-2xl font-display text-drift-foreground tracking-[0.2em] uppercase">

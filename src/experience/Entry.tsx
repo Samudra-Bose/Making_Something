@@ -56,7 +56,7 @@ export default function Entry() {
     useExperienceStore.getState().expandFork('origin');
   };
 
-  if (hasEntered) return null;
+  // Remove `if (hasEntered) return null;` so AnimatePresence can run exit animation
 
   return (
     <motion.div 

@@ -34,7 +34,29 @@ export default function Origin() {
     const mm = gsap.matchMedia(scroller);
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      // 1. HERO - Cinematic layered scroll
+      // 1. HERO - Initial Entrance Animation (Syncs with Entry.tsx exit)
+      const tl = gsap.timeline({ delay: 1.2 });
+      tl.fromTo('.st-hero-bg', 
+        { scale: 1.2, opacity: 0 }, 
+        { scale: 1.1, opacity: 0.3, duration: 2, ease: 'power3.out' }
+      )
+      .fromTo('.st-hero-title',
+        { y: 100, clipPath: 'inset(100% 0 0 0)' },
+        { y: 0, clipPath: 'inset(0% 0 0 0)', duration: 1.5, ease: 'power4.out' },
+        "-=1.5"
+      )
+      .fromTo('.st-hero-subtitle',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 1 },
+        "-=1.2"
+      )
+      .fromTo('.st-hero-subject',
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.5, ease: 'power3.out' },
+        "-=1.2"
+      );
+
+      // 1.1 HERO - Cinematic layered scroll
       gsap.to('.st-hero-bg', {
         y: 100,
         scale: 1,
