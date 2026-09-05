@@ -122,6 +122,12 @@ export default function ForkPane({ world, isActive, isExpanded, layoutState, chi
       <div 
         className="flex-1 w-full relative overflow-y-auto custom-scrollbar"
         onPointerDown={(e) => e.stopPropagation()} // Prevent drag when interacting with content
+        onScroll={(e) => {
+          if (isActive) {
+            const target = e.target as HTMLDivElement;
+            useExperienceStore.getState().setScroll(target.scrollTop);
+          }
+        }}
       >
         {/* We can conditionally dim inactive forks content */}
         <motion.div 
