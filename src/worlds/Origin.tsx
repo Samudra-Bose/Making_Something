@@ -217,9 +217,11 @@ export default function Origin() {
   }, [scale]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    // Only broadcast scroll to the shared reactive environment if this is the active fork
+    const el = e.currentTarget;
+    // Update shared scroll position so ReactiveField velocity works
+    setScroll(el.scrollTop);
     if (isActive) {
-      setScroll(e.currentTarget.scrollTop);
+      // globalProgress for Origin (0.0 → 0.25) is handled by ScrollTrigger onUpdate
     }
   };
 

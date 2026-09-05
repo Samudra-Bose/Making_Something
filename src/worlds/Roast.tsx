@@ -28,8 +28,16 @@ export default function Roast() {
       scroller: scroller,
       start: "top top",
       end: "bottom bottom",
+      onEnter: () => {
+        // Sync activeWorld when Roast becomes the focused world
+        useExperienceStore.getState().setActiveWorld('roast');
+      },
       onUpdate: (self) => {
         setRoastDevelopment(self.progress);
+        // Roast occupies global story 0.25 → 0.55
+        useExperienceStore.getState().setGlobalProgress(0.25 + self.progress * 0.30);
+        // Also update store scroll so ReactiveField velocity is correct
+        useExperienceStore.getState().setScroll(scroller.scrollTop);
         
         // Fire shockwave precisely at First Crack (progress ~0.5)
         if (self.progress > 0.48 && self.progress < 0.52 && !shockwaveFired.current) {

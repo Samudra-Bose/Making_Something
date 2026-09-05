@@ -27,8 +27,15 @@ export default function Brew() {
       scroller: scroller,
       start: 'top top',
       end: 'bottom bottom',
+      onEnter: () => {
+        useExperienceStore.getState().setActiveWorld('brew');
+      },
       onUpdate: (self) => {
         setBrewProgress(self.progress);
+        // Brew occupies global story 0.55 → 0.78
+        useExperienceStore.getState().setGlobalProgress(0.55 + self.progress * 0.23);
+        // Update store scroll so ReactiveField velocity works
+        useExperienceStore.getState().setScroll(scroller.scrollTop);
       }
     });
 
