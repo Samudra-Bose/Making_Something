@@ -34,6 +34,54 @@ export default function Origin() {
     const mm = gsap.matchMedia(scroller);
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // 1. HERO - Cinematic layered scroll
+      gsap.to('.st-hero-bg', {
+        y: 100,
+        scale: 1,
+        scrollTrigger: {
+          trigger: '.st-hero-container',
+          scroller: scroller,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+      
+      gsap.to('.st-hero-title', {
+        y: -150,
+        opacity: 0,
+        scrollTrigger: {
+          trigger: '.st-hero-container',
+          scroller: scroller,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+
+      gsap.to('.st-hero-subject', {
+        y: -300,
+        scale: 1.1,
+        scrollTrigger: {
+          trigger: '.st-hero-container',
+          scroller: scroller,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+
+      gsap.to('.st-hero-details', {
+        opacity: 0,
+        scrollTrigger: {
+          trigger: '.st-hero-container',
+          scroller: scroller,
+          start: 'top top',
+          end: '500px top',
+          scrub: true
+        }
+      });
+
       // 2. LAND - Altitude reveal
       gsap.fromTo('.st-altitude', 
         { opacity: 0, y: 50 },
@@ -169,43 +217,57 @@ export default function Origin() {
       className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar relative px-6 md:px-12 py-20 pb-40"
     >
       
-      {/* 1. PLACE / WONDER (Hero) */}
-      <div className="min-h-[85vh] flex flex-col justify-center items-start relative z-10">
-        <div className="overflow-hidden">
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-drift-accent text-[10px] md:text-xs tracking-[0.3em] uppercase mb-6 font-medium"
-          >
-            Origin
-          </motion.p>
+      {/* 1. CINEMATIC HERO (Pinned Scene) */}
+      <div className="st-hero-container relative w-full h-[150vh]">
+        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+          
+          {/* Background slow layer */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=2000&auto=format&fit=crop" 
+              alt="Mist over coffee farm"
+              className="st-hero-bg w-full h-full object-cover opacity-30 mix-blend-screen scale-110"
+            />
+          </div>
+
+          {/* Typography Layer (Mid-ground) */}
+          <div className="relative z-10 w-full flex flex-col items-center justify-center pointer-events-none">
+            <div className="overflow-hidden">
+              <div className="st-hero-subtitle text-drift-accent text-[10px] md:text-xs tracking-[0.4em] uppercase mb-6 font-medium">
+                The Source
+              </div>
+            </div>
+            <div className="overflow-hidden mix-blend-difference text-drift-bg">
+              <h1 className="st-hero-title text-[15vw] leading-[0.8] font-display uppercase tracking-tighter text-center whitespace-nowrap">
+                ETHIOPIA
+              </h1>
+            </div>
+          </div>
+
+          {/* Foreground Subject */}
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+             <div className="w-[60vw] md:w-[30vw] aspect-[3/4] relative st-hero-subject overflow-hidden">
+               <img 
+                 src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1974&auto=format&fit=crop"
+                 alt="Coffee Cherries Macro"
+                 className="w-full h-full object-cover filter contrast-125 grayscale st-hero-subject-img"
+               />
+               <div className="absolute inset-0 border border-drift-border/50 m-4"></div>
+             </div>
+          </div>
+
+          {/* Details (Overlay) */}
+          <div className="absolute bottom-12 right-12 z-30 st-hero-details text-right hidden md:block">
+            <p className="text-xs text-drift-foreground-muted tracking-[0.2em] font-sans uppercase">Altitude</p>
+            <p className="text-xl font-display text-drift-foreground mb-4">1,900-2,100M</p>
+            <p className="text-xs text-drift-foreground-muted tracking-[0.2em] font-sans uppercase">Varietal</p>
+            <p className="text-xl font-display text-drift-foreground">Heirloom</p>
+          </div>
         </div>
-        <motion.h1 
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="st-hero-text text-6xl md:text-8xl lg:text-9xl font-display text-drift-foreground mb-8 uppercase tracking-wider leading-[0.9]"
-        >
-          Ethiopia<br />Guji
-        </motion.h1>
-        
-        {scale !== 'compact' && (
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, delay: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="st-hero-text flex flex-col gap-3 mt-8 text-xs md:text-sm text-drift-foreground-muted tracking-[0.15em] font-sans uppercase border-l border-drift-border pl-5"
-          >
-            <p className="hover:text-drift-foreground transition-colors cursor-default">1,900–2,100M Altitude</p>
-            <p className="hover:text-drift-foreground transition-colors cursor-default">Natural Process</p>
-            <p className="hover:text-drift-foreground transition-colors cursor-default">Heirloom Varietal</p>
-          </motion.div>
-        )}
       </div>
 
       {scale !== 'compact' && (
-        <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="relative z-10 max-w-4xl mx-auto -mt-[20vh]">
           {/* 2. LAND / DISCOVERY */}
           <div className="st-altitude-trigger min-h-[70vh] flex flex-col justify-center">
             <h2 className="st-altitude text-3xl md:text-5xl lg:text-6xl font-display text-drift-foreground mb-10 leading-tight">

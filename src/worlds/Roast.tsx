@@ -44,6 +44,43 @@ export default function Roast() {
     const mm = gsap.matchMedia(scroller);
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Transition cinematic effect
+      gsap.to(".st-bean-expand", {
+        scale: 10,
+        opacity: 0,
+        scrollTrigger: {
+          trigger: ".st-transition-trigger",
+          scroller: scroller,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+      
+      gsap.to(".st-brew-emerge", {
+        opacity: 1,
+        y: -50,
+        scrollTrigger: {
+          trigger: ".st-transition-trigger",
+          scroller: scroller,
+          start: "top top",
+          end: "bottom center",
+          scrub: true
+        }
+      });
+
+      gsap.to(".st-brew-emerge-sub", {
+        opacity: 1,
+        y: -30,
+        scrollTrigger: {
+          trigger: ".st-transition-trigger",
+          scroller: scroller,
+          start: "center center",
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+
       // Auto-transition to Brew at the bottom
       ScrollTrigger.create({
         trigger: ".st-transition-trigger",
@@ -182,22 +219,34 @@ export default function Roast() {
              </div>
           </section>
           
-          {/* SECTION 07 - HANDOFF TO BREW */}
-          <section className="st-transition-trigger h-[50vh] flex flex-col justify-end pb-32 px-8 lg:px-16 relative text-center">
-             <div className="pointer-events-auto w-full z-10">
-               <p className="text-sm font-sans tracking-[0.2em] text-drift-foreground-muted uppercase mb-8">The bean is ready.</p>
-               <button 
-                onClick={() => {
-                  const state = useExperienceStore.getState();
-                  if (!state.openForks.includes("brew")) {
-                    state.openFork("brew");
-                  }
-                  state.focusFork("brew");
-                }}
-                className="text-xs font-sans tracking-[0.2em] uppercase text-drift-foreground border-b border-drift-border pb-2 hover:border-drift-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground"
-              >
-                Continue to Extraction
-              </button>
+          {/* SECTION 07 - HANDOFF TO BREW (Cinematic Expansion) */}
+          <section className="st-transition-trigger h-[150vh] flex flex-col justify-start relative text-center pointer-events-auto">
+             
+             {/* Sticky container for the transition effect */}
+             <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+               
+               {/* Macro Bean expanding into grounds */}
+               <div className="absolute inset-0 z-0 flex items-center justify-center">
+                 <div className="st-bean-expand w-[30vh] h-[30vh] rounded-full overflow-hidden relative">
+                   <img 
+                     src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=2000&auto=format&fit=crop" 
+                     alt="Macro Roasted Bean Texture" 
+                     className="w-full h-full object-cover scale-150"
+                   />
+                   <div className="absolute inset-0 bg-drift-bg/20 mix-blend-overlay"></div>
+                 </div>
+               </div>
+
+               {/* Typography emerging */}
+               <div className="relative z-10 w-full flex flex-col items-center">
+                 <h2 className="st-brew-emerge text-[8vw] font-display uppercase tracking-tighter text-white mix-blend-difference opacity-0">
+                   Extraction
+                 </h2>
+                 <p className="st-brew-emerge-sub text-xs tracking-[0.3em] uppercase text-drift-foreground-muted mt-4 opacity-0">
+                   The release of solubles
+                 </p>
+               </div>
+               
              </div>
           </section>
 

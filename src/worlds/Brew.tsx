@@ -148,20 +148,55 @@ export default function Brew() {
         }
       );
 
+      // SCENE 06 -> 07 Transition (Product Emerge)
+      gsap.to(".st-product-emerge", {
+        scale: 1,
+        opacity: 1,
+        scrollTrigger: {
+          trigger: ".st-transition-trigger",
+          scroller: scroller,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+      
+      gsap.to(".st-character-text", {
+        opacity: 0,
+        y: -100,
+        scrollTrigger: {
+          trigger: ".st-transition-trigger",
+          scroller: scroller,
+          start: "top top",
+          end: "center center",
+          scrub: true
+        }
+      });
+
+      gsap.to(".st-shop-reveal", {
+        opacity: 1,
+        y: -50,
+        scrollTrigger: {
+          trigger: ".st-transition-trigger",
+          scroller: scroller,
+          start: "center center",
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+
       // Auto-transition to Shop at the bottom
       ScrollTrigger.create({
-        trigger: '.st-transition-trigger',
+        trigger: ".st-transition-trigger",
         scroller: scroller,
-        start: 'top 80%',
+        start: "bottom bottom",
         onEnter: () => {
           const state = useExperienceStore.getState();
           if (!state.openForks.includes('shop')) {
             state.openFork('shop');
-            if (state.expandedFork === 'brew') {
-               state.expandFork('shop');
-            } else {
+            setTimeout(() => {
                state.focusFork('shop');
-            }
+            }, 100);
           }
         }
       });
@@ -311,28 +346,43 @@ export default function Brew() {
           </AntiGravity>
         </section>
 
-        {/* SCENE 07: CHARACTER */}
-        <section className="st-transition-trigger min-h-screen flex flex-col justify-center px-8 lg:px-16 relative bg-drift-foreground text-drift-bg">
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-bg/50 mb-12">07 — Character</div>
-            <h3 className="text-5xl md:text-7xl lg:text-8xl font-display mb-12 leading-tight mix-blend-difference">
-              {roastLevel === 'light' ? 'Jasmine, Citrus & Bright Acidity.' : 
-               roastLevel === 'medium' ? 'Stone Fruit, Caramel & Balanced Sweetness.' : 
-               'Dark Cocoa, Toasted Nuts & Heavy Body.'}
-            </h3>
+        {/* SCENE 07: CHARACTER (Cinematic Transition to Shop) */}
+        <section className="st-transition-trigger min-h-[150vh] relative bg-drift-foreground text-drift-bg overflow-hidden flex flex-col justify-start">
+          
+          <div className="sticky top-0 h-screen w-full flex items-center justify-center">
             
-            <button 
-              onClick={() => {
-                const state = useExperienceStore.getState();
-                if (!state.openForks.includes('shop')) {
-                  state.openFork('shop');
-                }
-                state.focusFork('shop');
-              }}
-              className="mt-24 text-xs font-sans tracking-[0.2em] uppercase text-drift-bg border-b border-drift-bg/30 pb-2 hover:border-drift-bg transition-colors"
-            >
-              Acquire in Shop
-            </button>
+            {/* The Cup scales down and transforms context */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+               <div className="st-product-emerge w-[150vw] h-[150vw] bg-drift-bg rounded-full opacity-0 origin-center scale-0"></div>
+            </div>
+
+            <div className="max-w-4xl mx-auto text-center relative z-10 pointer-events-auto mix-blend-difference">
+              <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-drift-bg/50 mb-12">07 - Character</div>
+              <h3 className="st-character-text text-5xl md:text-7xl lg:text-[7vw] font-display mb-12 leading-none">
+                {roastLevel === 'light' ? 'Jasmine, Citrus & Bright Acidity.' : 
+                 roastLevel === 'medium' ? 'Stone Fruit, Caramel & Balanced Sweetness.' : 
+                 'Dark Cocoa, Toasted Nuts & Heavy Body.'}
+              </h3>
+              
+              <div className="st-shop-reveal mt-32 flex flex-col items-center opacity-0">
+                <p className="text-xs font-sans tracking-[0.3em] uppercase text-drift-bg mb-8">
+                  The Final Form
+                </p>
+                <button 
+                  onClick={() => {
+                    const state = useExperienceStore.getState();
+                    if (!state.openForks.includes('shop')) {
+                      state.openFork('shop');
+                    }
+                    state.focusFork('shop');
+                  }}
+                  className="px-10 py-5 border border-drift-bg rounded-sm hover:bg-drift-bg hover:text-drift-foreground transition-colors cursor-pointer"
+                >
+                  <span className="text-xs font-sans tracking-[0.2em] uppercase">Acquire</span>
+                </button>
+              </div>
+            </div>
+            
           </div>
         </section>
 
