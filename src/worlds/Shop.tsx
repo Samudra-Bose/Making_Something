@@ -5,6 +5,10 @@ import { DRIFT_COLLECTION, Product } from '../data/products';
 import { useShockwave } from '../reactive/useShockwave';
 import { AntiGravity } from '../reactive/AntiGravity';
 
+interface ShopProps {
+  isJourney?: boolean;
+}
+
 // Awwwards-quality stagger reveal for cards
 function useStaggerReveal(count: number) {
   const ref = useRef<HTMLDivElement>(null);
@@ -12,14 +16,17 @@ function useStaggerReveal(count: number) {
   return { ref, isInView };
 }
 
-export default function Shop() {
+export default function Shop({ isJourney }: ShopProps = {}) {
   const selectedProductId = useExperienceStore((state) => state.selectedProductId);
   const setSelectedProduct = useExperienceStore((state) => state.setSelectedProduct);
   const roastLevel = useExperienceStore((state) => state.roastLevel);
   const brewMethod = useExperienceStore((state) => state.brewMethod);
   const hasAutoSelected = React.useRef(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    if (!containerRef.current) return;
+    const scroller = isJourney ? window : containerRef.current;
     if (!selectedProductId && !hasAutoSelected.current) {
       let bestMatch = DRIFT_COLLECTION.find(p => p.roast === roastLevel && p.recommendedBrew === brewMethod);
       if (!bestMatch) bestMatch = DRIFT_COLLECTION.find(p => p.roast === roastLevel);
@@ -45,7 +52,11 @@ export default function Shop() {
   };
 
   return (
-    <div onScroll={handleScroll} className="w-full h-full overflow-y-auto overflow-x-hidden relative scroll-smooth">
+    <div 
+      ref={containerRef}
+      onScroll={handleScroll}
+      className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'} bg-drift-bg text-drift-foreground`}
+    >
       <AnimatePresence mode="wait">
         {!selectedProductId ? (
           <ProductGrid key="grid" onSelect={setSelectedProduct} />

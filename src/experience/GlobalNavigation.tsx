@@ -47,21 +47,29 @@ export default function GlobalNavigation() {
 
       <div className="flex gap-4 md:gap-6 lg:gap-12 pointer-events-auto">
         {worlds.map((world) => {
-          const isOpen = openForks.includes(world.id);
-          const isActive = activeFork === world.id;
+          const isJourneyMode = openForks.length === 1 && openForks[0] === 'journey';
+          const isOpen = isJourneyMode || openForks.includes(world.id);
+          const isActive = isJourneyMode ? false : activeFork === world.id;
 
           return (
             <motion.button
               key={world.id}
               onClick={() => {
-                if (isOpen) {
-                  if (isActive) {
-                    closeFork(world.id);
-                  } else {
-                    focusFork(world.id);
+                if (isJourneyMode) {
+                  const el = document.querySelector(`[data-world="${world.id}"]`);
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
                   }
                 } else {
-                  openFork(world.id);
+                  if (isOpen) {
+                    if (isActive) {
+                      closeFork(world.id);
+                    } else {
+                      focusFork(world.id);
+                    }
+                  } else {
+                    openFork(world.id);
+                  }
                 }
               }}
               className="group relative flex flex-col items-end gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-drift-foreground p-1"

@@ -7,7 +7,11 @@ import { AntiGravity } from '../reactive/AntiGravity';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Brew() {
+interface BrewProps {
+  isJourney?: boolean;
+}
+
+export default function Brew({ isJourney }: BrewProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [extractPercent, setExtractPercent] = useState(0);
   
@@ -20,7 +24,7 @@ export default function Brew() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const scroller = containerRef.current;
+    const scroller = isJourney ? window : containerRef.current;
     
     // Overall Brew Progress
     const stGlobal = ScrollTrigger.create({
@@ -225,7 +229,11 @@ export default function Brew() {
   };
 
   return (
-    <div ref={containerRef} onScroll={handleScroll} className="w-full h-full overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar text-drift-foreground bg-drift-bg pb-[30vh]">
+    <div 
+      ref={containerRef} 
+      onScroll={handleScroll}
+      className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'} custom-scrollbar text-drift-foreground bg-drift-bg pb-[30vh]`}
+    >
       
       {/* Intro */}
       <section className="min-h-screen flex flex-col justify-center px-8 lg:px-16 relative z-10">

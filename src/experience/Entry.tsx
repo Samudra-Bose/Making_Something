@@ -52,8 +52,8 @@ export default function Entry() {
   const handleEnterClick = () => {
     triggerShockwave(window.innerWidth / 2, window.innerHeight / 2, 2);
     setHasEntered(true);
-    useExperienceStore.getState().openFork('origin');
-    useExperienceStore.getState().expandFork('origin');
+    useExperienceStore.getState().openFork('journey');
+    useExperienceStore.getState().expandFork('journey');
   };
 
   // Remove `if (hasEntered) return null;` so AnimatePresence can run exit animation

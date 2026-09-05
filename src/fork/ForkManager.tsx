@@ -6,6 +6,7 @@ import Origin from '../worlds/Origin';
 import Roast from '../worlds/Roast';
 import Brew from '../worlds/Brew';
 import Shop from '../worlds/Shop';
+import Journey from '../worlds/Journey';
 import { computeForkLayout } from './ForkLayoutEngine';
 
 export default function ForkManager() {
@@ -26,6 +27,7 @@ export default function ForkManager() {
 
   const renderWorld = (world: string) => {
     switch (world) {
+      case 'journey': return <Journey />;
       case 'origin': return <Origin />;
       case 'roast': return <Roast />;
       case 'brew': return <Brew />;

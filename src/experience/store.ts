@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type World = 'origin' | 'roast' | 'brew' | 'shop';
+export type World = 'journey' | 'origin' | 'roast' | 'brew' | 'shop';
 export type VisualMode = 'default' | 'cinematic' | 'focus';
 
 export type RoastLevel = 'light' | 'medium' | 'medium-dark' | 'dark';
@@ -68,12 +68,12 @@ interface ExperienceState {
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
   hasEntered: false,
-  activeWorld: 'origin',
-  activeFork: null,
+  activeWorld: 'journey',
+  activeFork: 'journey',
   expandedFork: null,
   openForks: [],
-  interactionMode: 'explore',
-  visualMode: 'default',
+  interactionMode: 'narrative',
+  visualMode: 'cinematic',
   motionIntensity: 1,
   pointer: { x: -1000, y: -1000 },
   pointerVelocity: { x: 0, y: 0 },

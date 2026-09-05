@@ -31,7 +31,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="relative w-screen h-[100dvh] overflow-hidden bg-drift-bg text-drift-foreground font-sans selection:bg-drift-accent/30 selection:text-drift-highlight">
+    <div className="relative w-full min-h-[100dvh] bg-drift-bg text-drift-foreground font-sans selection:bg-drift-accent/30 selection:text-drift-highlight">
       {children}
     </div>
   );

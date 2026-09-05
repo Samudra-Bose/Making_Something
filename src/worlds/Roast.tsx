@@ -6,7 +6,11 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { AntiGravity } from "../reactive/AntiGravity";
 import { useShockwave } from "../reactive/useShockwave";
 
-export default function Roast() {
+interface RoastProps {
+  isJourney?: boolean;
+}
+
+export default function Roast({ isJourney }: RoastProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const coffeeOrigin = useExperienceStore((state) => state.coffeeOrigin);
   const setRoastDevelopment = useExperienceStore((state) => state.setRoastDevelopment);
@@ -20,7 +24,7 @@ export default function Roast() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const scroller = containerRef.current;
+    const scroller = isJourney ? window : containerRef.current;
     
     // Core Narrative Scroll Sequence (0 to 1 progress maps to roastDevelopment)
     const st = ScrollTrigger.create({
@@ -127,7 +131,8 @@ export default function Roast() {
     <div 
       ref={containerRef} 
       onScroll={handleScroll}
-      className="relative h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar text-drift-foreground bg-transparent"
+      className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'} text-drift-foreground bg-transparent`}
+      data-world="roast"
     >
       {/* Narrative Scroll Container (Height determines the physical length of the roast) */}
       <div className="st-roast-narrative relative" style={{ height: "700vh" }}>

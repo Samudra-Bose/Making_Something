@@ -7,7 +7,11 @@ import { AntiGravity } from '../reactive/AntiGravity';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Origin() {
+interface OriginProps {
+  isJourney?: boolean;
+}
+
+export default function Origin({ isJourney }: OriginProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeFork = useExperienceStore(s => s.activeFork);
   const expandedFork = useExperienceStore(s => s.expandedFork);
@@ -16,14 +20,15 @@ export default function Origin() {
   const currentOrigin = useExperienceStore(state => state.coffeeOrigin);
   const openFork = useExperienceStore(state => state.openFork);
   
-  const isActive = activeFork === 'origin';
+  const isActive = isJourney || activeFork === 'origin';
   const isExpanded = expandedFork === 'origin';
   // Determine internal responsive scale state
   const scale = isExpanded ? 'expanded' : (isActive ? 'focused' : 'compact');
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const scroller = containerRef.current;
+    const scroller = isJourney ? window : containerRef.current;
+
     
     // Cleanup any existing triggers on this scroller
     ScrollTrigger.getAll().filter(t => t.scroller === scroller).forEach(t => t.kill());
@@ -37,12 +42,12 @@ export default function Origin() {
       // 1. HERO - Initial Entrance Animation (Syncs with Entry.tsx exit)
       const tl = gsap.timeline({ delay: 1.2 });
       tl.fromTo('.st-hero-bg', 
-        { scale: 1.2, opacity: 0 }, 
-        { scale: 1.1, opacity: 0.3, duration: 2, ease: 'power3.out' }
+        { scale: 1.1, opacity: 0 }, 
+        { scale: 1.0, opacity: 0.3, duration: 2, ease: 'power3.out' }
       )
-      .fromTo('.st-hero-title',
-        { y: 100, clipPath: 'inset(100% 0 0 0)' },
-        { y: 0, clipPath: 'inset(0% 0 0 0)', duration: 1.5, ease: 'power4.out' },
+      .fromTo('.st-hero-title-line',
+        { y: '100%', clipPath: 'inset(100% 0 0 0)' },
+        { y: '0%', clipPath: 'inset(0% 0 0 0)', duration: 1.5, ease: 'power4.out', stagger: 0.1 },
         "-=1.5"
       )
       .fromTo('.st-hero-subtitle',
@@ -56,53 +61,34 @@ export default function Origin() {
         "-=1.2"
       );
 
-      // 1.1 HERO - Cinematic layered scroll
-      gsap.to('.st-hero-bg', {
-        y: 100,
-        scale: 1,
+      // 1.1 HERO - Cinematic pinned scroll choreography
+      const heroScrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-hero-container',
           scroller: scroller,
           start: 'top top',
-          end: 'bottom top',
-          scrub: true
+          end: 'bottom bottom',
+          scrub: 1.5 // Added dampening for smooth settling
         }
       });
       
-      gsap.to('.st-hero-title', {
-        y: -150,
-        opacity: 0,
-        scrollTrigger: {
-          trigger: '.st-hero-container',
-          scroller: scroller,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true
-        }
-      });
+      // 0-40%: Image scale increases, headline moves slightly upward, metadata separates in depth
+      heroScrollTl.to('.st-hero-subject-img', { scale: 1.12, duration: 4 })
+                  .to('.st-hero-title-line', { y: '-10vh', duration: 4, stagger: 0.05 }, 0)
+                  .to('.st-hero-subtitle', { y: '-15vh', duration: 4 }, 0)
+                  .to('.st-hero-bg', { scale: 1.05, y: '5vh', duration: 4 }, 0)
 
-      gsap.to('.st-hero-subject', {
-        y: -300,
-        scale: 1.1,
-        scrollTrigger: {
-          trigger: '.st-hero-container',
-          scroller: scroller,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true
-        }
-      });
+      // 40-75%: Headline moves behind/across image (we use x/y translation), metadata drifting
+                  .to('.st-hero-title-line', { x: '-5vw', y: '-20vh', opacity: 0.4, duration: 3.5, stagger: 0.1 }, 4)
+                  .to('.st-hero-subject', { width: '40vw', left: '50%', duration: 3.5 }, 4)
+                  .to('.st-hero-details', { y: '-10vh', duration: 3.5 }, 4)
+                  .to('.st-altitude', { x: '5vw', duration: 3.5 }, 4)
+                  .to('.st-varietal', { y: '5vh', duration: 3.5 }, 4)
 
-      gsap.to('.st-hero-details', {
-        opacity: 0,
-        scrollTrigger: {
-          trigger: '.st-hero-container',
-          scroller: scroller,
-          start: 'top top',
-          end: '500px top',
-          scrub: true
-        }
-      });
+      // 75-100%: Image crop becomes extremely close, color temp shifts, transition prep
+                  .to('.st-hero-subject', { width: '100vw', height: '100vh', top: '50%', left: '50%', filter: 'sepia(30%) hue-rotate(-10deg) saturate(1.2)', duration: 2.5 }, 7.5)
+                  .to('.st-hero-subject-img', { scale: 1.5, objectPosition: 'center 60%', duration: 2.5 }, 7.5)
+                  .to('.st-hero-title-container', { opacity: 0, duration: 1 }, 7.5);
 
       // Track global narrative progress (Origin is 0.0 to 0.25)
       ScrollTrigger.create({
@@ -250,14 +236,14 @@ export default function Origin() {
   return (
     <div 
       ref={containerRef} 
-      onScroll={handleScroll}
-      className="h-full w-full overflow-y-auto overflow-x-hidden relative"
+      onScroll={handleScroll} 
+      className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
       data-world="origin"
     >
       
       {/* 1. CINEMATIC HERO (Pinned Scene) */}
-      <div className="st-hero-container relative w-full h-[150vh]">
-        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+      <div className="st-hero-container relative w-full h-[300vh]">
+        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden bg-drift-bg">
           
           {/* Background slow layer */}
           <div className="absolute inset-0 z-0">
@@ -275,10 +261,13 @@ export default function Origin() {
                 The Source
               </div>
             </div>
-            <div className="overflow-hidden">
-              <h1 className="st-hero-title text-[18vw] md:text-[14vw] leading-[0.85] font-display uppercase tracking-tighter text-left whitespace-nowrap text-drift-foreground">
-                ETHI<br/>OPIA
-              </h1>
+            <div className="st-hero-title-container text-[18vw] md:text-[14vw] leading-[0.85] font-display uppercase tracking-tighter text-left whitespace-nowrap text-drift-foreground">
+              <div className="overflow-hidden">
+                <div className="st-hero-title-line">ETHI</div>
+              </div>
+              <div className="overflow-hidden">
+                <div className="st-hero-title-line">OPIA</div>
+              </div>
             </div>
           </div>
 
