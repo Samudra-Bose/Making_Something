@@ -269,26 +269,26 @@ export default function Origin() {
           </div>
 
           {/* Typography Layer (Mid-ground) */}
-          <div className="relative z-10 w-full flex flex-col items-center justify-center pointer-events-none">
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center pointer-events-none pt-20 md:pt-0 md:items-start md:pl-[10vw]">
             <div className="overflow-hidden">
-              <div className="st-hero-subtitle text-drift-accent text-[10px] md:text-xs tracking-[0.4em] uppercase mb-6 font-medium">
+              <div className="st-hero-subtitle text-drift-accent text-[10px] md:text-xs tracking-[0.4em] uppercase mb-4 font-medium">
                 The Source
               </div>
             </div>
             <div className="overflow-hidden">
-              <h1 className="st-hero-title text-[15vw] leading-[0.8] font-display uppercase tracking-tighter text-center whitespace-nowrap text-drift-foreground drop-shadow-[0_2px_40px_rgba(22,20,18,0.15)]">
-                ETHIOPIA
+              <h1 className="st-hero-title text-[18vw] md:text-[14vw] leading-[0.85] font-display uppercase tracking-tighter text-left whitespace-nowrap text-drift-foreground">
+                ETHI<br/>OPIA
               </h1>
             </div>
           </div>
 
           {/* Foreground Subject */}
-          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-             <div className="w-[60vw] md:w-[30vw] aspect-[3/4] relative st-hero-subject overflow-hidden">
+          <div className="absolute inset-0 z-20 pointer-events-none">
+             <div className="absolute top-[55%] left-1/2 md:top-1/2 md:left-[60%] -translate-x-1/2 -translate-y-1/2 w-[70vw] md:w-[28vw] aspect-[3/4] st-hero-subject overflow-hidden shadow-2xl">
                <img 
                  src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1974&auto=format&fit=crop"
                  alt="Coffee Cherries Macro"
-                 className="w-full h-full object-cover filter contrast-125 grayscale st-hero-subject-img"
+                 className="w-full h-full object-cover filter contrast-110 grayscale hover:grayscale-0 transition-all duration-1000 st-hero-subject-img"
                />
                <div className="absolute inset-0 border border-drift-border/50 m-4"></div>
              </div>
