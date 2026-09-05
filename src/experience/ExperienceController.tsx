@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
 import { useExperienceStore } from './store';
 
+// ExperienceController is the SINGLE source of truth for pointer tracking.
+// It does NOT listen to window scroll — AppShell is overflow-hidden so window never scrolls.
+// Each world container reports its own scroll via setScroll().
+
 export default function ExperienceController() {
-  const { setPointer, setPointerVelocity, setScroll } = useExperienceStore();
+  const { setPointer, setPointerVelocity } = useExperienceStore();
 
   useEffect(() => {
     let lastX = 0;
@@ -26,30 +30,33 @@ export default function ExperienceController() {
       lastTime = now;
     };
 
-    const onScroll = () => {
-      setScroll(window.scrollY);
+    // Touch support
+    const onTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      setPointer(touch.clientX, touch.clientY);
     };
 
-    // Use requestAnimationFrame for velocity decay
+    // Velocity decay when no movement
     const tick = () => {
       const now = performance.now();
       const dt = now - lastTime;
-      if (dt > 100) {
-        setPointerVelocity(0, 0); // Decay velocity if no movement
+      if (dt > 120) {
+        setPointerVelocity(0, 0);
       }
       frameId = requestAnimationFrame(tick);
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
     frameId = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('touchmove', onTouchMove);
       cancelAnimationFrame(frameId);
     };
-  }, [setPointer, setPointerVelocity, setScroll]);
+  }, [setPointer, setPointerVelocity]);
 
   return null;
 }

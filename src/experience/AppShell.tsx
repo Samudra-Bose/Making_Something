@@ -11,26 +11,22 @@ gsap.config({
   force3D: true
 });
 
-// ScrollTrigger defaults for the physical/narrative feel
-ScrollTrigger.defaults({
-  scroller: window,
-  markers: false,
-  toggleActions: 'play none none reverse'
-});
+// CRITICAL: Do NOT set ScrollTrigger.defaults({ scroller: window }) here.
+// Each world uses its own local container ref as scroller.
+// Setting a global default would conflict with all child ScrollTriggers.
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Refresh ScrollTrigger on mount/resize to ensure calculations are correct
-    ScrollTrigger.refresh();
-    
+    // Refresh ScrollTrigger on resize only — do NOT kill all triggers on unmount
     const handleResize = () => {
       ScrollTrigger.refresh();
     };
     
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
     return () => {
       window.removeEventListener('resize', handleResize);
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      // Do NOT call ScrollTrigger.getAll().forEach(t => t.kill()) here —
+      // that would destroy all child world ScrollTriggers prematurely.
     };
   }, []);
 
