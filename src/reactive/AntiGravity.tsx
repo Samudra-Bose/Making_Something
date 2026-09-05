@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { useExperienceStore } from '../experience/store';
 
-export function AntiGravity({ children, className = '', depth = 1, float = true }: { children: React.ReactNode, className?: string, depth?: number, float?: boolean }) {
+export function AntiGravity({ children, className = '', depth = 1, float = true }: { children: React.ReactNode, className?: string, depth?: number, float?: boolean, key?: React.Key }) {
   const { scrollY } = useScroll();
   
   // Parallax based on scroll

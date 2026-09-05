@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion, useMotionValue, useTransform } from 'motion/react';
 import { useExperienceStore, World } from '../experience/store';
 import { SpatialState } from './ForkLayoutEngine';
@@ -8,6 +9,7 @@ interface ForkPaneProps {
   isExpanded: boolean;
   layoutState: SpatialState;
   children: React.ReactNode;
+  key?: React.Key;
 }
 
 export default function ForkPane({ world, isActive, isExpanded, layoutState, children }: ForkPaneProps) {

@@ -53,7 +53,7 @@ export default function Shop() {
   );
 }
 
-function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
+function ProductGrid({ onSelect }: { onSelect: (id: string) => void, key?: React.Key }) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -121,7 +121,7 @@ function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
   );
 }
 
-function ProductDetail({ productId, onBack }: { productId: string, onBack: () => void }) {
+function ProductDetail({ productId, onBack }: { productId: string; onBack: () => void, key?: React.Key }) {
   const product = DRIFT_COLLECTION.find(p => p.id === productId);
   
   const selectedVariant = useExperienceStore((state) => state.selectedVariant);

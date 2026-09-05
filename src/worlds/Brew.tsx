@@ -174,6 +174,7 @@ export default function Brew() {
     };
   }, []);
 
+  const activeFork = useExperienceStore((state) => state.activeFork);
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (activeFork === 'brew') {
       useExperienceStore.getState().setScroll(e.currentTarget.scrollTop);

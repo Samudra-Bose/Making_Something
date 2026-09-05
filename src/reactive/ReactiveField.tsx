@@ -8,6 +8,7 @@ import { useScrollVelocity } from './useScrollVelocity';
 export default function ReactiveField() {
   const activeWorld = useExperienceStore((state) => state.activeWorld);
   const roastDevelopment = useExperienceStore((state) => state.roastDevelopment);
+  const roastLevel = useExperienceStore((state) => state.roastLevel);
   const brewMethod = useExperienceStore((state) => state.brewMethod);
   const brewProgress = useExperienceStore((state) => state.brewProgress);
   const scroll = useExperienceStore((state) => state.scroll);
