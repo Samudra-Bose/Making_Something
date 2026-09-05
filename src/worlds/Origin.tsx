@@ -82,8 +82,8 @@ export default function Origin({ isJourney }: OriginProps = {}) {
                   .to('.st-hero-title-line', { x: '-5vw', y: '-20vh', opacity: 0.4, duration: 3.5, stagger: 0.1 }, 4)
                   .to('.st-hero-subject', { width: '40vw', left: '50%', duration: 3.5 }, 4)
                   .to('.st-hero-details', { y: '-10vh', duration: 3.5 }, 4)
-                  .to('.st-altitude', { x: '5vw', duration: 3.5 }, 4)
-                  .to('.st-varietal', { y: '5vh', duration: 3.5 }, 4)
+                  .to('.st-hero-metadata-alt', { x: '5vw', duration: 3.5 }, 4)
+                  .to('.st-hero-metadata-var', { y: '5vh', duration: 3.5 }, 4)
 
       // 75-100%: Image crop becomes extremely close, color temp shifts, transition prep
                   .to('.st-hero-subject', { width: '100vw', height: '100vh', top: '50%', left: '50%', filter: 'sepia(30%) hue-rotate(-10deg) saturate(1.2)', duration: 2.5 }, 7.5)
@@ -285,10 +285,14 @@ export default function Origin({ isJourney }: OriginProps = {}) {
 
           {/* Details (Overlay) */}
           <div className="absolute bottom-12 right-12 z-30 st-hero-details text-right hidden md:block">
-            <p className="text-xs text-drift-foreground-muted tracking-[0.2em] font-sans uppercase">Altitude</p>
-            <p className="text-xl font-display text-drift-foreground mb-4">1,900-2,100M</p>
-            <p className="text-xs text-drift-foreground-muted tracking-[0.2em] font-sans uppercase">Varietal</p>
-            <p className="text-xl font-display text-drift-foreground">Heirloom</p>
+            <div className="st-hero-metadata-alt">
+              <p className="text-xs text-drift-foreground-muted tracking-[0.2em] font-sans uppercase">Altitude</p>
+              <p className="text-xl font-display text-drift-foreground mb-4">1,900-2,100M</p>
+            </div>
+            <div className="st-hero-metadata-var">
+              <p className="text-xs text-drift-foreground-muted tracking-[0.2em] font-sans uppercase">Varietal</p>
+              <p className="text-xl font-display text-drift-foreground">Heirloom</p>
+            </div>
           </div>
         </div>
       </div>
