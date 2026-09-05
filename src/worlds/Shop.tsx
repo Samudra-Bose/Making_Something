@@ -32,8 +32,16 @@ export default function Shop() {
     }
   }, [roastLevel, brewMethod, selectedProductId, setSelectedProduct]);
 
+  const activeFork = useExperienceStore((state) => state.activeFork);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (activeFork === 'shop') {
+      useExperienceStore.getState().setScroll(e.currentTarget.scrollTop);
+    }
+  };
+
   return (
-    <div className="w-full h-full overflow-y-auto overflow-x-hidden relative custom-scrollbar scroll-smooth">
+    <div onScroll={handleScroll} className="w-full h-full overflow-y-auto overflow-x-hidden relative custom-scrollbar scroll-smooth">
       <AnimatePresence mode="wait">
         {!selectedProductId ? (
           <ProductGrid key="grid" onSelect={setSelectedProduct} />

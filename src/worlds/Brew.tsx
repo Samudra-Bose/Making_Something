@@ -174,8 +174,14 @@ export default function Brew() {
     };
   }, []);
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (activeFork === 'brew') {
+      useExperienceStore.getState().setScroll(e.currentTarget.scrollTop);
+    }
+  };
+
   return (
-    <div ref={containerRef} className="w-full h-full overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar text-drift-foreground bg-drift-bg pb-[30vh]">
+    <div ref={containerRef} onScroll={handleScroll} className="w-full h-full overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar text-drift-foreground bg-drift-bg pb-[30vh]">
       
       {/* Intro */}
       <section className="min-h-screen flex flex-col justify-center px-8 lg:px-16 relative z-10">
