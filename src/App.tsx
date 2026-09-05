@@ -43,7 +43,7 @@ export default function App() {
       
       {/* The Window System */}
       <div className="relative z-10 w-full min-h-screen pointer-events-none">
-        <div className="w-full h-full pointer-events-auto">
+        <div className="w-full pointer-events-auto">
           {hasEntered && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

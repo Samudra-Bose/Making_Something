@@ -35,10 +35,15 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       onEnter: () => {
         useExperienceStore.getState().setActiveWorld('brew');
       },
+      onEnterBack: () => {
+        useExperienceStore.getState().setActiveWorld('brew');
+      },
       onUpdate: (self) => {
         setBrewProgress(self.progress);
         // Brew occupies global story 0.55 → 0.78
-        useExperienceStore.getState().setGlobalProgress(0.55 + self.progress * 0.23);
+        if (!isJourney) {
+          useExperienceStore.getState().setGlobalProgress(0.55 + self.progress * 0.23);
+        }
         // Update store scroll so ReactiveField velocity works
         useExperienceStore.getState().setScroll(scroller.scrollTop);
       }
@@ -204,7 +209,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
         start: "bottom bottom",
         onEnter: () => {
           const state = useExperienceStore.getState();
-          if (!state.openForks.includes('shop')) {
+          if (!state.openForks.includes('shop') && !isJourney) {
             state.openFork('shop');
             setTimeout(() => {
                state.focusFork('shop');
@@ -233,6 +238,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       ref={containerRef} 
       onScroll={handleScroll}
       className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'} custom-scrollbar text-drift-foreground bg-drift-bg pb-[30vh]`}
+      data-world="brew"
     >
       
       {/* Intro */}
@@ -398,11 +404,16 @@ export default function Brew({ isJourney }: BrewProps = {}) {
                 </p>
                 <button 
                   onClick={() => {
-                    const state = useExperienceStore.getState();
-                    if (!state.openForks.includes('shop')) {
-                      state.openFork('shop');
+                    if (isJourney) {
+                      const el = document.querySelector(`[data-world="shop"]`);
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      const state = useExperienceStore.getState();
+                      if (!state.openForks.includes('shop')) {
+                        state.openFork('shop');
+                      }
+                      state.focusFork('shop');
                     }
-                    state.focusFork('shop');
                   }}
                   className="px-10 py-5 border border-drift-bg rounded-sm hover:bg-drift-bg hover:text-drift-foreground transition-colors cursor-pointer"
                 >

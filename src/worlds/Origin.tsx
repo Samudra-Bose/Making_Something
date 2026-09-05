@@ -96,8 +96,10 @@ export default function Origin({ isJourney }: OriginProps = {}) {
         scroller: scroller,
         start: 'top top',
         end: 'bottom bottom',
+        onEnter: () => useExperienceStore.getState().setActiveWorld('origin'),
+        onEnterBack: () => useExperienceStore.getState().setActiveWorld('origin'),
         onUpdate: (self) => {
-          if (isActive) {
+          if (isActive && !isJourney) {
             useExperienceStore.getState().setGlobalProgress(self.progress * 0.25);
           }
         }
@@ -406,11 +408,16 @@ export default function Origin({ isJourney }: OriginProps = {}) {
             </p>
             <button 
               onClick={() => {
-                const state = useExperienceStore.getState();
-                if (!state.openForks.includes('roast')) {
-                  state.openFork('roast');
+                if (isJourney) {
+                  const el = document.querySelector(`[data-world="roast"]`);
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  const state = useExperienceStore.getState();
+                  if (!state.openForks.includes('roast')) {
+                    state.openFork('roast');
+                  }
+                  state.focusFork('roast');
                 }
-                state.focusFork('roast');
               }}
               className="group relative px-10 py-5 border border-drift-border rounded-sm hover:bg-drift-foreground/5 transition-colors overflow-hidden cursor-pointer"
             >

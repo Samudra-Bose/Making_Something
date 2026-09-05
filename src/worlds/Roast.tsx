@@ -36,10 +36,15 @@ export default function Roast({ isJourney }: RoastProps = {}) {
         // Sync activeWorld when Roast becomes the focused world
         useExperienceStore.getState().setActiveWorld('roast');
       },
+      onEnterBack: () => {
+        useExperienceStore.getState().setActiveWorld('roast');
+      },
       onUpdate: (self) => {
         setRoastDevelopment(self.progress);
         // Roast occupies global story 0.25 → 0.55
-        useExperienceStore.getState().setGlobalProgress(0.25 + self.progress * 0.30);
+        if (!isJourney) {
+          useExperienceStore.getState().setGlobalProgress(0.25 + self.progress * 0.30);
+        }
         // Also update store scroll so ReactiveField velocity is correct
         useExperienceStore.getState().setScroll(scroller.scrollTop);
         
@@ -55,11 +60,8 @@ export default function Roast({ isJourney }: RoastProps = {}) {
 
     const mm = gsap.matchMedia(scroller);
 
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      // Horizontal Scroll Sequence
-      gsap.to(".st-roast-horizontal-container", {
-        x: () => -(document.querySelector('.st-roast-horizontal-container') as HTMLElement)?.scrollWidth + window.innerWidth,
-        ease: "none",
+      // Horizontal Scroll Sequence and Transition
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: ".st-roast-narrative",
           scroller: scroller,
@@ -70,46 +72,38 @@ export default function Roast({ isJourney }: RoastProps = {}) {
         }
       });
 
-      // Transition cinematic effect
-      gsap.to(".st-bean-expand", {
+      tl.to(".st-roast-horizontal-container", {
+        x: () => -(document.querySelector('.st-roast-horizontal-container') as HTMLElement)?.scrollWidth + window.innerWidth,
+        ease: "none",
+        duration: 1
+      });
+
+      // We can trigger the transition effects concurrently as we reach the end
+      // 0.8 to 1.0 of the timeline represents the last section (Handoff)
+      tl.to(".st-bean-expand", {
         scale: 10,
         opacity: 0,
-        scrollTrigger: {
-          trigger: ".st-transition-trigger",
-          scroller: scroller,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true
-        }
-      });
+        ease: "power2.in",
+        duration: 0.15
+      }, 0.85);
       
-      gsap.to(".st-brew-emerge", {
+      tl.to(".st-brew-emerge", {
         opacity: 1,
         y: -50,
-        scrollTrigger: {
-          trigger: ".st-transition-trigger",
-          scroller: scroller,
-          start: "top top",
-          end: "bottom center",
-          scrub: true
-        }
-      });
+        ease: "power2.out",
+        duration: 0.1
+      }, 0.9);
 
-      gsap.to(".st-brew-emerge-sub", {
+      tl.to(".st-brew-emerge-sub", {
         opacity: 1,
         y: -30,
-        scrollTrigger: {
-          trigger: ".st-transition-trigger",
-          scroller: scroller,
-          start: "center center",
-          end: "bottom bottom",
-          scrub: true
-        }
-      });
+        ease: "power2.out",
+        duration: 0.05
+      }, 0.95);
 
-      // Auto-transition to Brew at the bottom
+      // Auto-transition to Brew at the very end of the narrative scroll
       ScrollTrigger.create({
-        trigger: ".st-transition-trigger",
+        trigger: ".st-roast-narrative",
         scroller: scroller,
         start: "bottom bottom",
         onEnter: () => {
@@ -157,7 +151,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
         </div>
 
         {/* --- HORIZONTAL SECTIONS OVERLAY --- */}
-        <div className="st-roast-horizontal-container absolute top-0 left-0 w-fit h-screen pointer-events-none flex flex-row items-center">
+        <div className="st-roast-horizontal-container sticky top-0 left-0 w-fit h-screen pointer-events-none flex flex-row items-center">
           
           {/* SECTION 01 - GREEN (0-15%) */}
           <section className="w-screen h-screen flex items-center px-8 lg:px-16 relative">

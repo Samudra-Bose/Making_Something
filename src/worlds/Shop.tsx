@@ -1,9 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useExperienceStore } from '../experience/store';
 import { DRIFT_COLLECTION, Product } from '../data/products';
 import { useShockwave } from '../reactive/useShockwave';
 import { AntiGravity } from '../reactive/AntiGravity';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface ShopProps {
   isJourney?: boolean;
@@ -42,12 +46,28 @@ export default function Shop({ isJourney }: ShopProps = {}) {
     }
   }, [roastLevel, brewMethod, selectedProductId, setSelectedProduct]);
 
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+    const scroller = isJourney ? window : containerRef.current;
+    const st = ScrollTrigger.create({
+      trigger: containerRef.current,
+      scroller: scroller,
+      start: 'top center',
+      end: 'bottom bottom',
+      onEnter: () => useExperienceStore.getState().setActiveWorld('shop'),
+      onEnterBack: () => useExperienceStore.getState().setActiveWorld('shop'),
+    });
+    return () => st.kill();
+  }, [isJourney]);
+
   const activeFork = useExperienceStore((state) => state.activeFork);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (activeFork === 'shop') {
       useExperienceStore.getState().setScroll(e.currentTarget.scrollTop);
-      useExperienceStore.getState().setGlobalProgress(0.78 + (e.currentTarget.scrollTop / e.currentTarget.scrollHeight) * 0.22);
+      if (!isJourney) {
+        useExperienceStore.getState().setGlobalProgress(0.78 + (e.currentTarget.scrollTop / e.currentTarget.scrollHeight) * 0.22);
+      }
     }
   };
 
@@ -56,6 +76,7 @@ export default function Shop({ isJourney }: ShopProps = {}) {
       ref={containerRef}
       onScroll={handleScroll}
       className={`relative w-full ${isJourney ? 'min-h-screen' : 'h-full overflow-y-auto overflow-x-hidden'} bg-drift-bg text-drift-foreground`}
+      data-world="shop"
     >
       <AnimatePresence mode="wait">
         {!selectedProductId ? (
