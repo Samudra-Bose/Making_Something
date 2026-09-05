@@ -40,7 +40,7 @@ export default function Cart() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsCartOpen(false)}
-            className="fixed inset-0 bg-black/80 z-50 pointer-events-auto"
+            className="fixed inset-0 bg-drift-bg/90 z-50 pointer-events-auto"
           />
 
           {/* Cart Drawer */}
@@ -49,9 +49,9 @@ export default function Cart() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-drift-surface border-l border-drift-border/40 shadow-2xl z-50 pointer-events-auto flex flex-col"
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-drift-surface border-l border-drift-border shadow-2xl z-50 pointer-events-auto flex flex-col"
           >
-            <header className="p-8 border-b border-drift-border/30 flex justify-between items-center">
+            <header className="p-8 border-b border-drift-border flex justify-between items-center">
               <div className="flex items-center gap-4">
                 {isCheckout && !isSuccess && (
                   <button onClick={() => setIsCheckout(false)} className="text-drift-foreground-muted hover:text-drift-foreground">

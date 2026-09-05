@@ -100,6 +100,17 @@ export default function Brew() {
         </div>
       </div>
 
+      {/* EDITORIAL IMAGE */}
+      <div className="w-full px-8 lg:px-16 mb-24">
+        <div className="w-full h-[60vh] md:h-[70vh] overflow-hidden border border-drift-border p-2 bg-drift-surface">
+          <img 
+            src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop" 
+            alt="Pouring Coffee" 
+            className="w-full h-full object-cover filter grayscale contrast-125 hover:grayscale-0 transition-all duration-1000"
+          />
+        </div>
+      </div>
+
       {/* Preparation / Method Selection */}
       <div className="brew-stage min-h-[80vh] flex flex-col justify-center px-8 lg:px-16 opacity-30 translate-y-8">
         <h3 className="text-xs tracking-[0.25em] text-drift-foreground-muted uppercase mb-12">01. Prepare</h3>
@@ -208,6 +219,17 @@ export default function Brew() {
             className="h-full bg-drift-foreground" 
             style={{ width: `${Math.min(100, brewProgress * 130)}%` }}
             layout
+          />
+        </div>
+      </div>
+
+      {/* EDITORIAL IMAGE */}
+      <div className="w-full px-8 lg:px-16 mb-32 flex justify-center">
+        <div className="w-full max-w-2xl h-[50vh] overflow-hidden border border-drift-border p-2 bg-drift-surface relative">
+          <img 
+            src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" 
+            alt="Brewed Coffee" 
+            className="w-full h-full object-cover filter contrast-125 saturate-50"
           />
         </div>
       </div>

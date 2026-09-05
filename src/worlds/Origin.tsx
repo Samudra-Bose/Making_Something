@@ -163,9 +163,24 @@ export default function Origin() {
             </p>
           </div>
 
+          {/* EDITORIAL IMAGE */}
+          <div className="w-full h-[60vh] md:h-[80vh] my-24 overflow-hidden relative group">
+            <img 
+              src="https://images.unsplash.com/photo-1524350876685-274059332603?q=80&w=2071&auto=format&fit=crop" 
+              alt="Guji Highlands" 
+              className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 origin-center scale-100 group-hover:scale-105"
+            />
+            <div className="absolute bottom-6 left-6 text-xs tracking-widest uppercase text-white/70 mix-blend-difference">
+              Guji Zone, 2,100M
+            </div>
+          </div>
+
           {/* 3. ALTITUDE & PLANT / CONTEXT */}
-          <div className="st-plant-trigger min-h-[80vh] flex flex-col lg:flex-row gap-16 items-center justify-between border-y border-drift-border py-24 my-24">
-            <div className="st-plant flex-1 w-full">
+          <div className="st-plant-trigger min-h-[80vh] flex flex-col lg:flex-row gap-16 items-center justify-between border-y border-drift-border py-24 my-24 relative">
+            <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none grayscale mix-blend-multiply">
+              <img src="https://images.unsplash.com/photo-1524350876685-274059332603?q=80&w=2071&auto=format&fit=crop" alt="Coffee Farm Landscape" className="w-full h-full object-cover" />
+            </div>
+            <div className="st-plant flex-1 w-full relative z-10">
               <div className="text-xs text-drift-accent tracking-[0.2em] uppercase mb-6 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-drift-accent"></span>
                 Elevation
@@ -217,6 +232,20 @@ export default function Origin() {
                 <div className="w-24 md:w-32 text-xs md:text-sm tracking-widest text-drift-foreground-muted uppercase">Profile</div>
                 <div className="h-[1px] bg-drift-border st-process-line flex-1"></div>
                 <div className="text-xl md:text-2xl font-display text-drift-foreground text-right">Fruit-forward & Syrupy</div>
+              </div>
+            </div>
+          </div>
+
+          {/* EDITORIAL IMAGE 2 */}
+          <div className="w-full h-[50vh] my-32 flex justify-end relative">
+            <div className="w-[80%] md:w-[60%] h-full overflow-hidden relative group border border-drift-border p-2 bg-drift-bg">
+              <img 
+                src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1974&auto=format&fit=crop" 
+                alt="Coffee Cherries" 
+                className="w-full h-full object-cover filter contrast-125 saturate-50 transition-all duration-1000 group-hover:saturate-100"
+              />
+              <div className="absolute top-8 -left-12 rotate-[-90deg] origin-left text-xs tracking-[0.2em] uppercase text-drift-foreground-muted whitespace-nowrap">
+                Selective Hand-Picking
               </div>
             </div>
           </div>

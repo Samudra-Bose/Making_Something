@@ -84,6 +84,20 @@ export default function Roast() {
         </div>
       </section>
 
+      {/* EDITORIAL IMAGE */}
+      <section className="w-full px-8 lg:px-16 mb-32">
+        <div className="w-full h-[60vh] overflow-hidden relative border border-drift-border p-2 bg-drift-surface">
+          <img 
+            src="https://images.unsplash.com/photo-1517488629431-6427e028c037?q=80&w=2069&auto=format&fit=crop" 
+            alt="Coffee Roasting" 
+            className="w-full h-full object-cover filter contrast-125 sepia-[0.3]"
+          />
+          <div className="absolute bottom-8 left-8 text-xs tracking-widest uppercase text-white/90 drop-shadow-md">
+            The Maillard Reaction
+          </div>
+        </div>
+      </section>
+
       {/* 2. THE TRANSFORMATION SCROLL SEQUENCE */}
       <section className="st-roast-sequence min-h-[300vh] relative">
         <div className="sticky top-0 h-screen flex items-center justify-center pointer-events-none overflow-hidden">

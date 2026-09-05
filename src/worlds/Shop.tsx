@@ -44,13 +44,21 @@ function ProductGrid({ onSelect }: { onSelect: (id: string) => void }) {
             className="group flex flex-col cursor-pointer border border-drift-border hover:border-drift-foreground/50 bg-drift-surface p-6 lg:p-8 transition-colors duration-500 rounded-sm shadow-md hover:shadow-xl"
             onClick={() => onSelect(product.id)}
           >
-            <div className="flex justify-between items-start mb-12">
+            <div className="flex justify-between items-start mb-8">
               <span className="text-[10px] tracking-[0.2em] text-drift-foreground-muted uppercase border border-drift-border px-2 py-1 rounded-sm">
                 No. 0{index + 1}
               </span>
               <span className="text-sm font-display tracking-tight text-drift-foreground">
                 ${product.price}
               </span>
+            </div>
+
+            <div className="w-full aspect-[4/3] bg-drift-bg mb-8 overflow-hidden border border-drift-border/50">
+              <img 
+                src={`https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=800&auto=format&fit=crop&sig=${index}`} 
+                alt={product.name}
+                className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700 mix-blend-multiply opacity-90"
+              />
             </div>
 
             <div className="flex-1">
@@ -143,6 +151,14 @@ function ProductDetail({ productId, onBack }: { productId: string, onBack: () =>
         {/* Left Column: Story & Data */}
         <div>
           <div className="mb-12">
+            <div className="w-full aspect-[4/3] bg-drift-bg mb-12 overflow-hidden border border-drift-border p-2">
+              <img 
+                src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=1600&auto=format&fit=crop" 
+                alt={product.name}
+                className="w-full h-full object-cover filter contrast-125 saturate-50 mix-blend-multiply"
+              />
+            </div>
+
             <h2 className="text-4xl lg:text-6xl font-display font-medium tracking-tight mb-4">{product.name}</h2>
             <p className="text-sm tracking-widest uppercase text-drift-foreground-muted mb-8">
               {product.origin} • {product.region}
