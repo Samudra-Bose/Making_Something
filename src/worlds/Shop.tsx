@@ -8,6 +8,29 @@ import { AntiGravity } from '../reactive/AntiGravity';
 export default function Shop() {
   const selectedProductId = useExperienceStore((state) => state.selectedProductId);
   const setSelectedProduct = useExperienceStore((state) => state.setSelectedProduct);
+  const roastLevel = useExperienceStore((state) => state.roastLevel);
+  const brewMethod = useExperienceStore((state) => state.brewMethod);
+  const hasAutoSelected = React.useRef(false);
+
+  // Auto-select based on journey configuration
+  React.useEffect(() => {
+    if (!selectedProductId && !hasAutoSelected.current) {
+      // Find the best match based on the journey
+      // Prioritize roast level, then brew method
+      let bestMatch = DRIFT_COLLECTION.find(p => p.roast === roastLevel && p.recommendedBrew === brewMethod);
+      if (!bestMatch) bestMatch = DRIFT_COLLECTION.find(p => p.roast === roastLevel);
+      if (!bestMatch) bestMatch = DRIFT_COLLECTION.find(p => p.recommendedBrew === brewMethod);
+      
+      if (bestMatch) {
+        hasAutoSelected.current = true;
+        // Set a slight delay for dramatic effect during transition
+        const timer = setTimeout(() => {
+          setSelectedProduct(bestMatch!.id);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [roastLevel, brewMethod, selectedProductId, setSelectedProduct]);
 
   return (
     <div className="w-full h-full overflow-y-auto overflow-x-hidden relative custom-scrollbar scroll-smooth">
