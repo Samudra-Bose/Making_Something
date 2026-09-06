@@ -133,7 +133,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       cupTl.fromTo('.st-cup-main', { scale: 0.82, y: '8vh' }, { scale: 1.0, y: '0vh', duration: 1, ease: 'power2.out' }, 0);
       cupTl.fromTo('.st-cup-steam-final', { opacity: 0, y: '10px' }, { opacity: 0.3, y: '-15px', duration: 1, ease: 'none' }, 0); // Very subtle steam
 
-      // 9. SECOND MASK FOR BREW -> SHOP (Handled by Shop.tsx mask reveal)
+      // 14. BREW -> SHOP (50vh transition space at bottom)
       const transTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-brew-shop-trans',
@@ -143,9 +143,19 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           scrub: 1
         }
       });
-      // Cup scale +10% while Shop masks over it
-      transTl.to('.st-cup-main', { scale: 1.10, y: '-5vh', duration: 1, ease: 'none' }, 0);
-
+      // 0.00: cup centered
+      // 0.20: cup scale +8%
+      transTl.to('.st-cup-main', { scale: 1.08, duration: 0.20 }, 0.00);
+      // 0.35: camera pulls backward, 0.70: cup moves toward background
+      transTl.to('.st-cup-main', { scale: 0.4, y: '-10vh', opacity: 0, duration: 0.35 }, 0.35);
+      // 0.45: package enters from below, 0.60: package reaches center
+      transTl.fromTo('.st-shop-package', { y: '60vh', opacity: 0, rotate: -5 }, { y: '0vh', opacity: 1, rotate: -2, duration: 0.15 }, 0.45);
+      // 0.78: package becomes dominant
+      transTl.to('.st-shop-package', { scale: 1.05, duration: 0.18 }, 0.60);
+      // 0.85: package label becomes readable
+      transTl.fromTo('.st-shop-package .text-center', { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.70);
+      // 0.95: Shop typography enters
+      transTl.fromTo('.st-shop-ui', { opacity: 0, y: '20px' }, { opacity: 1, y: '0px', duration: 0.05 }, 0.95);
     });
 
     return () => mm.revert();
