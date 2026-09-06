@@ -120,11 +120,13 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           }
         }
       });
-      pourTl.to('.st-pour-vessel', { rotate: 8, duration: 1 }, 0);
+      // Water is 100% focal point. Vessel is 25-35% secondary (subtle rotation). Typography is 20-30% secondary.
+      pourTl.to('.st-pour-vessel', { rotate: 3, duration: 1, ease: 'none' }, 0);
       pourTl.fromTo('.st-pour-path', { strokeDashoffset: '100%' }, { strokeDashoffset: '0%', duration: 1, ease: 'power1.inOut' }, 0);
       pourTl.fromTo('.st-pour-ring', { scale: 0.2, opacity: 0 }, { scale: 1.15, opacity: 0.8, duration: 0.5, ease: 'power2.out' }, 0.5);
       pourTl.to('.st-pour-ring', { opacity: 0, duration: 0.5 }, 1.0);
-      pourTl.fromTo('.st-pour-text', { x: '-5vw' }, { x: '3vw', duration: 1 }, 0);
+      // Typography subtle motion (-2vw instead of -5vw)
+      pourTl.fromTo('.st-pour-text', { x: '-2vw' }, { x: '0vw', duration: 1, ease: 'none' }, 0);
 
       // EXTRACTION (large numerical typography progresses)
       const extractTl = gsap.timeline({
@@ -166,8 +168,10 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           }
         }
       });
-      cupTl.fromTo('.st-cup-main', { scale: 0.82, y: '8vh' }, { scale: 1.0, y: '0vh', duration: 1, ease: 'power2.out' }, 0);
-      cupTl.fromTo('.st-cup-steam-final', { opacity: 0, y: '10px' }, { opacity: 0.3, y: '-15px', duration: 1, ease: 'none' }, 0); // Very subtle steam
+      // Longest visual breath: completely calm. Image scale stability (no scaling up).
+      cupTl.fromTo('.st-cup-main', { y: '4vh', opacity: 0 }, { y: '0vh', opacity: 1, duration: 0.4, ease: 'power2.out' }, 0);
+      // Steam remains extremely subtle
+      cupTl.fromTo('.st-cup-steam-final', { opacity: 0, y: '5px' }, { opacity: 0.15, y: '-10px', duration: 1, ease: 'none' }, 0); 
 
       // 14. BREW -> SHOP (50vh transition space at bottom)
       const transTl = gsap.timeline({
@@ -179,9 +183,9 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           scrub: 1
         }
       });
-      // 0.00: cup centered
-      // 0.20: cup scale +8%
-      transTl.to('.st-cup-main', { scale: 1.08, duration: 0.20 }, 0.00);
+      // 0.00-0.30: Hold as dominant object
+      // 0.30-1.00: Pull back to prepare for Shop mask
+      transTl.to('.st-cup-main', { scale: 0.85, y: '-15vh', duration: 0.70, ease: 'power2.inOut' }, 0.30);
       // 0.35: camera pulls backward, 0.70: cup moves toward background
       transTl.to('.st-cup-main', { scale: 0.4, y: '-10vh', opacity: 0, duration: 0.35 }, 0.35);
       // Shop elements are animated simultaneously by Shop.tsx's top-bottom trigger
