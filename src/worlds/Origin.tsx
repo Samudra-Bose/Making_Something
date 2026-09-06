@@ -25,9 +25,7 @@ export default function Origin({ isJourney }: OriginProps = {}) {
     const mm = gsap.matchMedia(scroller);
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      // 1. FIRST VIEWPORT - EXACT IMPLEMENTATION
       const tl = gsap.timeline();
-      
       tl.to('.st-hero-logo', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0);
       tl.to('.st-hero-nav', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.15);
       tl.to('.st-hero-title-line', { y: 0, clipPath: 'inset(0% 0 0 0)', duration: 1, ease: 'power3.out', stagger: 0.09 }, 0.2);
@@ -35,8 +33,7 @@ export default function Origin({ isJourney }: OriginProps = {}) {
       tl.to('.st-hero-support', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.8);
       tl.to('.st-hero-metadata', { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out' }, 0.9);
 
-      // 2. FIRST SCROLL - EXACT CHOREOGRAPHY
-      // Pin for ~220vh + 45vh transition = 265vh
+      // Pinned Timeline (265vh)
       const pinTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-hero-pin',
@@ -47,57 +44,43 @@ export default function Origin({ isJourney }: OriginProps = {}) {
           pin: true,
           anticipatePin: 1,
           onUpdate: (self) => {
-            if (isActive) {
-               useExperienceStore.getState().setActiveWorld('origin');
-            }
+            if (isActive) useExperienceStore.getState().setActiveWorld('origin');
           }
         }
       });
-
-      // Normalize timeline progress. Let's map 0 -> 0.83 (220/265) for the main sequence.
-      // And 0.83 -> 1.0 (45/265) for transition.
       
-      // Main Sequence (0 - 0.83)
-      pinTl.to('.st-hero-bg', { y: '-2vh', ease: 'none', duration: 0.83 }, 0);
-      pinTl.to('.st-hero-subject-img', { scale: 1.07, duration: 0.45, ease: 'none' }, 0)
-           .to('.st-hero-subject-img', { scale: 1.16, duration: 0.25, ease: 'none' }, 0.45);
-      pinTl.fromTo('.st-hero-subject-img', { objectPosition: '50% 50%' }, { objectPosition: '50% 70%', duration: 0.33, ease: 'none' }, 0.5);
-      pinTl.to('.st-hero-subject-container', { x: '-3vw', y: '-4vh', duration: 0.83, ease: 'none' }, 0);
+      // Normalize progress mapping: 
+      // 0.00 - 0.15: HOLD
+      // 0.15 - 0.80: TRANSFORM (Main Sequence)
+      // 0.80 - 1.00: RELEASE (Transition to Roast)
+
+      const trStart = 0.15;
+      const trDur = 0.65; // ends at 0.80
+      const relStart = 0.80;
+      const relDur = 0.20;
+
+      // TRANSFORM PHASE
+      // Depth-based scale
+      pinTl.fromTo('.st-hero-bg', { scale: 1.02 }, { scale: 1.06, ease: 'none', duration: trDur }, trStart);
+      pinTl.fromTo('.st-hero-subject-img', { scale: 1.00 }, { scale: 1.12, ease: 'none', duration: trDur }, trStart);
+      pinTl.fromTo('.st-foreground-bean', { scale: 1.00 }, { scale: 1.16, ease: 'none', duration: trDur }, trStart);
+
+      // Camera Push System
+      pinTl.to('.st-hero-subject-container', { y: '-4vh', duration: trDur, ease: 'none' }, trStart);
+      pinTl.to('.st-hero-title-container', { y: '-10vh', duration: trDur, ease: 'none' }, trStart);
+      pinTl.to('.st-hero-metadata', { x: '3vw', duration: trDur, ease: 'none' }, trStart);
       
-      // Headline Lines
-      pinTl.to('.st-title-1', { y: '-8vh', x: '-2vw', duration: 0.75, ease: 'none' }, 0.08);
-      pinTl.to('.st-title-2', { y: '-11vh', x: '1vw', duration: 0.71, ease: 'none' }, 0.12);
-      pinTl.to('.st-title-3', { y: '-14vh', x: '3vw', duration: 0.68, ease: 'none' }, 0.15);
-      pinTl.to('.st-hero-title-container', { scale: 1.08, duration: 0.83, ease: 'none' }, 0);
+      // Secondary object (bean) cross-world link
+      pinTl.fromTo('.st-foreground-bean', { x: '-10vw' }, { x: '10vw', duration: trDur, ease: 'none' }, trStart);
 
-      // Supporting copy y 0 -> -8vh
-      pinTl.to('.st-hero-support', { y: '-8vh', duration: 0.83, ease: 'none' }, 0);
+      // Cross-world Typography (ORIGIN)
+      pinTl.to('.st-bg-word', { y: '-30vh', duration: trDur, ease: 'none' }, trStart);
+      pinTl.to('.st-bg-word', { opacity: 0.25, duration: relDur, ease: 'none' }, relStart);
 
-      // Metadata
-      pinTl.to('.st-altitude', { x: '4vw', duration: 0.83, ease: 'none' }, 0);
-      pinTl.to('.st-varietal', { y: '-5vh', duration: 0.83, ease: 'none' }, 0);
-
-      // Foreground object x -12vw -> 12vw
-      pinTl.fromTo('.st-foreground-bean', { x: '-12vw' }, { x: '12vw', duration: 0.83, ease: 'none' }, 0);
-
-      // 5. ORIGIN -> ROAST TRANSITION - EXACT SEQUENCE (0.83 - 1.0)
-      const trStart = 0.83;
-      const trDuration = 0.17;
-      
-      // 0.20: scale Origin image +8%
-      pinTl.to('.st-hero-subject-img', { scale: '+=0.08', duration: trDuration * 0.20, ease: 'none' }, trStart);
-      // 0.30: move image upward by 5vh
-      pinTl.to('.st-hero-subject-container', { y: '-=5vh', duration: trDuration * 0.10, ease: 'none' }, trStart + trDuration * 0.20);
-      // 0.35: headline moves behind image
-      pinTl.to('.st-hero-title-container', { x: '10vw', duration: trDuration * 0.55, ease: 'none' }, trStart + trDuration * 0.35);
-      // 0.40: crop into central subject
-      pinTl.to('.st-hero-subject-container', { width: '100vw', height: '100vh', scale: 1.5, duration: trDuration * 0.40, ease: 'none' }, trStart + trDuration * 0.40);
-      // 0.50: expanding elliptical mask (Origin shrinks to reveal Roast)
-      pinTl.fromTo('.st-hero-pin', { clipPath: 'ellipse(150% 150% at 50% 50%)' }, { clipPath: 'ellipse(0% 0% at 50% 50%)', duration: trDuration * 0.50, ease: 'none' }, trStart + trDuration * 0.50);
-      // 0.70: Origin opacity reaches 0.35
-      pinTl.to('.st-hero-pin', { opacity: 0.35, duration: trDuration * 0.20, ease: 'none' }, trStart + trDuration * 0.50);
-      // 0.90: typography exits
-      pinTl.to('.st-hero-title-container', { opacity: 0, duration: trDuration * 0.10, ease: 'none' }, trStart + trDuration * 0.80);
+      // RELEASE PHASE (Transition)
+      pinTl.to('.st-hero-subject-container', { scale: 1.5, duration: relDur, ease: 'power2.in' }, relStart);
+      pinTl.to('.st-hero-pin', { clipPath: 'circle(0% at 50% 50%)', duration: relDur * 0.8, ease: 'none' }, relStart + (relDur * 0.2));
+      pinTl.to('.st-hero-title-container', { x: '-20vw', opacity: 0, duration: relDur * 0.5, ease: 'none' }, relStart);
 
     });
 
@@ -105,39 +88,31 @@ export default function Origin({ isJourney }: OriginProps = {}) {
   }, [isActive, isJourney]);
 
   return (
-    <div 
-      ref={containerRef} 
-      onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
-      data-world="origin"
-      style={{ zIndex: 40 }} // Higher z-index to mask OUT over Roast
-    >
-      <div className="st-hero-pin w-full h-screen relative overflow-hidden bg-[#F2F0EB]" style={{ clipPath: 'circle(150% at 50% 50%)' }}>
-        
+    <div ref={containerRef} onScroll={(e) => setScroll(e.currentTarget.scrollTop)} className={`relative w-full ${isJourney ? '' : 'h-full overflow-y-auto overflow-x-hidden'}`} data-world="origin" style={{ zIndex: 10 }}>
+      <div className="st-hero-pin w-full h-screen relative overflow-hidden bg-transparent" style={{ clipPath: 'circle(150% at 50% 50%)' }}>
         <div className="drift-entry-stage w-full h-full relative">
-          <div className="absolute inset-0 z-0 pointer-events-none opacity-20 st-hero-bg overflow-hidden depth-back">
-             <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover scale-110 blur-sm" alt="" />
+          
+          <div className="absolute inset-0 z-0 pointer-events-none opacity-20 st-hero-bg overflow-hidden depth-bg">
+             <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover blur-sm" alt="" />
           </div>
 
-          <div className="absolute top-8 right-8 z-50 text-drift-foreground font-sans tracking-[0.2em] uppercase text-[10px] st-hero-nav opacity-0 -translate-y-[12px] mix-blend-difference text-white">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[5] opacity-10 st-bg-word pointer-events-none text-[30vw] font-display tracking-tighter text-[#333]">
+            ORIGIN
+          </div>
+
+          <div className="absolute top-8 right-8 z-50 text-drift-foreground font-sans tracking-[0.2em] uppercase text-[10px] st-hero-nav opacity-0 -translate-y-[12px] mix-blend-difference text-white depth-type">
             EXPLORE
           </div>
 
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 text-drift-foreground font-sans tracking-[0.4em] uppercase text-[10px] st-hero-logo opacity-0 -translate-y-[20px] mix-blend-difference text-white">
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 text-drift-foreground font-sans tracking-[0.4em] uppercase text-[10px] st-hero-logo opacity-0 -translate-y-[20px] mix-blend-difference text-white depth-type">
             DRIFT
           </div>
 
-          <div className="absolute top-[20%] left-[10%] z-10 flex flex-col items-start pointer-events-none depth-main">
-            <div className="st-hero-title-container text-[12vw] leading-[0.8] font-display uppercase tracking-tighter text-drift-foreground mix-blend-difference opacity-90 text-white">
-              <div className="overflow-hidden">
-                <div className="st-hero-title-line st-title-1 translate-y-[8vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>ETHIOPIAN</div>
-              </div>
-              <div className="overflow-hidden">
-                <div className="st-hero-title-line st-title-2 translate-y-[11vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>HEIRLOOM</div>
-              </div>
-              <div className="overflow-hidden">
-                <div className="st-hero-title-line st-title-3 translate-y-[14vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>COFFEE</div>
-              </div>
+          <div className="absolute top-[20%] left-[10%] z-10 flex flex-col items-start pointer-events-none depth-type st-hero-title-container">
+            <div className="text-[12vw] leading-[0.8] font-display uppercase tracking-tighter text-drift-foreground mix-blend-difference opacity-90 text-white">
+              <div className="overflow-hidden"><div className="st-hero-title-line translate-y-[8vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>ETHIOPIAN</div></div>
+              <div className="overflow-hidden"><div className="st-hero-title-line translate-y-[11vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>HEIRLOOM</div></div>
+              <div className="overflow-hidden"><div className="st-hero-title-line translate-y-[14vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>COFFEE</div></div>
             </div>
             <div className="st-hero-support mt-8 max-w-sm text-drift-foreground-muted font-sans text-sm leading-relaxed opacity-0 translate-y-[30px]">
               Grown at extreme altitude. Carefully hand-picked. Processed naturally under the equatorial sun.
@@ -148,18 +123,19 @@ export default function Origin({ isJourney }: OriginProps = {}) {
             <img src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1974&auto=format&fit=crop" alt="Coffee Cherries" className="w-full h-full object-cover grayscale-[0.2] st-hero-subject-img origin-center scale-[0.88]" />
           </div>
 
-          <div className="absolute inset-0 z-30 pointer-events-none mix-blend-difference text-white">
-            <div className="absolute bottom-[10%] right-[15%] text-right st-hero-metadata st-altitude opacity-0 -translate-x-[24px]">
+          <div className="absolute inset-0 z-30 pointer-events-none mix-blend-difference text-white st-hero-metadata">
+            <div className="absolute bottom-[10%] right-[15%] text-right opacity-0 -translate-x-[24px]">
               <p className="text-[10px] tracking-[0.3em] font-sans uppercase mb-2 opacity-60">Elevation</p>
               <p className="text-3xl font-display">1,900M</p>
             </div>
-            <div className="absolute bottom-[10%] left-[10%] text-left st-hero-metadata st-varietal opacity-0 -translate-x-[24px]">
+            <div className="absolute bottom-[10%] left-[10%] text-left opacity-0 -translate-x-[24px]">
               <p className="text-[10px] tracking-[0.3em] font-sans uppercase mb-2 opacity-60">Process</p>
               <p className="text-3xl font-display">Natural</p>
             </div>
           </div>
 
-          <div className="absolute top-2/3 right-[10%] z-40 w-48 h-48 opacity-90 st-foreground-bean pointer-events-none drop-shadow-2xl depth-front">
+          {/* Cross-world object */}
+          <div className="absolute top-2/3 right-[10%] z-40 w-48 h-48 opacity-90 st-foreground-bean pointer-events-none drop-shadow-2xl depth-fg">
              <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full mix-blend-darken" alt="Coffee Bean" />
           </div>
         </div>

@@ -7,14 +7,17 @@ import Roast from './Roast';
 import Brew from './Brew';
 import Shop from './Shop';
 import Lenis from 'lenis';
+import { useScrollVelocity } from '../reactive/useScrollVelocity';
 
 export default function Journey() {
   const setGlobalProgress = useExperienceStore(s => s.setGlobalProgress);
+  const scroll = useExperienceStore(s => s.scroll);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Velocity impulse tracking
+  const rawVelocity = useScrollVelocity(scroll);
 
   useEffect(() => {
-    // 22. SCROLL CONTAINER - NON-NEGOTIABLE
-    // ONE continuous primary vertical scroll on normal desktop/mobile
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
@@ -39,7 +42,7 @@ export default function Journey() {
       }
     });
 
-    // 18. POINTER INTERACTION (Desktop only)
+    // POINTER INTERACTION
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     let xTo: gsap.QuickToFunc;
     let yTo: gsap.QuickToFunc;
@@ -47,13 +50,22 @@ export default function Journey() {
     let handlePointerMove: ((e: MouseEvent) => void) | null = null;
 
     if (!isTouch && containerRef.current) {
-      xTo = gsap.quickTo('.st-foreground-bean, .st-roast-bean', 'x', { duration: 0.6, ease: 'power3.out' });
-      yTo = gsap.quickTo('.st-foreground-bean, .st-roast-bean', 'y', { duration: 0.6, ease: 'power3.out' });
-      rotTo = gsap.quickTo('.st-foreground-bean, .st-roast-bean', 'rotation', { duration: 0.6, ease: 'power3.out' });
+      // Main subject (+-6px, +-5px)
+      const mainX = gsap.quickTo('.depth-main', 'x', { duration: 0.6, ease: 'power3.out' });
+      const mainY = gsap.quickTo('.depth-main', 'y', { duration: 0.6, ease: 'power3.out' });
+      
+      // Foreground (+-10px, +-8px, +-2deg)
+      xTo = gsap.quickTo('.depth-fg', 'x', { duration: 0.6, ease: 'power3.out' });
+      yTo = gsap.quickTo('.depth-fg', 'y', { duration: 0.6, ease: 'power3.out' });
+      rotTo = gsap.quickTo('.depth-fg', 'rotation', { duration: 0.6, ease: 'power3.out' });
 
       handlePointerMove = (e: MouseEvent) => {
-        const nx = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
-        const ny = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
+        const nx = (e.clientX / window.innerWidth - 0.5) * 2; 
+        const ny = (e.clientY / window.innerHeight - 0.5) * 2; 
+        
+        mainX(nx * 6);
+        mainY(ny * 5);
+        
         xTo(nx * 10);
         yTo(ny * 8);
         rotTo(nx * 2);
@@ -62,37 +74,20 @@ export default function Journey() {
       window.addEventListener('mousemove', handlePointerMove);
     }
 
-    // 16. GLOBAL TYPOGRAPHY DEPTH
-    // .depth-back = 0.55, .depth-main = 1.0, .depth-front = 1.35
-    // Actually, setting y offsets based on these multipliers:
-    const depthBacks = gsap.utils.toArray('.depth-back');
-    const depthMains = gsap.utils.toArray('.depth-main');
-    const depthFronts = gsap.utils.toArray('.depth-front');
-    
-    depthBacks.forEach((el: any) => {
-      gsap.to(el, {
-        y: (i, target) => -ScrollTrigger.maxScroll(window) * 0.45, // moves slower than scroll
-        ease: 'none',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      });
+    // SPATIAL STAGE (Scroll-linked Parallax)
+    // Environment: 0.25x, Background: 0.45x, Secondary: 0.75x, Main: 1.0x (default), Typography: 1.10x, Foreground: 1.30x
+    // GSAP ScrollTrigger can apply basic y movement to all elements with these classes.
+    // However, since many elements are inside pinned containers, standard y-transforms might fight with inner timelines.
+    // For elements NOT part of a pinned timeline, we can do this. If they are pinned, it's safer to control them in their respective timelines.
+    // For now, let's keep the classes as descriptive markers and only apply global parallax if they have `.global-parallax`.
+    const pBg = gsap.utils.toArray('.global-parallax.depth-bg');
+    pBg.forEach((el: any) => {
+      gsap.to(el, { y: (i, t) => -ScrollTrigger.maxScroll(window) * 0.55, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
 
-    depthFronts.forEach((el: any) => {
-      gsap.to(el, {
-        y: (i, target) => ScrollTrigger.maxScroll(window) * 0.35, // moves faster than scroll
-        ease: 'none',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      });
+    const pFg = gsap.utils.toArray('.global-parallax.depth-fg');
+    pFg.forEach((el: any) => {
+      gsap.to(el, { y: (i, t) => ScrollTrigger.maxScroll(window) * 0.30, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
 
     return () => {
@@ -104,6 +99,22 @@ export default function Journey() {
       gsap.ticker.remove(lenis.raf);
     };
   }, [setGlobalProgress]);
+
+  // SCROLL VELOCITY IMPULSE (React side)
+  useEffect(() => {
+    // 11. Fast scrolling impulse
+    if (Math.abs(rawVelocity) > 5) {
+       const intensity = Math.min(1, Math.abs(rawVelocity) / 50);
+       gsap.to('.depth-fg', { y: `+=${intensity * 15}px`, duration: 0.1, overwrite: 'auto' });
+       gsap.to('.depth-fg', { y: 0, duration: 0.6, delay: 0.1, ease: 'power3.out' });
+       
+       gsap.to('.depth-type', { x: `+=${(Math.random() > 0.5 ? 1 : -1) * intensity * 8}px`, duration: 0.1, overwrite: 'auto' });
+       gsap.to('.depth-type', { x: 0, duration: 0.6, delay: 0.1, ease: 'power3.out' });
+       
+       gsap.to('.depth-main', { y: `+=${intensity * 4}px`, duration: 0.1, overwrite: 'auto' });
+       gsap.to('.depth-main', { y: 0, duration: 0.6, delay: 0.1, ease: 'power3.out' });
+    }
+  }, [rawVelocity]);
 
   return (
     <div ref={containerRef} id="journey-container" className="w-full relative bg-transparent pointer-events-auto overflow-hidden">
