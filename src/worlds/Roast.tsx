@@ -47,9 +47,9 @@ export default function Roast({ isJourney }: RoastProps = {}) {
       roastTl.fromTo('.st-foreground-bean', { x: '10vw', rotate: 0 }, { x: '-80vw', rotate: 180, duration: 1, ease: 'none' }, 0);
       roastTl.fromTo('.st-bg-word-roast', { x: '50vw' }, { x: '-150vw', duration: 1, ease: 'none' }, 0);
 
-      // 0.00-0.20 hold, 0.20-0.75 transform, 0.75-1.00 release
-      const trStart = 0.20;
-      const trDur = 0.55; 
+      // 0.00-0.05 hold, 0.05-0.75 transform, 0.75-1.00 release
+      const trStart = 0.05;
+      const trDur = 0.70; 
       
       // Horizontal track moving exactly -70%
       roastTl.to('.st-roast-track', { x: '-70%', duration: trDur, ease: 'none' }, trStart);

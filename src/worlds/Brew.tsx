@@ -45,10 +45,10 @@ export default function Brew({ isJourney }: BrewProps = {}) {
         }
       });
       
-      // 0.00-0.15 hold, 0.15-0.85 transform, 0.85-1.00 release
+      // 0.00-0.05 hold, 0.05-0.85 transform, 0.85-1.00 release
       
-      // 0.15-0.30: bean centered, scale +15%
-      grindTl.fromTo('.st-grind-beans', { scale: 1.0 }, { scale: 1.15, duration: 0.15, ease: 'none' }, 0.15);
+      // 0.05-0.30: bean centered, scale +15%
+      grindTl.fromTo('.st-grind-beans', { scale: 1.0 }, { scale: 1.15, duration: 0.25, ease: 'none' }, 0.05);
       
       // 0.30-0.45: circular mask expands
       grindTl.to('.st-grind-beans-container', { clipPath: 'circle(100% at 50% 50%)', duration: 0.15, ease: 'power2.in' }, 0.30);
@@ -69,7 +69,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       grindTl.to('.st-water-steam', { opacity: 0.5, duration: 0.1 }, 0.85);
 
       // Background cross-world text
-      grindTl.fromTo('.st-bg-word-brew', { y: '30vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 0.5 }, 0.15);
+      grindTl.fromTo('.st-bg-word-brew', { y: '30vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 0.5 }, 0.05);
 
 
       // 11. BLOOM & 15. ADD PHYSICAL RESPONSE
@@ -186,18 +186,19 @@ export default function Brew({ isJourney }: BrewProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
+      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
       data-world="brew"
+      style={{ zIndex: 10 }}
     >
       {/* GRIND & WATER */}
-      <div className="st-brew-grind-water w-full h-screen relative bg-[#F2F0EB] overflow-hidden depth-bg">
+      <div className="st-brew-grind-water w-full h-screen relative bg-transparent overflow-hidden depth-bg">
         
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[5] opacity-0 st-bg-word-brew pointer-events-none text-[30vw] font-display tracking-tighter text-[#333]">
           BREW
         </div>
 
         <div className="st-grind-camera w-full h-full relative flex items-center justify-center">
-           <div className="st-grind-beans-container absolute inset-0 flex items-center justify-center" style={{ clipPath: 'circle(15% at 50% 50%)' }}>
+           <div className="st-grind-beans-container absolute inset-0 flex items-center justify-center bg-[#F2F0EB]" style={{ clipPath: 'circle(15% at 50% 50%)' }}>
               <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="st-grind-beans absolute inset-0 w-full h-full object-cover mix-blend-multiply brightness-50" />
               <img src="https://images.unsplash.com/photo-1517486448375-9e66db9a6a8b?q=80&w=2069&auto=format&fit=crop" className="st-grind-grounds absolute inset-0 w-full h-full object-cover opacity-0 mix-blend-multiply" />
            </div>

@@ -50,12 +50,12 @@ export default function Origin({ isJourney }: OriginProps = {}) {
       });
       
       // Normalize progress mapping: 
-      // 0.00 - 0.15: HOLD
-      // 0.15 - 0.80: TRANSFORM (Main Sequence)
+      // 0.00 - 0.05: HOLD
+      // 0.05 - 0.80: TRANSFORM (Main Sequence)
       // 0.80 - 1.00: RELEASE (Transition to Roast)
 
-      const trStart = 0.15;
-      const trDur = 0.65; // ends at 0.80
+      const trStart = 0.05;
+      const trDur = 0.75; // ends at 0.80
       const relStart = 0.80;
       const relDur = 0.20;
 
