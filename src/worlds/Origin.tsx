@@ -65,19 +65,33 @@ export default function Origin({ isJourney }: OriginProps = {}) {
       pinTl.fromTo('.st-hero-subject-img', { scale: 1.00 }, { scale: 1.12, ease: 'none', duration: trDur }, trStart);
       pinTl.fromTo('.st-foreground-bean', { scale: 1.00 }, { scale: 1.16, ease: 'none', duration: trDur }, trStart);
 
-      // Camera Push System
+      // 14. TYPOGRAPHY HIERARCHY:
+      // Hero (large): 8vh -> 0vh
+      pinTl.fromTo('.st-hero-title', { y: '8vh' }, { y: '0vh', duration: trDur, ease: 'none' }, trStart);
+      // Narrative (small): 30px -> 0px
+      pinTl.fromTo('.st-hero-copy', { y: '30px', opacity: 0 }, { y: '0px', opacity: 1, duration: trDur * 0.8, ease: 'power1.out' }, trStart);
+      // Metadata (very subtle): -10px -> 0px (was -24px)
+      pinTl.fromTo('.st-hero-meta', { x: '-10px', opacity: 0 }, { x: '0px', opacity: 1, duration: trDur * 0.8, ease: 'power1.out' }, trStart);
+
+      // Camera Push System restored
       pinTl.to('.st-hero-subject-container', { y: '-4vh', duration: trDur, ease: 'none' }, trStart);
       pinTl.to('.st-hero-title-container', { y: '-10vh', duration: trDur, ease: 'none' }, trStart);
       pinTl.to('.st-hero-metadata', { x: '3vw', duration: trDur, ease: 'none' }, trStart);
       
-      // Secondary object (bean) cross-world link
-      pinTl.fromTo('.st-foreground-bean', { x: '-10vw' }, { x: '10vw', duration: trDur, ease: 'none' }, trStart);
-
-      // Cross-world Typography (ORIGIN)
+      // Cross-world Typography (ORIGIN) restored
       pinTl.to('.st-bg-word', { y: '-30vh', duration: trDur, ease: 'none' }, trStart);
       pinTl.to('.st-bg-word', { opacity: 0.25, duration: relDur, ease: 'none' }, relStart);
 
-      // RELEASE PHASE (Transition)
+      // 15. IMAGE MOTION - STOP CONSTANT ZOOMING
+      // HOLD (0.00-0.20) -> ZOOM (0.20-0.50) -> HOLD (0.50-0.80)
+      const zoomStart = trStart + (trDur * 0.2); // starts at ~0.20
+      const zoomDur = trDur * 0.4; // 0.20 to 0.50 is 30% of total
+      pinTl.fromTo('.st-hero-subject-img', { scale: 1.0 }, { scale: 1.12, duration: zoomDur, ease: 'power2.inOut' }, zoomStart);
+      
+      // Secondary foreground objects (max 2)
+      pinTl.fromTo('.st-foreground-bean', { y: '10vh', rotate: 0 }, { y: '-10vh', rotate: -15, duration: trDur, ease: 'none' }, trStart);
+
+      // RELEASE PHASE (Transform 0.80 - 1.00)
       pinTl.to('.st-hero-subject-container', { scale: 1.5, duration: relDur, ease: 'power2.in' }, relStart);
       pinTl.to('.st-hero-pin', { clipPath: 'circle(0% at 50% 50%)', duration: relDur * 0.8, ease: 'none' }, relStart + (relDur * 0.2));
       pinTl.to('.st-hero-title-container', { x: '-20vw', opacity: 0, duration: relDur * 0.5, ease: 'none' }, relStart);

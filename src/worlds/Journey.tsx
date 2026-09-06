@@ -44,33 +44,36 @@ export default function Journey() {
 
     // POINTER INTERACTION
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    let xTo: gsap.QuickToFunc;
-    let yTo: gsap.QuickToFunc;
-    let rotTo: gsap.QuickToFunc;
     let handlePointerMove: ((e: MouseEvent) => void) | null = null;
 
     if (!isTouch && containerRef.current) {
-      // Main subject (+-6px, +-5px)
       const mainX = gsap.quickTo('.depth-main', 'x', { duration: 0.6, ease: 'power3.out' });
       const mainY = gsap.quickTo('.depth-main', 'y', { duration: 0.6, ease: 'power3.out' });
       
-      // Foreground (+-10px, +-8px, +-2deg)
-      xTo = gsap.quickTo('.depth-fg', 'x', { duration: 0.6, ease: 'power3.out' });
-      yTo = gsap.quickTo('.depth-fg', 'y', { duration: 0.6, ease: 'power3.out' });
-      rotTo = gsap.quickTo('.depth-fg', 'rotation', { duration: 0.6, ease: 'power3.out' });
+      const fgX = gsap.quickTo('.depth-fg', 'x', { duration: 0.4, ease: 'power3.out' });
+      const fgY = gsap.quickTo('.depth-fg', 'y', { duration: 0.4, ease: 'power3.out' });
+      const fgRot = gsap.quickTo('.depth-fg', 'rotation', { duration: 0.4, ease: 'power3.out' });
+
+      const typeX = gsap.quickTo('.depth-type', 'x', { duration: 0.8, ease: 'power2.out' });
 
       handlePointerMove = (e: MouseEvent) => {
-        const nx = (e.clientX / window.innerWidth - 0.5) * 2; 
-        const ny = (e.clientY / window.innerHeight - 0.5) * 2; 
-        
-        mainX(nx * 6);
-        mainY(ny * 5);
-        
-        xTo(nx * 10);
-        yTo(ny * 8);
-        rotTo(nx * 2);
-      };
+         const x = (e.clientX / window.innerWidth - 0.5) * 2;
+         const y = (e.clientY / window.innerHeight - 0.5) * 2;
 
+         // Evaluate dynamic multiplier every frame
+         const isCup = useExperienceStore.getState().activeWorld === 'brew' && useExperienceStore.getState().brewProgress > 0.8;
+         const ptrMult = isCup ? 0.4 : 1.0;
+         const typeMult = isCup ? 0.3 : 1.0;
+
+         mainX(x * 6 * ptrMult);
+         mainY(y * 5 * ptrMult);
+
+         fgX(x * 10 * ptrMult);
+         fgY(y * 8 * ptrMult);
+         fgRot(x * 2 * ptrMult);
+
+         typeX(x * -15 * typeMult);
+      };
       window.addEventListener('mousemove', handlePointerMove);
     }
 
