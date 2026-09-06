@@ -61,8 +61,15 @@ export default function ReactiveField() {
   const friction = lerp(0.95, 0.80, finalIntensity);
   const maxCursorMove = lerp(60, 200, finalIntensity);
 
+  // 17. REACTIVE_BG - FINAL MIX (Atmospheric role)
+  // Base visual emphasis 20-35%, spikes slightly at major events (velocity/crack).
+  const dynamicOpacity = lerp(0.12, 0.25, Math.min(1, finalIntensity));
+
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none mix-blend-multiply opacity-20">
+    <div 
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden mix-blend-multiply transition-opacity duration-300"
+      style={{ opacity: dynamicOpacity }}
+    >
       <DotGrid />
       <Waves
         backgroundColor="transparent"
