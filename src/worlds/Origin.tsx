@@ -136,8 +136,8 @@ export default function Origin({ isJourney }: OriginProps = {}) {
             </div>
           </div>
 
-          <div className="absolute top-1/2 left-[55%] -translate-y-1/2 z-20 w-[40vw] h-[65vh] st-hero-subject-container overflow-hidden pointer-events-none shadow-2xl depth-main">
-            <img src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1974&auto=format&fit=crop" alt="Coffee Cherries" className="w-full h-full object-cover grayscale-[0.2] st-hero-subject-img origin-center scale-[0.88]" />
+          <div className="absolute top-1/2 left-[55%] -translate-y-1/2 z-20 w-[45vw] h-[75vh] st-hero-subject-container overflow-hidden pointer-events-none shadow-2xl depth-main">
+            <img src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1974&auto=format&fit=crop" alt="Coffee Cherries" className="w-full h-full object-cover grayscale-[0.2] st-hero-subject-img origin-center scale-[1.0]" />
           </div>
 
           <div className="absolute inset-0 z-30 pointer-events-none mix-blend-difference text-white st-hero-metadata">

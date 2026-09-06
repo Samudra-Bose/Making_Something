@@ -104,16 +104,16 @@ export default function Roast({ isJourney }: RoastProps = {}) {
         </div>
 
         <div className="st-roast-track absolute top-0 left-0 h-full w-[350vw] flex items-center depth-sec">
-          <div className="w-[100vw] h-full flex flex-col justify-center items-center text-[#8B9D83] font-display text-[15vw] uppercase leading-none tracking-tighter st-roast-green">
+          <div className="w-[100vw] h-full flex flex-col justify-end pb-[20vh] items-center text-[#8B9D83] font-display text-[15vw] uppercase leading-none tracking-tighter st-roast-green">
             GREEN
           </div>
-          <div className="w-[50vw] h-full flex justify-center items-center text-[#C5A880] font-display text-[15vw] uppercase leading-none tracking-tighter st-roast-yellow">
+          <div className="w-[50vw] h-full flex justify-center items-start pt-[20vh] text-[#C5A880] font-display text-[15vw] uppercase leading-none tracking-tighter st-roast-yellow">
             YELLOW
           </div>
-          <div className="w-[50vw] h-full flex justify-center items-center text-[#D4AF37] font-display text-[18vw] uppercase leading-none tracking-tighter st-roast-gold">
+          <div className="w-[50vw] h-full flex justify-center items-end pb-[25vh] text-[#D4AF37] font-display text-[18vw] uppercase leading-none tracking-tighter st-roast-gold">
             GOLD
           </div>
-          <div className="w-[50vw] h-full flex justify-center items-center text-[#995c2b] font-display text-[18vw] uppercase leading-none tracking-tighter st-roast-caramel">
+          <div className="w-[50vw] h-full flex justify-center items-start pt-[25vh] text-[#995c2b] font-display text-[18vw] uppercase leading-none tracking-tighter st-roast-caramel">
             CARAMEL
           </div>
           <div className="w-[50vw] h-full flex justify-center items-center text-[#5c3a21] font-display text-[20vw] uppercase leading-none tracking-tighter st-roast-brown">
