@@ -2,8 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { useExperienceStore } from '../experience/store';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
