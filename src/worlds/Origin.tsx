@@ -81,13 +81,23 @@ export default function Origin({ isJourney }: OriginProps = {}) {
       pinTl.fromTo('.st-foreground-bean', { x: '-12vw' }, { x: '12vw', duration: 0.83, ease: 'none' }, 0);
 
       // 5. ORIGIN -> ROAST TRANSITION - EXACT SEQUENCE (0.83 - 1.0)
-      // 0.00: scale = final. (done)
-      // 0.15: begin increasing scale.
-      pinTl.to('.st-hero-subject-container', { scale: 1.5, duration: 0.17, ease: 'none' }, 0.83 + (0.17 * 0.15));
-      // 0.30: organic clip mask, expands. Roast visual appears underneath (Roast will be -mt-[100vh] and z-index below Origin).
-      pinTl.to('.st-hero-pin', { clipPath: 'circle(0% at 50% 50%)', duration: 0.17 * 0.6, ease: 'none' }, 0.83 + (0.17 * 0.40));
-      // 0.65: text moves outside focal frame
-      pinTl.to('.st-hero-title-container', { x: '-50vw', opacity: 0, duration: 0.17 * 0.35, ease: 'none' }, 0.83 + (0.17 * 0.65));
+      const trStart = 0.83;
+      const trDuration = 0.17;
+      
+      // 0.20: scale Origin image +8%
+      pinTl.to('.st-hero-subject-img', { scale: '+=0.08', duration: trDuration * 0.20, ease: 'none' }, trStart);
+      // 0.30: move image upward by 5vh
+      pinTl.to('.st-hero-subject-container', { y: '-=5vh', duration: trDuration * 0.10, ease: 'none' }, trStart + trDuration * 0.20);
+      // 0.35: headline moves behind image
+      pinTl.to('.st-hero-title-container', { x: '10vw', duration: trDuration * 0.55, ease: 'none' }, trStart + trDuration * 0.35);
+      // 0.40: crop into central subject
+      pinTl.to('.st-hero-subject-container', { width: '100vw', height: '100vh', scale: 1.5, duration: trDuration * 0.40, ease: 'none' }, trStart + trDuration * 0.40);
+      // 0.50: expanding elliptical mask (Origin shrinks to reveal Roast)
+      pinTl.fromTo('.st-hero-pin', { clipPath: 'ellipse(150% 150% at 50% 50%)' }, { clipPath: 'ellipse(0% 0% at 50% 50%)', duration: trDuration * 0.50, ease: 'none' }, trStart + trDuration * 0.50);
+      // 0.70: Origin opacity reaches 0.35
+      pinTl.to('.st-hero-pin', { opacity: 0.35, duration: trDuration * 0.20, ease: 'none' }, trStart + trDuration * 0.50);
+      // 0.90: typography exits
+      pinTl.to('.st-hero-title-container', { opacity: 0, duration: trDuration * 0.10, ease: 'none' }, trStart + trDuration * 0.80);
 
     });
 
@@ -100,7 +110,7 @@ export default function Origin({ isJourney }: OriginProps = {}) {
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
       className={`relative w-full ${isJourney ? '' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
       data-world="origin"
-      style={{ zIndex: 10 }} // Higher z-index to mask OUT over Roast
+      style={{ zIndex: 40 }} // Higher z-index to mask OUT over Roast
     >
       <div className="st-hero-pin w-full h-screen relative overflow-hidden bg-[#F2F0EB]" style={{ clipPath: 'circle(150% at 50% 50%)' }}>
         
