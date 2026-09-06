@@ -53,11 +53,12 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       // 0.30-0.45: circular mask expands
       grindTl.to('.st-grind-beans-container', { clipPath: 'circle(100% at 50% 50%)', duration: 0.15, ease: 'power2.in' }, 0.30);
       
-      // 0.45-0.60: macro coffee texture fills mask
-      grindTl.to('.st-grind-beans', { scale: 3.0, opacity: 0, duration: 0.15, ease: 'none' }, 0.45);
+      // 0.45-0.65: macro coffee texture fades to grounds
+      grindTl.to('.st-grind-beans', { scale: 3.0, opacity: 0, duration: 0.20, ease: 'none' }, 0.45);
+      grindTl.fromTo('.st-grind-grounds', { scale: 1.2, opacity: 0 }, { scale: 1.0, opacity: 1, duration: 0.20, ease: 'none' }, 0.45);
       
-      // 0.60-0.75: grounds texture appears inside
-      grindTl.fromTo('.st-grind-grounds', { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1.0, duration: 0.15, ease: 'power1.out' }, 0.60);
+      // 0.65-0.75: grounds settle
+      grindTl.to('.st-grind-grounds', { scale: 1.05, duration: 0.20, ease: 'none' }, 0.65);
       
       // 0.75-0.85: grounds settle (water moves down)
       grindTl.to('.st-grind-grounds', { y: '5vh', duration: 0.10, ease: 'power1.inOut' }, 0.75);
