@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function App() {
   const hasEntered = useExperienceStore((state) => state.hasEntered);
   const activeFork = useExperienceStore((state) => state.activeFork);
+  const openForks = useExperienceStore((state) => state.openForks);
   const setActiveWorld = useExperienceStore((state) => state.setActiveWorld);
 
   // CRITICAL: Keep activeWorld in sync with activeFork so ReactiveField

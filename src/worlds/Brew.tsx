@@ -114,8 +114,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
-      data-world="brew"
+      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'} custom-scrollbar text-drift-foreground bg-drift-bg`} 
       style={{ zIndex: 30 }}
     >
       <div className="st-brew-pin w-full h-screen relative">
@@ -125,11 +124,11 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           
           {/* THE BEAN -> GRIND */}
           <div className="absolute z-10 w-[20vw] h-[20vw] st-grind-bean mix-blend-multiply">
-            <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full" />
+            <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full" alt="Coffee Bean Macro" />
           </div>
           
           <div className="absolute inset-0 z-10 st-grind-grounds opacity-0 pointer-events-none">
-             <img src="https://images.unsplash.com/photo-1517486448375-9e66db9a6a8b?q=80&w=2069&auto=format&fit=crop" className="w-full h-full object-cover mix-blend-multiply" />
+             <img src="https://images.unsplash.com/photo-1517486448375-9e66db9a6a8b?q=80&w=2069&auto=format&fit=crop" className="w-full h-full object-cover mix-blend-multiply" alt="Coffee Grounds Texture" />
           </div>
 
           {/* WATER STREAM */}
@@ -155,7 +154,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
 
           {/* THE CUP */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] max-w-md max-h-md st-cup-container opacity-0 z-40">
-             <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" className="w-full h-full object-cover rounded-full shadow-2xl mix-blend-multiply" />
+             <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" className="w-full h-full object-cover rounded-full shadow-2xl mix-blend-multiply" alt="Brewed Coffee in Cup" />
              <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-48 h-48 bg-white/30 blur-[40px] rounded-full st-cup-steam" />
           </div>
 

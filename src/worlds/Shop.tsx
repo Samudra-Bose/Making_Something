@@ -93,7 +93,7 @@ export default function Shop({ isJourney }: ShopProps = {}) {
 
           <div className="st-shop-package absolute z-20 w-[40vw] md:w-[25vw] aspect-[3/4] shadow-2xl flex items-center justify-center overflow-hidden bg-[#222222]">
              {/* Simulating the package */}
-             <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30" />
+             <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30" alt="Coffee Packaging Texture" />
              <div className="text-center p-8 border border-white/20 m-4 relative z-10">
                <div className="text-white/60 text-[10px] tracking-[0.3em] uppercase mb-4">Origin</div>
                <div className="text-white text-3xl font-display mb-2">Guji Zone</div>
@@ -115,7 +115,7 @@ export default function Shop({ isJourney }: ShopProps = {}) {
 
              <div className="st-shop-action mt-8">
                 <button 
-                  onClick={() => useExperienceStore.getState().setCartOpen(true)}
+                  onClick={() => useExperienceStore.getState().setIsCartOpen(true)}
                   className="px-10 py-5 bg-[#333333] text-white text-xs tracking-[0.2em] uppercase hover:bg-black transition-colors w-full sm:w-auto"
                 >
                   Add to Cart
