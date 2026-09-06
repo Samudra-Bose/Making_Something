@@ -86,16 +86,24 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           }
         }
       });
-      // Camera Push
-      bloomTl.fromTo('.st-bloom-grounds', { scale: 1.0 }, { scale: 1.12, duration: 1, ease: 'none' }, 0);
-      bloomTl.to('.st-bloom-grounds', { y: '-4vh', duration: 1, ease: 'none' }, 0);
-      bloomTl.to('.st-bloom-text', { y: '-8vh', duration: 1, ease: 'none' }, 0);
+      // Ambient Camera Push (spans full 1.0 duration quietly)
+      bloomTl.fromTo('.st-bloom-grounds', { scale: 1.0, y: '0vh' }, { scale: 1.12, y: '-4vh', duration: 1, ease: 'none' }, 0);
+      bloomTl.fromTo('.st-bloom-text', { scale: 0.90, y: '0vh' }, { scale: 1.10, y: '-8vh', duration: 1, ease: 'none' }, 0);
 
-      bloomTl.to('.st-bloom-grounds', { filter: 'brightness(0.3)', duration: 0.15 }, 0.20);
-      bloomTl.fromTo('.st-bloom-center', { scale: 1.0 }, { scale: 1.35, duration: 0.15, ease: 'power2.out' }, 0.45);
-      bloomTl.to('.st-bloom-steam', { opacity: 0.55, duration: 0.15 }, 0.75);
-      bloomTl.to('.st-bloom-center', { scale: 2.0, opacity: 0, duration: 0.15 }, 0.90);
-      bloomTl.fromTo('.st-bloom-text', { scale: 0.90 }, { scale: 1.10, duration: 1 }, 0);
+      // 0.00-0.25: Quiet (Only ambient camera push above happens here)
+
+      // 0.25-0.50: Water contact + darkening
+      bloomTl.fromTo('.st-bloom-grounds', { filter: 'brightness(1)' }, { filter: 'brightness(0.3)', duration: 0.25, ease: 'power2.inOut' }, 0.25);
+      
+      // 0.50-0.75: Expansion
+      bloomTl.fromTo('.st-bloom-center', { scale: 1.0, opacity: 0 }, { scale: 1.35, opacity: 0.8, duration: 0.25, ease: 'power2.out' }, 0.50);
+      
+      // 0.75-0.90: Maximum bloom (steam peaks)
+      bloomTl.to('.st-bloom-steam', { opacity: 0.55, duration: 0.15, ease: 'power1.inOut' }, 0.75);
+      
+      // 0.90-1.00: Release (dissipate before next scene)
+      bloomTl.to('.st-bloom-center', { scale: 2.0, opacity: 0, duration: 0.10, ease: 'power2.in' }, 0.90);
+      bloomTl.to('.st-bloom-steam', { opacity: 0, duration: 0.10, ease: 'power2.in' }, 0.90);
 
 
       // 12. POUR & 16. FEEL WEIGHTED
