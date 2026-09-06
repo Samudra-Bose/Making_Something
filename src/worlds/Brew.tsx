@@ -101,9 +101,9 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       // 0.75-0.90: Maximum bloom (steam peaks)
       bloomTl.to('.st-bloom-steam', { opacity: 0.55, duration: 0.15, ease: 'power1.inOut' }, 0.75);
       
-      // 0.90-1.00: Release (dissipate before next scene)
-      bloomTl.to('.st-bloom-center', { scale: 2.0, opacity: 0, duration: 0.10, ease: 'power2.in' }, 0.90);
-      bloomTl.to('.st-bloom-steam', { opacity: 0, duration: 0.10, ease: 'power2.in' }, 0.90);
+      // 0.80-1.00: Settling (15-20% visibly settle)
+      bloomTl.to('.st-bloom-center', { scale: 1.25, opacity: 0.6, duration: 0.20, ease: 'power2.inOut' }, 0.80);
+      bloomTl.to('.st-bloom-steam', { opacity: 0.2, duration: 0.20, ease: 'power2.inOut' }, 0.80);
 
 
       // 12. POUR & 16. FEEL WEIGHTED
