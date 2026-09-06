@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { useExperienceStore } from '../experience/store';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { AntiGravity } from '../reactive/AntiGravity';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,75 +26,72 @@ export default function Roast({ isJourney }: RoastProps = {}) {
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       
-      // 1. ORIGIN -> ROAST TRANSITION & HORIZONTAL SEQUENCE
       const roastTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-roast-pin',
           scroller: scroller,
           start: 'top top',
-          end: '+=600%', // Long pin for horizontal progression
+          end: '+=300%', // 300vh horizontal scene
           scrub: 1,
           pin: true,
           anticipatePin: 1,
-          onEnter: () => useExperienceStore.getState().setActiveWorld('roast'),
-          onEnterBack: () => useExperienceStore.getState().setActiveWorld('roast'),
           onUpdate: (self) => {
-            if (isActive && !isJourney) {
-              useExperienceStore.getState().setGlobalProgress(0.25 + self.progress * 0.30);
+            if (isActive) {
+               useExperienceStore.getState().setActiveWorld('roast');
+               useExperienceStore.getState().setRoastDevelopment(self.progress);
             }
           }
         }
       });
 
-      // Initially, Roast container is hidden via clip-path
-      gsap.set('.st-roast-reveal', { clipPath: 'circle(0% at 50% 50%)' });
+      // Horizontal track moving exactly -70%
+      roastTl.to('.st-roast-track', { x: '-70%', duration: 1, ease: 'none' }, 0);
       
-      // 0-10%: Transition Reveal (Origin -> Roast)
-      roastTl.to('.st-roast-reveal', { clipPath: 'circle(150% at 50% 50%)', duration: 1 })
-             .fromTo('.st-roast-bg', { scale: 1.2 }, { scale: 1, duration: 1 }, 0);
+      // Stage scales
+      roastTl.fromTo('.st-roast-green', { scale: 1.0 }, { scale: 1.03, duration: 0.2 }, 0);
+      roastTl.fromTo('.st-roast-yellow', { scale: 1.0 }, { scale: 1.06, duration: 0.2 }, 0.2);
+      roastTl.fromTo('.st-roast-gold', { scale: 1.0 }, { scale: 1.08, duration: 0.2 }, 0.4);
+      roastTl.fromTo('.st-roast-caramel', { scale: 1.0 }, { scale: 1.05, duration: 0.2 }, 0.6);
+      roastTl.fromTo('.st-roast-brown', { scale: 1.0 }, { scale: 1.02, duration: 0.2 }, 0.8);
+      
+      // 7. FIRST CRACK - EXACT EVENT (60-70% of Roast pinned scene)
+      // tension build 55-65%
+      roastTl.to('.st-roast-bean', { rotate: '+=72deg', scale: 1.15, duration: 0.1 }, 0.55);
+      roastTl.to('.st-first-crack-text', { scale: 1.15, duration: 0.1 }, 0.55);
+      
+      // Crack point (65-70%) - very fast impulse
+      roastTl.to('.st-roast-bean', { x: '1.2vw', rotate: '+=4deg', duration: 0.02 }, 0.65)
+             .to('.st-roast-bean', { x: '0vw', rotate: '-=4deg', duration: 0.03 }, 0.67);
+      
+      roastTl.to('.st-first-crack-text-1', { x: '-1.5vw', duration: 0.02 }, 0.65)
+             .to('.st-first-crack-text-2', { x: '1.5vw', duration: 0.02 }, 0.65);
+             
+      roastTl.fromTo('.st-crack-radial', { scale: 0.4, opacity: 0 }, { scale: 2.0, opacity: 0.8, duration: 0.02 }, 0.65)
+             .to('.st-crack-radial', { scale: 1.0, opacity: 0, duration: 0.03 }, 0.67);
+             
+      // Settle
+      roastTl.to('.st-first-crack-text-1', { x: '0vw', duration: 0.05 }, 0.70);
+      roastTl.to('.st-first-crack-text-2', { x: '0vw', duration: 0.05 }, 0.70);
 
-      // 10-80%: Horizontal Roast Sequence
-      // We will move the inner track horizontally
-      roastTl.to('.st-roast-track', { x: '-80vw', duration: 7 }, 1)
-             .to('.st-roast-bean', { rotate: 360, duration: 7 }, 1)
-             .to('.st-roast-bg', { filter: 'sepia(80%) hue-rotate(-20deg) saturate(2) brightness(0.6)', duration: 7 }, 1)
-             // Typographic choreography
-             .to('.st-roast-word-green', { opacity: 0, x: -100, duration: 1 }, 1)
-             .to('.st-roast-word-yellow', { opacity: 1, scale: 1.1, duration: 1 }, 2)
-             .to('.st-roast-word-yellow', { opacity: 0, scale: 0.9, duration: 1 }, 3)
-             .to('.st-roast-word-gold', { opacity: 1, scale: 1.2, duration: 1 }, 4)
-             .to('.st-roast-word-gold', { opacity: 0, scale: 0.9, duration: 1 }, 5)
-             .to('.st-roast-word-brown', { opacity: 1, scale: 1.3, duration: 1 }, 6)
-             .to('.st-roast-word-brown', { opacity: 0, scale: 0.9, duration: 1 }, 7);
-
-      // 80-100%: Setup for First Crack
-      roastTl.to('.st-roast-bean', { scale: 1.2, duration: 2 }, 8)
-             .to('.st-roast-bg', { scale: 1.05, duration: 2 }, 8);
-
-
-      // 2. FIRST CRACK MOMENT
-      const crackTl = gsap.timeline({
+      // 8. ROAST -> BREW TRANSITION (Using another pin/spacer for 45vh)
+      // I'll create a second pin for the transition or just continue this timeline.
+      // 45vh = 45% of 100vh. If we add it to the end of Roast:
+      const transTl = gsap.timeline({
         scrollTrigger: {
-          trigger: '.st-first-crack',
+          trigger: '.st-roast-trans-trigger',
           scroller: scroller,
           start: 'top top',
-          end: '+=150%',
-          scrub: 0, // No scrub smoothing to make it feel abrupt
+          end: '+=45%',
+          scrub: 1,
           pin: true
         }
       });
-
-      // Build tension
-      crackTl.fromTo('.st-crack-text', { letterSpacing: '-0.05em', scale: 0.9 }, { letterSpacing: '0.1em', scale: 1, duration: 1 })
-             // Abrupt crack
-             .to('.st-crack-text', { scale: 1.5, letterSpacing: '0.5em', filter: 'blur(2px)', duration: 0.1, ease: 'rough' })
-             .to('.st-crack-bg', { scale: 1.2, filter: 'contrast(1.5) brightness(1.2)', duration: 0.1 })
-             .to('.st-crack-particles', { opacity: 1, scale: 1.5, duration: 0.1 })
-             // Settle
-             .to('.st-crack-text', { scale: 1.2, letterSpacing: '0.2em', filter: 'blur(0px)', duration: 0.8 })
-             .to('.st-crack-bg', { scale: 1.1, filter: 'contrast(1) brightness(0.8)', duration: 0.8 })
-             .to('.st-crack-particles', { opacity: 0, scale: 2, duration: 0.8 });
-
+      // 0.20: camera scales to bean. 0.35: bean fills 55%. 0.45: organic mask around bean. 0.55: ground texture replace.
+      transTl.to('.st-roast-final-bean', { scale: 5, duration: 0.35 }, 0.0);
+      transTl.to('.st-roast-final-mask', { clipPath: 'circle(40% at 50% 50%)', duration: 0.2 }, 0.35);
+      transTl.to('.st-roast-grounds-texture', { opacity: 1, duration: 0.1 }, 0.55);
+      transTl.to('.st-roast-grounds-texture', { scale: 1.5, y: '20vh', duration: 0.2 }, 0.65);
+      transTl.to('.st-roast-water-visual', { opacity: 1, y: '0vh', duration: 0.18 }, 0.82);
     });
 
     return () => mm.revert();
@@ -107,65 +103,58 @@ export default function Roast({ isJourney }: RoastProps = {}) {
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
       className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
       data-world="roast"
-      style={{ zIndex: 20 }} // Higher z-index to overlay Origin
+      style={{ zIndex: 5 }} // Lower z-index so Origin masks out over it
     >
-      <div className="st-roast-pin w-full h-screen relative">
-        <div className="st-roast-reveal w-full h-full relative overflow-hidden bg-[#2D1B11]">
+      <div className="st-roast-pin w-full h-screen relative bg-[#2D1B11] overflow-hidden">
+        {/* Horizontal Track */}
+        <div className="st-roast-track absolute top-0 left-0 h-full w-[350vw] flex items-center">
           
-          {/* Background */}
-          <div className="absolute inset-0 z-0">
-             <img 
-               src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop"
-               className="w-full h-full object-cover st-roast-bg mix-blend-overlay opacity-60"
-               alt=""
-             />
-             <div className="absolute inset-0 bg-gradient-to-r from-[#8B9D83] via-[#C5A880] to-[#3B2516] mix-blend-multiply opacity-80" />
+          <div className="w-[100vw] h-full flex flex-col justify-center items-center text-[#8B9D83] font-display text-[15vw] uppercase leading-none tracking-tighter st-roast-green depth-back">
+            GREEN
+          </div>
+          <div className="w-[50vw] h-full flex justify-center items-center text-[#C5A880] font-display text-[15vw] uppercase leading-none tracking-tighter st-roast-yellow depth-back">
+            YELLOW
+          </div>
+          <div className="w-[50vw] h-full flex justify-center items-center text-[#D4AF37] font-display text-[18vw] uppercase leading-none tracking-tighter st-roast-gold depth-back">
+            GOLD
+          </div>
+          <div className="w-[50vw] h-full flex justify-center items-center text-[#995c2b] font-display text-[18vw] uppercase leading-none tracking-tighter st-roast-caramel depth-back">
+            CARAMEL
+          </div>
+          <div className="w-[50vw] h-full flex justify-center items-center text-[#5c3a21] font-display text-[20vw] uppercase leading-none tracking-tighter st-roast-brown depth-back">
+            BROWN
+          </div>
+          <div className="w-[50vw] h-full flex justify-center items-center text-[#2D1B11] font-display text-[22vw] uppercase leading-none tracking-tighter st-roast-dark depth-back mix-blend-color-dodge">
+            DARK
           </div>
 
-          {/* Horizontal Track */}
-          <div className="st-roast-track absolute inset-0 z-10 flex items-center w-[200vw]">
-            
-            {/* The Bean (Moves with track but rotates) */}
-            <div className="absolute left-[30vw] top-1/2 -translate-y-1/2 w-[30vw] h-[30vw] st-roast-bean mix-blend-luminosity">
-              <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full shadow-2xl" />
+          <div className="absolute top-1/2 left-[180vw] -translate-y-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none mix-blend-difference text-white">
+            <div className="text-[10vw] font-display uppercase tracking-tighter leading-none flex st-first-crack-text">
+              <div className="st-first-crack-text-1">FIRST</div>
+              <div className="st-first-crack-text-2">CRACK</div>
             </div>
-
-            {/* Typography Stations */}
-            <div className="w-[100vw] h-full flex flex-col justify-center items-center text-[#EAE7E0] font-display text-[15vw] uppercase leading-none tracking-tighter opacity-80 st-roast-word-green">
-              GREEN
-            </div>
-            <div className="absolute left-[40vw] text-[#EAE7E0] font-display text-[15vw] uppercase leading-none tracking-tighter opacity-0 st-roast-word-yellow mix-blend-overlay">
-              YELLOW
-            </div>
-            <div className="absolute left-[60vw] text-[#EAE7E0] font-display text-[18vw] uppercase leading-none tracking-tighter opacity-0 st-roast-word-gold mix-blend-overlay">
-              GOLD
-            </div>
-            <div className="absolute left-[80vw] text-[#EAE7E0] font-display text-[20vw] uppercase leading-none tracking-tighter opacity-0 st-roast-word-brown">
-              BROWN
-            </div>
-
           </div>
+        </div>
 
+        {/* The Bean */}
+        <div className="absolute left-[30vw] top-1/2 -translate-y-1/2 w-[30vw] h-[30vw] st-roast-bean mix-blend-luminosity depth-main pointer-events-none">
+          <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full shadow-2xl" />
+        </div>
+        
+        {/* Radial Crack Element */}
+        <div className="absolute top-1/2 left-[30vw] -translate-y-1/2 w-[40vw] h-[40vw] rounded-full bg-white/20 blur-xl opacity-0 st-crack-radial pointer-events-none" />
+      </div>
+
+      <div className="st-roast-trans-trigger w-full h-screen relative bg-[#1A100C] overflow-hidden">
+        {/* Bean to brew transition */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-[30vw] h-[30vw] st-roast-final-bean relative">
+            <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="w-full h-full object-cover rounded-full st-roast-final-mask" />
+            <img src="https://images.unsplash.com/photo-1495474472205-51f75f23b1fb?q=80&w=2070&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover rounded-full opacity-0 st-roast-grounds-texture" />
+          </div>
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-blue-100/10 opacity-0 st-roast-water-visual translate-y-[100%]" />
         </div>
       </div>
-
-      {/* First Crack Section */}
-      <div className="st-first-crack w-full h-screen relative bg-[#1A100C] overflow-hidden flex items-center justify-center">
-         <div className="absolute inset-0 z-0 opacity-40">
-           <img 
-               src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop"
-               className="w-full h-full object-cover st-crack-bg filter brightness-50"
-               alt=""
-             />
-         </div>
-         <div className="st-crack-particles absolute inset-0 z-10 opacity-0 bg-[radial-gradient(circle_at_center,rgba(255,200,100,0.2)_0%,transparent_70%)]" />
-         
-         <div className="z-20 text-[#F2F0EB] font-display text-[12vw] uppercase tracking-tighter leading-none flex gap-4 st-crack-text mix-blend-difference">
-           <div>FIRST</div>
-           <div>CRACK</div>
-         </div>
-      </div>
-      
     </div>
   );
 }
