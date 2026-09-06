@@ -29,9 +29,18 @@ export default function ReactiveField() {
 
   // Scroll velocity multiplier
   const rawVelocity = useScrollVelocity(scroll);
-  const velocityMultiplier = 1.0 + Math.min(0.35, rawVelocity * 0.05); 
+  const velocityMultiplier = 1.0 + Math.min(0.35, Math.abs(rawVelocity) * 0.05); 
   
-  const finalIntensity = intensity * velocityMultiplier;
+  // 19. MULTI-WINDOW MODE Intensity Scaling
+  const openForks = useExperienceStore((state) => state.openForks);
+  let modeMultiplier = 1.0;
+  if (openForks.length === 2) {
+    modeMultiplier = 0.6; // average
+  } else if (openForks.length > 2) {
+    modeMultiplier = 0.3; // grid view
+  }
+
+  const finalIntensity = intensity * velocityMultiplier * modeMultiplier;
 
   // Map intensity to properties
   const xGap = lerp(40, 8, finalIntensity);

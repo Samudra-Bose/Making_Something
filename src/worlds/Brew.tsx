@@ -133,7 +133,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       cupTl.fromTo('.st-cup-main', { scale: 0.82, y: '8vh' }, { scale: 1.0, y: '0vh', duration: 1, ease: 'power2.out' }, 0);
       cupTl.fromTo('.st-cup-steam-final', { opacity: 0, y: '10px' }, { opacity: 0.3, y: '-15px', duration: 1, ease: 'none' }, 0); // Very subtle steam
 
-      // 9. SECOND MASK FOR BREW -> SHOP
+      // 9. SECOND MASK FOR BREW -> SHOP (Handled by Shop.tsx mask reveal)
       const transTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-brew-shop-trans',
@@ -143,9 +143,8 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           scrub: 1
         }
       });
-      // Cup scale +10%, mask expands from cup center. Package appears behind mask.
-      transTl.to('.st-cup-main', { scale: 1.10, y: '-5vh', duration: 0.5, ease: 'none' }, 0);
-      transTl.to('.st-cup-mask-wrapper', { clipPath: 'circle(150% at 50% 50%)', duration: 1, ease: 'power2.in' }, 0);
+      // Cup scale +10% while Shop masks over it
+      transTl.to('.st-cup-main', { scale: 1.10, y: '-5vh', duration: 1, ease: 'none' }, 0);
 
     });
 
