@@ -45,11 +45,13 @@ export default function Brew({ isJourney }: BrewProps = {}) {
         }
       });
       
-      // 0-0.25: bean centered, scale +15%
-      grindTl.fromTo('.st-grind-beans', { scale: 1.0 }, { scale: 1.15, duration: 0.25, ease: 'none' }, 0);
+      // 0.00-0.15 hold, 0.15-0.85 transform, 0.85-1.00 release
       
-      // 0.25-0.45: circular mask expands
-      grindTl.to('.st-grind-beans-container', { clipPath: 'circle(100% at 50% 50%)', duration: 0.2, ease: 'power2.in' }, 0.25);
+      // 0.15-0.30: bean centered, scale +15%
+      grindTl.fromTo('.st-grind-beans', { scale: 1.0 }, { scale: 1.15, duration: 0.15, ease: 'none' }, 0.15);
+      
+      // 0.30-0.45: circular mask expands
+      grindTl.to('.st-grind-beans-container', { clipPath: 'circle(100% at 50% 50%)', duration: 0.15, ease: 'power2.in' }, 0.30);
       
       // 0.45-0.60: macro coffee texture fills mask
       grindTl.to('.st-grind-beans', { scale: 3.0, opacity: 0, duration: 0.15, ease: 'none' }, 0.45);
@@ -57,17 +59,17 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       // 0.60-0.75: grounds texture appears inside
       grindTl.fromTo('.st-grind-grounds', { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1.0, duration: 0.15, ease: 'power1.out' }, 0.60);
       
-      // 0.75-0.90: grounds settle (water moves down)
-      grindTl.to('.st-grind-grounds', { y: '5vh', duration: 0.15, ease: 'power1.inOut' }, 0.75);
+      // 0.75-0.85: grounds settle (water moves down)
+      grindTl.to('.st-grind-grounds', { y: '5vh', duration: 0.10, ease: 'power1.inOut' }, 0.75);
 
       // Water stream believable acceleration
-      grindTl.fromTo('.st-water-stream', { y: '-100vh', opacity: 0 }, { y: '0vh', opacity: 1, duration: 0.2, ease: 'power2.in' }, 0.70);
-      grindTl.to('.st-water-surface', { scale: 10, opacity: 0.8, duration: 0.1, ease: 'power2.out' }, 0.90);
-      grindTl.to('.st-water-level', { y: '-30vh', duration: 0.1 }, 0.90);
-      grindTl.to('.st-water-steam', { opacity: 0.5, duration: 0.1 }, 0.90);
+      grindTl.fromTo('.st-water-stream', { y: '-100vh', opacity: 0 }, { y: '0vh', opacity: 1, duration: 0.2, ease: 'power2.in' }, 0.65);
+      grindTl.to('.st-water-surface', { scale: 10, opacity: 0.8, duration: 0.1, ease: 'power2.out' }, 0.85);
+      grindTl.to('.st-water-level', { y: '-30vh', duration: 0.1 }, 0.85);
+      grindTl.to('.st-water-steam', { opacity: 0.5, duration: 0.1 }, 0.85);
 
       // Background cross-world text
-      grindTl.fromTo('.st-bg-word-brew', { y: '30vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 0.5 }, 0.2);
+      grindTl.fromTo('.st-bg-word-brew', { y: '30vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 0.5 }, 0.15);
 
 
       // 11. BLOOM & 15. ADD PHYSICAL RESPONSE
