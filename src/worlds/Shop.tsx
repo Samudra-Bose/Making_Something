@@ -32,6 +32,35 @@ export default function Shop({ isJourney }: ShopProps = {}) {
         scrollTrigger: {
           trigger: '.st-shop-pin',
           scroller: scroller,
+          start: 'top bottom', // Start animating as soon as Shop enters the viewport
+          end: 'bottom bottom', // End when it reaches its pinned state
+          scrub: 1,
+        }
+      });
+      
+      // 9. CONTINUOUS TRANSITION: Fade in the background smoothly instead of a hard mask
+      tl.fromTo('.st-shop-pin-mask', { backgroundColor: 'rgba(26, 16, 12, 0)' }, { backgroundColor: 'rgba(26, 16, 12, 1)', duration: 0.8 }, 0);
+      
+      // Background text cross-world link
+      tl.fromTo('.st-bg-word-shop', { y: '10vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 1.0 }, 0.0);
+      
+      // 18. SHOP - PHYSICAL PRODUCT (Scroll-linked entrance)
+      // Initial product: scale 0.90, y 40px, rotation -2deg
+      // Scroll: scale 0.90 -> 1.00, y 40px -> 0, rotation -2deg -> 0deg
+      tl.fromTo('.st-shop-product', 
+        { scale: 0.90, y: '40px', rotation: -2, filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.2))' }, 
+        { scale: 1.0, y: '0px', rotation: 0, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.5))', duration: 1.0, ease: 'power2.out' }, 
+        0.0
+      );
+      
+      // Shop typography enters at 0.95
+      tl.fromTo('.st-shop-ui', { opacity: 0, y: '5vh' }, { opacity: 1, y: '0vh', duration: 0.2 }, 0.8);
+
+      // We need a separate timeline for pinning Shop since the above animates BEFORE it pins
+      const pinTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.st-shop-pin',
+          scroller: scroller,
           start: 'top top',
           end: '+=200%', 
           scrub: 1,
@@ -42,24 +71,7 @@ export default function Shop({ isJourney }: ShopProps = {}) {
           }
         }
       });
-      
-      // 9. SECOND MASK FOR BREW -> SHOP
-      // The pin wrapper in Shop starts clipped to 0, expanding from center.
-      // Wait, if it's pinned, the whole container masks in!
-      tl.fromTo('.st-shop-pin-mask', { clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(150% at 50% 50%)', duration: 0.3, ease: 'power2.in' }, 0);
-      
-      // Background text cross-world link
-      tl.fromTo('.st-bg-word-shop', { y: '30vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 0.5 }, 0.2);
-      
-      // 18. SHOP - PHYSICAL PRODUCT
-      // scale 0.94 -> 1.0, y 30px -> 0, rotation -2deg -> 0, shadow small -> stronger
-      tl.fromTo('.st-shop-product', { scale: 0.94, y: '30px', rotation: -2, filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.2))' }, { scale: 1.0, y: '0px', rotation: 0, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.5))', duration: 0.6, ease: 'power2.out' }, 0.2);
-      
-      // Camera Push: Supporting objects y 0 -> -3vh
-      tl.to('.st-shop-ui', { y: '-3vh', duration: 0.5, ease: 'none' }, 0.4);
-      
-      tl.to('.st-shop-ui', { opacity: 1, duration: 0.3 }, 0.5);
-
+      // Shop specific pinned animations (if any)
     });
 
     return () => mm.revert();
@@ -97,9 +109,12 @@ export default function Shop({ isJourney }: ShopProps = {}) {
           </div>
           
           <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-6 opacity-0 st-shop-ui z-20 depth-fg">
-            <Button className="bg-[#D4AF37] hover:bg-[#C5A880] text-black font-sans uppercase tracking-widest text-xs h-14 px-10 rounded-none">
-              Add to Cart <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+            <button className="bg-[#D4AF37] hover:bg-[#C5A880] text-black font-sans uppercase tracking-widest text-xs h-14 px-10 rounded-none flex items-center justify-center transition-colors">
+              Add to Cart 
+              <svg className="ml-3 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
           
         </div>

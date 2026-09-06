@@ -150,14 +150,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       transTl.to('.st-cup-main', { scale: 1.08, duration: 0.20 }, 0.00);
       // 0.35: camera pulls backward, 0.70: cup moves toward background
       transTl.to('.st-cup-main', { scale: 0.4, y: '-10vh', opacity: 0, duration: 0.35 }, 0.35);
-      // 0.45: package enters from below, 0.60: package reaches center
-      transTl.fromTo('.st-shop-package', { y: '60vh', opacity: 0, rotate: -5 }, { y: '0vh', opacity: 1, rotate: -2, duration: 0.15 }, 0.45);
-      // 0.78: package becomes dominant
-      transTl.to('.st-shop-package', { scale: 1.05, duration: 0.18 }, 0.60);
-      // 0.85: package label becomes readable
-      transTl.fromTo('.st-shop-package .text-center', { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.70);
-      // 0.95: Shop typography enters
-      transTl.fromTo('.st-shop-ui', { opacity: 0, y: '20px' }, { opacity: 1, y: '0px', duration: 0.05 }, 0.95);
+      // Shop elements are animated simultaneously by Shop.tsx's top-bottom trigger
     });
 
     return () => mm.revert();
