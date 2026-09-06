@@ -122,9 +122,17 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           }
         }
       });
-      pourTl.to('.st-pour-vessel', { rotate: 8, duration: 1 }, 0);
-      pourTl.fromTo('.st-pour-path', { strokeDashoffset: '100%' }, { strokeDashoffset: '0%', duration: 1 }, 0);
-      pourTl.fromTo('.st-pour-ring', { scale: 0.2, opacity: 0 }, { scale: 1.15, opacity: 0.8, duration: 0.5 }, 0.5);
+      // 0.20: stream begins entering, 0.40: stream reaches grounds
+      pourTl.fromTo('.st-pour-path', { strokeDashoffset: '100%' }, { strokeDashoffset: '0%', duration: 0.20 }, 0.20);
+      // 0.55: surface reacts
+      pourTl.fromTo('.st-pour-ring', { scale: 0.2, opacity: 0 }, { scale: 0.5, opacity: 0.8, duration: 0.15 }, 0.40);
+      // 0.70: vessel reaches maximum controlled rotation
+      pourTl.to('.st-pour-vessel', { rotate: 8, duration: 0.70 }, 0.00);
+      // 0.80: surface ring reaches maximum size
+      pourTl.to('.st-pour-ring', { scale: 1.15, opacity: 0.4, duration: 0.25 }, 0.55);
+      // 1.00: pour settles
+      pourTl.to('.st-pour-ring', { opacity: 0, duration: 0.20 }, 0.80);
+      pourTl.to('.st-pour-vessel', { rotate: 5, duration: 0.30 }, 0.70);
       pourTl.to('.st-pour-ring', { opacity: 0, duration: 0.5 }, 1.0);
       pourTl.fromTo('.st-pour-text', { x: '-5vw' }, { x: '3vw', duration: 1 }, 0);
 
