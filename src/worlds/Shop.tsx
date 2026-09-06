@@ -38,21 +38,32 @@ export default function Shop({ isJourney }: ShopProps = {}) {
       
       // 9. CONTINUOUS TRANSITION: Fade in the background smoothly instead of a hard mask
       tl.fromTo('.st-shop-pin-mask', { backgroundColor: 'rgba(26, 16, 12, 0)' }, { backgroundColor: 'rgba(26, 16, 12, 1)', duration: 0.8 }, 0);
-      
       // Background text cross-world link
       tl.fromTo('.st-bg-word-shop', { y: '10vh', opacity: 0 }, { y: '0vh', opacity: 0.1, duration: 1.0 }, 0.0);
       
-      // 18. SHOP - PHYSICAL PRODUCT (Scroll-linked entrance)
-      // Initial product: scale 0.90, y 40px, rotation -2deg
-      // Scroll: scale 0.90 -> 1.00, y 40px -> 0, rotation -2deg -> 0deg
+      // Mask expands to reveal the world (0.00-0.40)
+      tl.fromTo('.st-shop-pin-mask', 
+        { clipPath: 'circle(0% at 50% 50%)' }, 
+        { clipPath: 'circle(150% at 50% 50%)', duration: 0.4, ease: 'power2.inOut' }, 
+      0);
+
+      // Package enters and becomes clearer (0.30-0.60)
       tl.fromTo('.st-shop-product', 
-        { scale: 0.90, y: '40px', rotation: -2, filter: 'drop-shadow(0px 10px 15px rgba(0,0,0,0.2))' }, 
-        { scale: 1.0, y: '0px', rotation: 0, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.5))', duration: 1.0, ease: 'power2.out' }, 
-        0.0
-      );
-      
-      // Shop typography enters at 0.95
-      tl.fromTo('.st-shop-ui', { opacity: 0, y: '5vh' }, { opacity: 1, y: '0vh', duration: 0.2 }, 0.8);
+        { y: '20vh', scale: 0.9, filter: 'blur(10px)', opacity: 0 }, 
+        { y: '0vh', scale: 1.0, filter: 'blur(0px)', opacity: 1, duration: 0.3, ease: 'power2.out' }, 
+      0.30);
+
+      // Label appears (0.60-0.80)
+      tl.fromTo('.st-shop-label',
+        { opacity: 0, y: '10px' },
+        { opacity: 1, y: '0px', duration: 0.2, ease: 'power1.out' },
+      0.60);
+
+      // UI becomes available (0.80-1.00)
+      tl.fromTo('.st-shop-ui', 
+        { opacity: 0, y: '20px' }, 
+        { opacity: 1, y: '0px', duration: 0.2, ease: 'power1.out' }, 
+      0.80);
 
       // We need a separate timeline for pinning Shop since the above animates BEFORE it pins
       const pinTl = gsap.timeline({
@@ -95,11 +106,11 @@ export default function Shop({ isJourney }: ShopProps = {}) {
 
           <div className="relative z-10 w-[40vw] max-w-[400px] aspect-[3/4] flex items-center justify-center st-shop-product depth-main">
             <div className="w-full h-full bg-[#D9D3C5] rounded-sm p-8 flex flex-col justify-between border-l-4 border-l-[#C5A880]">
-              <div>
+              <div className="st-shop-label">
                  <h3 className="font-sans text-xs tracking-[0.2em] uppercase text-[#3B2516]/60 mb-2">Single Origin</h3>
                  <h2 className="font-display text-4xl tracking-tighter text-[#1A100C] uppercase leading-none">Ethiopian<br/>Heirloom</h2>
               </div>
-              <div className="flex justify-between items-end">
+              <div className="flex justify-between items-end st-shop-label">
                  <span className="font-display text-2xl text-[#3B2516]">$24</span>
                  <span className="font-sans text-xs uppercase tracking-widest text-[#3B2516]/50">250G</span>
               </div>

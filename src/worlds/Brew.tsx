@@ -186,9 +186,6 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       // 0.00-0.30: Hold as dominant object
       // 0.30-1.00: Pull back to prepare for Shop mask
       transTl.to('.st-cup-main', { scale: 0.85, y: '-15vh', duration: 0.70, ease: 'power2.inOut' }, 0.30);
-      // 0.35: camera pulls backward, 0.70: cup moves toward background
-      transTl.to('.st-cup-main', { scale: 0.4, y: '-10vh', opacity: 0, duration: 0.35 }, 0.35);
-      // Shop elements are animated simultaneously by Shop.tsx's top-bottom trigger
     });
 
     return () => mm.revert();

@@ -8,6 +8,7 @@ import { useScrollVelocity } from './useScrollVelocity';
 export default function ReactiveField() {
   const globalProgress = useExperienceStore((state) => state.globalProgress);
   const scroll = useExperienceStore((state) => state.scroll);
+  const activeWorld = useExperienceStore((state) => state.activeWorld);
   
   const lerp = (start: number, end: number, amt: number) => {
     return (1 - amt) * start + amt * end;
@@ -40,7 +41,14 @@ export default function ReactiveField() {
     modeMultiplier = 0.3; // grid view
   }
 
-  const finalIntensity = intensity * velocityMultiplier * modeMultiplier;
+  // 12. CUP - LONGEST VISUAL BREATH (Reduce intensity by 50%)
+  const brewProgress = useExperienceStore((state) => state.brewProgress);
+  let cupMultiplier = 1.0;
+  if (activeWorld === 'brew' && brewProgress > 0.8) {
+    cupMultiplier = 0.5;
+  }
+
+  const finalIntensity = intensity * velocityMultiplier * modeMultiplier * cupMultiplier;
 
   // Map intensity to properties
   const xGap = lerp(40, 8, finalIntensity);
