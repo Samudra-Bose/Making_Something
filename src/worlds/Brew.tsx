@@ -108,7 +108,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           scrub: 1,
           pin: true,
           onUpdate: (self) => {
-             if (isActive) useExperienceStore.getState().setBrewProgress(0.6 + self.progress * 0.2);
+             if (isActive) useExperienceStore.getState().setBrewProgress(0.5 + self.progress * 0.2);
           }
         }
       });
@@ -117,6 +117,32 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       pourTl.fromTo('.st-pour-ring', { scale: 0.2, opacity: 0 }, { scale: 1.15, opacity: 0.8, duration: 0.5, ease: 'power2.out' }, 0.5);
       pourTl.to('.st-pour-ring', { opacity: 0, duration: 0.5 }, 1.0);
       pourTl.fromTo('.st-pour-text', { x: '-5vw' }, { x: '3vw', duration: 1 }, 0);
+
+      // EXTRACTION (large numerical typography progresses)
+      const extractTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.st-brew-extract',
+          scroller: scroller,
+          start: 'top top',
+          end: '+=150%',
+          scrub: 1,
+          pin: true,
+          onUpdate: (self) => {
+             if (isActive) useExperienceStore.getState().setBrewProgress(0.7 + self.progress * 0.1);
+             // GSAP proxy to text content
+             const el = document.querySelector('.st-extract-num');
+             if (el) {
+                const val = Math.floor(self.progress * 100);
+                el.textContent = val.toString().padStart(2, '0') + '%';
+             }
+          }
+        }
+      });
+      // 0.00-0.20 hold, 0.20-0.80 transform, 0.80-1.00 release
+      extractTl.fromTo('.st-extract-bg', { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0);
+      extractTl.fromTo('.st-extract-num', { scale: 0.8, opacity: 0 }, { scale: 1.0, opacity: 1, duration: 0.2, ease: 'power2.out' }, 0.2);
+      extractTl.to('.st-extract-bg', { scale: 1.1, duration: 0.6, ease: 'none' }, 0.2);
+      extractTl.to('.st-extract-num', { opacity: 0, scale: 1.1, duration: 0.2, ease: 'power2.in' }, 0.8);
 
 
       // 13. CUP & 17. CREATE STILLNESS
@@ -199,6 +225,14 @@ export default function Brew({ isJourney }: BrewProps = {}) {
                <circle cx="50" cy="50" r="48" fill="none" stroke="#3B2516" strokeWidth="2" strokeDasharray="301" className="st-pour-path" />
             </svg>
             <div className="st-pour-ring absolute w-[90%] h-[90%] rounded-full border border-[#3B2516]/50 opacity-0" />
+         </div>
+      </div>
+
+      {/* EXTRACTION */}
+      <div className="st-brew-extract w-full h-screen relative bg-[#1A100C] flex items-center justify-center overflow-hidden">
+         <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop" className="st-extract-bg absolute inset-0 w-full h-full object-cover opacity-0 mix-blend-overlay depth-bg" />
+         <div className="st-extract-num text-[25vw] font-display text-white opacity-0 tracking-tighter leading-none depth-type mix-blend-difference">
+           00%
          </div>
       </div>
 

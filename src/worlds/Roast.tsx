@@ -43,6 +43,10 @@ export default function Roast({ isJourney }: RoastProps = {}) {
         }
       });
 
+      // 19. GLOBAL OBJECT TRAVEL (Roast Phase)
+      roastTl.fromTo('.st-foreground-bean', { x: '10vw', rotate: 0 }, { x: '-80vw', rotate: 180, duration: 1, ease: 'none' }, 0);
+      roastTl.fromTo('.st-bg-word-roast', { x: '50vw' }, { x: '-150vw', duration: 1, ease: 'none' }, 0);
+
       // 0.00-0.20 hold, 0.20-0.75 transform, 0.75-1.00 release
       const trStart = 0.20;
       const trDur = 0.55; 
