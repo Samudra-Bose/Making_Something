@@ -26,43 +26,56 @@ export default function Brew({ isJourney }: BrewProps = {}) {
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       
-      // 9. GRIND & 10. WATER (Tied to brewProgress)
-      // We will pin this first section for 200vh
+      // 8. ROAST -> BREW TRANSITION (45vh) & 9. GRIND & 10. WATER
+      // Combined into one pinned scene of 245vh
       const grindTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-brew-grind-water',
           scroller: scroller,
           start: 'top top',
-          end: '+=200%',
+          end: '+=245%',
           scrub: 1,
           pin: true,
           anticipatePin: 1,
           onUpdate: (self) => {
              if (isActive) {
                useExperienceStore.getState().setActiveWorld('brew');
-               useExperienceStore.getState().setBrewProgress(self.progress * 0.4); // first 40% of brew
+               useExperienceStore.getState().setBrewProgress(self.progress * 0.4); 
              }
           }
         }
       });
-      // 0.20: beans rotate 12deg
+      // 8. ROAST -> BREW TRANSITION (0 -> 0.18 approx for 45vh out of 245vh)
+      // 9. GRIND (overlaps transition)
+      // 0.20: beans rotate 12deg, camera scales to bean
+      grindTl.to('.st-grind-camera', { scale: 1.08, duration: 0.1 }, 0.1);
       grindTl.to('.st-grind-beans', { rotate: 12, duration: 0.2 }, 0);
-      // 0.30: camera scale 1.0->1.08
-      grindTl.to('.st-grind-camera', { scale: 1.08, duration: 0.15 }, 0.15);
-      // 0.45: whole-bean opacity decreasing
-      grindTl.to('.st-grind-beans', { opacity: 0, duration: 0.4 }, 0.45);
-      // 0.55: ground texture appears
+      
+      // 0.35: bean fills 55% of viewport
+      grindTl.to('.st-grind-beans', { scale: 5.5, duration: 0.15 }, 0.2);
+      
+      // 0.45: organic mask around bean, whole-bean opacity decreasing
+      grindTl.to('.st-grind-beans-container', { clipPath: 'circle(40% at 50% 50%)', duration: 0.1 }, 0.35);
+      grindTl.to('.st-grind-beans', { opacity: 0, duration: 0.2 }, 0.45);
+      
+      // 0.55: replace inner visual with ground texture
       grindTl.fromTo('.st-grind-grounds', { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.55);
-      // 0.85: grounds settle
-      grindTl.to('.st-grind-grounds', { y: '10vh', duration: 0.15 }, 0.85);
+      
+      // 0.65: ground texture expands outward
+      grindTl.to('.st-grind-grounds', { scale: 1.5, duration: 0.1 }, 0.65);
+      
+      // 0.75: grounds visually settle toward lower center
+      grindTl.to('.st-grind-grounds', { y: '15vh', duration: 0.1 }, 0.75);
 
-      // Water overlaps end of grind
-      // 0.15: stream enters frame. 0.35: stream reaches coffee. 0.50: water surface expands. 0.70: level reaches final. 0.85: steam begins.
-      const waterStart = 0.5; // Offset within grindTl
-      grindTl.fromTo('.st-water-stream', { y: '-100vh', opacity: 0 }, { y: '0vh', opacity: 1, duration: 0.2 }, waterStart + 0.15);
-      grindTl.to('.st-water-surface', { scale: 10, opacity: 0.8, duration: 0.2 }, waterStart + 0.50);
-      grindTl.to('.st-water-level', { y: '-30vh', duration: 0.2 }, waterStart + 0.50);
-      grindTl.to('.st-water-steam', { opacity: 0.5, duration: 0.15 }, waterStart + 0.85);
+      // 0.82: water visual appears above them
+      grindTl.fromTo('.st-water-stream', { y: '-100vh', opacity: 0 }, { y: '0vh', opacity: 1, duration: 0.1 }, 0.82);
+      
+      // 0.92: water begins moving downward (stream reaches coffee, water surface expands)
+      grindTl.to('.st-water-surface', { scale: 10, opacity: 0.8, duration: 0.08 }, 0.92);
+      grindTl.to('.st-water-level', { y: '-30vh', duration: 0.08 }, 0.92);
+      
+      // 1.00: Brew owns. Steam begins
+      grindTl.to('.st-water-steam', { opacity: 0.5, duration: 0.1 }, 0.90);
 
 
       // 11. BLOOM (Pin for 160vh)
@@ -134,10 +147,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           scrub: 1
         }
       });
-      transTl.to('.st-cup-main', { scale: 1.12, duration: 0.35 }, 0); // camera pull back relatively
-      transTl.fromTo('.st-shop-package-initial', { opacity: 0, y: '10vh' }, { opacity: 1, y: '0vh', duration: 0.2 }, 0.35);
-      transTl.to('.st-shop-package-initial', { rotate: 0, duration: 0.15 }, 0.55); // Rotation handled via internal state, just opacity/y here
-
+      transTl.to('.st-cup-main', { scale: 1.12, duration: 0.35 }, 0);
     });
 
     return () => mm.revert();
@@ -153,8 +163,10 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       {/* GRIND & WATER */}
       <div className="st-brew-grind-water w-full h-screen relative bg-[#F2F0EB] overflow-hidden">
         <div className="st-grind-camera w-full h-full relative flex items-center justify-center">
-           <img src="https://images.unsplash.com/photo-1495474472205-51f75f23b1fb?q=80&w=2070&auto=format&fit=crop" className="st-grind-beans absolute inset-0 w-full h-full object-cover mix-blend-multiply" />
-           <img src="https://images.unsplash.com/photo-1517486448375-9e66db9a6a8b?q=80&w=2069&auto=format&fit=crop" className="st-grind-grounds absolute inset-0 w-full h-full object-cover opacity-0 mix-blend-multiply" />
+           <div className="st-grind-beans-container absolute inset-0 flex items-center justify-center">
+              <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="st-grind-beans w-[30vw] h-[30vw] object-cover rounded-full mix-blend-multiply" />
+              <img src="https://images.unsplash.com/photo-1517486448375-9e66db9a6a8b?q=80&w=2069&auto=format&fit=crop" className="st-grind-grounds absolute inset-0 w-full h-full object-cover opacity-0 mix-blend-multiply" />
+           </div>
            
            <div className="st-water-stream absolute top-0 w-8 h-[60vh] bg-blue-100/30 blur-sm z-20" />
            <div className="st-water-surface absolute bottom-0 w-full h-1 bg-blue-900/10 opacity-0 z-10" />
@@ -192,7 +204,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
 
       {/* TRANSITION TO SHOP */}
       <div className="st-brew-shop-trans w-full h-[50vh] relative bg-[#2D1B11] overflow-hidden flex items-center justify-center">
-         <div className="st-shop-package-initial w-[30vw] max-w-xs aspect-[3/4] bg-[#222222] shadow-2xl rotate-[-3deg] opacity-0" />
+         {/* Blank space to overlap with Shop.tsx -mt-[50vh] */}
       </div>
     </div>
   );
