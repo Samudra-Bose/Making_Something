@@ -104,17 +104,25 @@ export default function Shop({ isJourney }: ShopProps = {}) {
           {/* Subtle noise/texture overlay for material feel (20. MATERIAL LANGUAGE) */}
           <div className="absolute inset-0 z-[1] opacity-5 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stucco.png")' }}></div>
 
-          <div className="relative z-10 w-[40vw] max-w-[400px] aspect-[3/4] flex items-center justify-center st-shop-product depth-main">
-            <div className="w-full h-full bg-[#D9D3C5] rounded-sm p-8 flex flex-col justify-between border-l-4 border-l-[#C5A880]">
-              <div className="st-shop-label">
-                 <h3 className="font-sans text-xs tracking-[0.2em] uppercase text-[#3B2516]/60 mb-2">Single Origin</h3>
-                 <h2 className="font-display text-4xl tracking-tighter text-[#1A100C] uppercase leading-none">Ethiopian<br/>Heirloom</h2>
-              </div>
-              <div className="flex justify-between items-end st-shop-label">
-                 <span className="font-display text-2xl text-[#3B2516]">$24</span>
-                 <span className="font-sans text-xs uppercase tracking-widest text-[#3B2516]/50">250G</span>
-              </div>
-            </div>
+          <div className="relative z-10 w-[40vw] max-w-[350px] aspect-[1/1.4] flex flex-col justify-end p-10 st-shop-product depth-main drop-shadow-2xl bg-[#E6E2D6] rounded-sm overflow-hidden border border-white/50">
+             {/* Paper texture */}
+             <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}></div>
+             
+             {/* Minimalist Graphic */}
+             <div className="absolute top-10 left-10 w-16 h-16 rounded-full bg-[#3B2516] opacity-10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-[#E6E2D6]" />
+             </div>
+
+             <div className="st-shop-label relative z-10 flex flex-col gap-6">
+                <div>
+                   <h2 className="font-display text-5xl tracking-tighter text-[#1A100C] uppercase leading-[0.9]">Ethiopian<br/>Heirloom</h2>
+                   <h3 className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#3B2516]/60 mt-3">Single Origin / Light Roast</h3>
+                </div>
+                <div className="flex justify-between items-end border-t border-[#3B2516]/10 pt-4">
+                   <span className="font-sans text-[10px] uppercase tracking-widest text-[#3B2516]/50">250G Whole Bean</span>
+                   <span className="font-display text-2xl text-[#3B2516]">$24</span>
+                </div>
+             </div>
           </div>
           
           <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-6 opacity-0 st-shop-ui z-20 depth-fg">
