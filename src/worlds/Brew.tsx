@@ -249,9 +249,20 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       {/* CUP */}
       <div className="st-brew-cup w-full h-screen relative bg-[#D9D3C5] flex flex-col items-center justify-center overflow-hidden z-20">
          <div className="st-cup-mask-wrapper absolute inset-0 flex items-center justify-center">
-           <div className="st-cup-main w-[50vw] max-w-sm aspect-square relative depth-main">
+           
+           {/* Quiet Typography */}
+           <div className="absolute top-1/3 left-1/4 -translate-y-1/2 -translate-x-1/2 flex flex-col gap-2 z-0 depth-bg opacity-30">
+              <span className="font-sans text-[10px] tracking-[0.4em] uppercase text-[#3B2516]">Resolution</span>
+           </div>
+           
+           <div className="st-cup-main w-[50vw] max-w-sm aspect-square relative depth-main z-10">
               <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" className="w-full h-full object-cover rounded-full shadow-2xl mix-blend-multiply" />
               <div className="st-cup-steam-final absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-white/40 blur-[40px] rounded-full pointer-events-none opacity-0" />
+           </div>
+           
+           {/* Quiet Typography */}
+           <div className="absolute bottom-1/3 right-1/4 translate-y-1/2 translate-x-1/2 flex flex-col gap-2 z-0 depth-bg opacity-30 text-right">
+              <span className="font-sans text-[10px] tracking-[0.4em] uppercase text-[#3B2516]">Clarity</span>
            </div>
          </div>
       </div>
