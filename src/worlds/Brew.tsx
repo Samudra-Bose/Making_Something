@@ -92,12 +92,20 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           }
         }
       });
-      // 0.20: water contact. 0.35: grounds darken. 0.45: center expands. 0.60: bloom 1.4x. 0.75: steam visible. 0.90: max expansion
-      bloomTl.to('.st-bloom-grounds', { filter: 'brightness(0.3)', duration: 0.15 }, 0.20);
-      bloomTl.fromTo('.st-bloom-center', { scale: 1 }, { scale: 1.4, duration: 0.15 }, 0.45);
-      bloomTl.to('.st-bloom-steam', { opacity: 0.6, duration: 0.15 }, 0.75);
-      bloomTl.to('.st-bloom-center', { scale: 2.0, opacity: 0, duration: 0.15 }, 0.90);
-      bloomTl.fromTo('.st-bloom-text', { scale: 0.85 }, { scale: 1.10, duration: 1 }, 0);
+      // 0.00: grounds compact
+      bloomTl.to('.st-bloom-grounds', { scale: 0.95, duration: 0.20 }, 0.00);
+      // 0.20: water contact (implied by previous timeline, maybe add a ripple or opacity shift here)
+      // 0.35: grounds darken
+      bloomTl.to('.st-bloom-grounds', { filter: 'brightness(0.5)', duration: 0.10 }, 0.35);
+      // 0.45: surface begins expanding, 0.60: bloom scale ≈ 1.35
+      bloomTl.fromTo('.st-bloom-center', { scale: 0.95 }, { scale: 1.35, duration: 0.15 }, 0.45);
+      // 0.70: steam appears
+      bloomTl.to('.st-bloom-steam', { opacity: 0.8, duration: 0.10 }, 0.70);
+      // 0.80: BLOOM typography reaches maximum scale
+      bloomTl.fromTo('.st-bloom-text', { scale: 0.85 }, { scale: 1.25, duration: 0.80 }, 0.00);
+      // 0.90: surface begins settling
+      bloomTl.to('.st-bloom-center', { scale: 1.25, opacity: 0.9, duration: 0.10 }, 0.90);
+      // 1.00: stable extraction state (inherent as timeline finishes)
 
 
       // 12. POUR (Pin for 180vh)
