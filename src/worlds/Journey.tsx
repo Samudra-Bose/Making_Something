@@ -42,11 +42,13 @@ export default function Journey() {
       }
     });
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // POINTER INTERACTION
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     let handlePointerMove: ((e: MouseEvent) => void) | null = null;
 
-    if (!isTouch && containerRef.current) {
+    if (!isTouch && containerRef.current && !prefersReducedMotion) {
       const mainX = gsap.quickTo('.depth-main', 'x', { duration: 0.6, ease: 'power3.out' });
       const mainY = gsap.quickTo('.depth-main', 'y', { duration: 0.6, ease: 'power3.out' });
       
@@ -60,7 +62,6 @@ export default function Journey() {
          const x = (e.clientX / window.innerWidth - 0.5) * 2;
          const y = (e.clientY / window.innerHeight - 0.5) * 2;
 
-         // Evaluate dynamic multiplier every frame
          const isCup = useExperienceStore.getState().activeWorld === 'brew' && useExperienceStore.getState().brewProgress > 0.8;
          const ptrMult = isCup ? 0.4 : 1.0;
          const typeMult = isCup ? 0.3 : 1.0;
@@ -74,6 +75,7 @@ export default function Journey() {
 
          typeX(x * -15 * typeMult);
       };
+
       window.addEventListener('mousemove', handlePointerMove);
     }
 
@@ -85,12 +87,12 @@ export default function Journey() {
     // For now, let's keep the classes as descriptive markers and only apply global parallax if they have `.global-parallax`.
     const pBg = gsap.utils.toArray('.global-parallax.depth-bg');
     pBg.forEach((el: any) => {
-      gsap.to(el, { y: (i, t) => -ScrollTrigger.maxScroll(window) * 0.55, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+      gsap.to(el, { y: (i, t) => prefersReducedMotion ? 0 : -ScrollTrigger.maxScroll(window) * 0.55, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
 
     const pFg = gsap.utils.toArray('.global-parallax.depth-fg');
     pFg.forEach((el: any) => {
-      gsap.to(el, { y: (i, t) => ScrollTrigger.maxScroll(window) * 0.30, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+      gsap.to(el, { y: (i, t) => prefersReducedMotion ? 0 : ScrollTrigger.maxScroll(window) * 0.30, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
 
     const globalTl = gsap.timeline({
@@ -121,6 +123,9 @@ export default function Journey() {
 
   // SCROLL VELOCITY IMPULSE (React side)
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     // 11. Fast scrolling impulse
     if (Math.abs(rawVelocity) > 5) {
        const intensity = Math.min(1, Math.abs(rawVelocity) / 50);
