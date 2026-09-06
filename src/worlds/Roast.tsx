@@ -60,38 +60,53 @@ export default function Roast({ isJourney }: RoastProps = {}) {
       roastTl.to('.st-first-crack-text', { scale: 1.15, duration: 0.1 }, 0.55);
       
       // Crack point (65-70%) - very fast impulse
-      roastTl.to('.st-roast-bean', { x: '1.2vw', rotate: '+=4deg', duration: 0.02 }, 0.65)
-             .to('.st-roast-bean', { x: '0vw', rotate: '-=4deg', duration: 0.03 }, 0.67);
+      roastTl.to('.st-roast-bean', { x: '12px', rotate: '+=3deg', duration: 0.02 }, 0.65)
+             .to('.st-roast-bean', { x: '0px', rotate: '-=3deg', duration: 0.03 }, 0.67);
       
-      roastTl.to('.st-first-crack-text-1', { x: '-1.5vw', duration: 0.02 }, 0.65)
-             .to('.st-first-crack-text-2', { x: '1.5vw', duration: 0.02 }, 0.65);
+      roastTl.to('.st-first-crack-text-1', { scale: 1.12, x: '-1.5vw', duration: 0.02 }, 0.65)
+             .to('.st-first-crack-text-2', { scale: 1.12, x: '1.5vw', duration: 0.02 }, 0.65)
+             .to('.st-first-crack-text-1', { scale: 1, x: '0vw', duration: 0.05 }, 0.67)
+             .to('.st-first-crack-text-2', { scale: 1, x: '0vw', duration: 0.05 }, 0.67);
              
       roastTl.fromTo('.st-crack-radial', { scale: 0.4, opacity: 0 }, { scale: 2.0, opacity: 0.8, duration: 0.02 }, 0.65)
              .to('.st-crack-radial', { scale: 1.0, opacity: 0, duration: 0.03 }, 0.67);
              
-      // Settle
-      roastTl.to('.st-first-crack-text-1', { x: '0vw', duration: 0.05 }, 0.70);
-      roastTl.to('.st-first-crack-text-2', { x: '0vw', duration: 0.05 }, 0.70);
+      roastTl.to('.st-foreground-roast-obj', { y: '20px', x: '-20px', duration: 0.02 }, 0.65)
+             .to('.st-foreground-roast-obj', { y: '0px', x: '0px', duration: 0.08 }, 0.67);
 
-      // 8. ROAST -> BREW TRANSITION (Using another pin/spacer for 45vh)
-      // I'll create a second pin for the transition or just continue this timeline.
-      // 45vh = 45% of 100vh. If we add it to the end of Roast:
+      // 8. ROAST -> BREW TRANSITION (Using another pin/spacer for transition)
       const transTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.st-roast-trans-trigger',
           scroller: scroller,
           start: 'top top',
-          end: '+=45%',
+          end: '+=100%', // 100vh transition
           scrub: 1,
           pin: true
         }
       });
-      // 0.20: camera scales to bean. 0.35: bean fills 55%. 0.45: organic mask around bean. 0.55: ground texture replace.
-      transTl.to('.st-roast-final-bean', { scale: 5, duration: 0.35 }, 0.0);
-      transTl.to('.st-roast-final-mask', { clipPath: 'circle(40% at 50% 50%)', duration: 0.2 }, 0.35);
-      transTl.to('.st-roast-grounds-texture', { opacity: 1, duration: 0.1 }, 0.55);
-      transTl.to('.st-roast-grounds-texture', { scale: 1.5, y: '20vh', duration: 0.2 }, 0.65);
-      transTl.to('.st-roast-water-visual', { opacity: 1, y: '0vh', duration: 0.18 }, 0.82);
+      // 0.00: bean visible at center.
+      // 0.15: camera moves closer.
+      transTl.to('.st-roast-final-bean', { scale: 1.5, duration: 0.15 }, 0.00);
+      // 0.30: bean reaches approx 50% viewport height
+      transTl.to('.st-roast-final-bean', { scale: 2.5, duration: 0.15 }, 0.15);
+      // 0.40: macro crop fills most of the frame
+      transTl.to('.st-roast-final-bean', { scale: 5.0, duration: 0.10 }, 0.30);
+      // 0.50: apply circular mask
+      transTl.to('.st-roast-final-mask', { clipPath: 'circle(45% at 50% 50%)', duration: 0.10 }, 0.40);
+      // 0.60: ground-coffee texture appears inside the mask
+      transTl.to('.st-roast-grounds-texture', { opacity: 1, duration: 0.10 }, 0.50);
+      // 0.70: bean visual recedes
+      transTl.to('.st-roast-final-mask', { opacity: 0, duration: 0.10 }, 0.60);
+      // 0.78: grounds become dominant
+      transTl.to('.st-roast-grounds-texture', { scale: 1.2, duration: 0.08 }, 0.70);
+      // 0.84: grounds begin settling downward
+      transTl.to('.st-roast-grounds-texture', { y: '10vh', duration: 0.06 }, 0.78);
+      // 0.90: water visual enters from above
+      transTl.to('.st-roast-water-visual', { y: '-10vh', opacity: 1, duration: 0.06 }, 0.84);
+      // 0.96: water approaches grounds
+      transTl.to('.st-roast-water-visual', { y: '0vh', scale: 1.1, duration: 0.06 }, 0.90);
+      // 1.00: Brew scene becomes dominant (handled by Brew overlapping)
     });
 
     return () => mm.revert();
