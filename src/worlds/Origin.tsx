@@ -75,7 +75,10 @@ export default function Origin({ isJourney }: OriginProps = {}) {
 
       // Camera Push System restored
       pinTl.to('.st-hero-subject-container', { y: '-4vh', duration: trDur, ease: 'none' }, trStart);
-      pinTl.to('.st-hero-title-container', { y: '-10vh', duration: trDur, ease: 'none' }, trStart);
+      // Differential typography movement
+      pinTl.to('.st-title-line-1', { y: '-15vh', duration: trDur, ease: 'none' }, trStart);
+      pinTl.to('.st-title-line-2', { y: '-10vh', duration: trDur, ease: 'none' }, trStart);
+      pinTl.to('.st-title-line-3', { y: '-5vh', duration: trDur, ease: 'none' }, trStart);
       pinTl.to('.st-hero-metadata', { x: '3vw', duration: trDur, ease: 'none' }, trStart);
       
       // Cross-world Typography (ORIGIN) restored
@@ -124,9 +127,9 @@ export default function Origin({ isJourney }: OriginProps = {}) {
 
           <div className="absolute top-[20%] left-[10%] z-10 flex flex-col items-start pointer-events-none depth-type st-hero-title-container">
             <div className="text-[12vw] leading-[0.8] font-display uppercase tracking-tighter text-drift-foreground mix-blend-difference opacity-90 text-white">
-              <div className="overflow-hidden"><div className="st-hero-title-line translate-y-[8vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>ETHIOPIAN</div></div>
-              <div className="overflow-hidden"><div className="st-hero-title-line translate-y-[11vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>HEIRLOOM</div></div>
-              <div className="overflow-hidden"><div className="st-hero-title-line translate-y-[14vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>COFFEE</div></div>
+              <div className="overflow-hidden st-title-line-1"><div className="st-hero-title-line translate-y-[8vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>ETHIOPIAN</div></div>
+              <div className="overflow-hidden st-title-line-2"><div className="st-hero-title-line translate-y-[11vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>HEIRLOOM</div></div>
+              <div className="overflow-hidden st-title-line-3"><div className="st-hero-title-line translate-y-[14vh]" style={{ clipPath: 'inset(100% 0 0 0)' }}>COFFEE</div></div>
             </div>
             <div className="st-hero-support mt-8 max-w-sm text-drift-foreground-muted font-sans text-sm leading-relaxed opacity-0 translate-y-[30px]">
               Grown at extreme altitude. Carefully hand-picked. Processed naturally under the equatorial sun.
