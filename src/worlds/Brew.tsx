@@ -196,7 +196,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
+      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`}
       data-world="brew"
       style={{ zIndex: 10 }}
     >

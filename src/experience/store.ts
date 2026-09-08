@@ -18,6 +18,7 @@ interface ExperienceState {
   pointerVelocity: { x: number; y: number };
   scroll: number;
   globalProgress: number; // 0.0 to 1.0 story timeline
+  globalVelocity: number;
   
   // Shared Coffee State
   coffeeOrigin: string;
@@ -49,6 +50,7 @@ interface ExperienceState {
   setPointerVelocity: (vx: number, vy: number) => void;
   setScroll: (y: number) => void;
   setGlobalProgress: (p: number) => void;
+  setGlobalVelocity: (v: number) => void;
   setCoffeeOrigin: (origin: string) => void;
   setCoffeeAltitude: (alt: number) => void;
   setRoastLevel: (level: RoastLevel) => void;
@@ -79,6 +81,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   pointerVelocity: { x: 0, y: 0 },
   scroll: 0,
   globalProgress: 0,
+  globalVelocity: 0,
   
   coffeeOrigin: 'Ethiopia / Guji',
   coffeeAltitude: 0.8, // default high altitude
@@ -134,6 +137,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   setPointerVelocity: (vx, vy) => set({ pointerVelocity: { x: vx, y: vy } }),
   setScroll: (y) => set({ scroll: y }),
   setGlobalProgress: (p) => set({ globalProgress: p }),
+  setGlobalVelocity: (v) => set({ globalVelocity: v }),
   
   setCoffeeOrigin: (origin) => set({ coffeeOrigin: origin }),
   setCoffeeAltitude: (alt) => set({ coffeeAltitude: alt }),

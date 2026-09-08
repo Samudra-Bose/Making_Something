@@ -7,16 +7,11 @@ import Roast from './Roast';
 import Brew from './Brew';
 import Shop from './Shop';
 import Lenis from 'lenis';
-import { useScrollVelocity } from '../reactive/useScrollVelocity';
-
 export default function Journey() {
   const setGlobalProgress = useExperienceStore(s => s.setGlobalProgress);
   const scroll = useExperienceStore(s => s.scroll);
+  const globalVelocity = useExperienceStore(s => s.globalVelocity);
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Velocity impulse tracking
-  const rawVelocity = useScrollVelocity(scroll);
-
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -25,7 +20,11 @@ export default function Journey() {
       infinite: false,
     });
 
-    lenis.on('scroll', ScrollTrigger.update);
+    lenis.on('scroll', (e: any) => {
+      useExperienceStore.getState().setScroll(e.scroll);
+      useExperienceStore.getState().setGlobalVelocity(e.velocity);
+      ScrollTrigger.update();
+    });
 
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);
@@ -127,8 +126,8 @@ export default function Journey() {
     if (prefersReducedMotion) return;
 
     // 11. Fast scrolling impulse
-    if (Math.abs(rawVelocity) > 5) {
-       const intensity = Math.min(1, Math.abs(rawVelocity) / 50);
+    if (Math.abs(globalVelocity) > 5) {
+       const intensity = Math.min(1, Math.abs(globalVelocity) / 50);
        gsap.to('.depth-fg', { y: `+=${intensity * 15}px`, duration: 0.1, overwrite: 'auto' });
        gsap.to('.depth-fg', { y: 0, duration: 0.6, delay: 0.1, ease: 'power3.out' });
        
@@ -141,7 +140,7 @@ export default function Journey() {
        gsap.to('.st-global-travel-text', { x: `+=${intensity * 15}px`, rotate: `-=${intensity * 2}deg`, duration: 0.1, overwrite: 'auto' });
        gsap.to('.st-global-travel-text', { x: 0, rotate: 0, duration: 0.6, delay: 0.1, ease: 'power3.out' });
     }
-  }, [rawVelocity]);
+  }, [globalVelocity]);
 
   return (
     <div ref={containerRef} id="journey-container" className="w-full relative bg-transparent pointer-events-auto overflow-hidden">
