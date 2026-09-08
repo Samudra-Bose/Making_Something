@@ -15,7 +15,12 @@ gsap.config({
 // Each world uses its own local container ref as scroller.
 // Setting a global default would conflict with all child ScrollTriggers.
 
+import { useExperienceStore } from './store';
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  const openForks = useExperienceStore(s => s.openForks);
+  const isJourney = openForks.length === 1 && openForks[0] === 'journey';
+
   useEffect(() => {
     // Refresh ScrollTrigger on resize only — do NOT kill all triggers on unmount
     const handleResize = () => {
@@ -25,13 +30,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener('resize', handleResize, { passive: true });
     return () => {
       window.removeEventListener('resize', handleResize);
-      // Do NOT call ScrollTrigger.getAll().forEach(t => t.kill()) here —
-      // that would destroy all child world ScrollTriggers prematurely.
     };
   }, []);
 
   return (
-    <div className="relative w-full min-h-[100dvh] bg-drift-bg text-drift-foreground font-sans selection:bg-drift-accent/30 selection:text-drift-highlight">
+    <div className={`relative w-full min-h-[100dvh] bg-drift-bg text-drift-foreground font-sans selection:bg-drift-accent/30 selection:text-drift-highlight ${isJourney ? '' : 'overflow-hidden max-h-[100dvh]'}`}>
       {children}
     </div>
   );
