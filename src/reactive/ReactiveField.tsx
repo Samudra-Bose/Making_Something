@@ -133,13 +133,7 @@ export default function ReactiveField() {
       setupGrid();
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouse.targetX = e.clientX;
-      mouse.targetY = e.clientY;
-    };
-
     window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', handleMouseMove);
     // Touch interactions are disabled per requirements, so we do not bind touchmove
     resize();
 
@@ -265,6 +259,10 @@ export default function ReactiveField() {
       const time = (Date.now() - startTime) * 0.001;
       const params = getParams();
       
+      const { pointer } = useExperienceStore.getState();
+      mouse.targetX = pointer.x === -1000 ? -1000 : pointer.x;
+      mouse.targetY = pointer.y === -1000 ? -1000 : pointer.y;
+
       mouse.x += (mouse.targetX - mouse.x) * 0.1;
       mouse.y += (mouse.targetY - mouse.y) * 0.1;
 

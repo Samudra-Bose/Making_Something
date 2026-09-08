@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useExperienceStore } from '../experience/store';
 
 export default function DotGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -13,13 +14,6 @@ export default function DotGrid() {
     let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000 };
     let ripples: { x: number, y: number, radius: number, life: number }[] = [];
 
-    const handleMouseMove = (e: MouseEvent) => {
-      // Calculate coordinates relative to the canvas
-      const rect = canvas.getBoundingClientRect();
-      mouse.targetX = e.clientX - rect.left;
-      mouse.targetY = e.clientY - rect.top;
-    };
-
     const handleClick = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       ripples.push({ 
@@ -28,12 +22,6 @@ export default function DotGrid() {
         radius: 0, 
         life: 1 
       });
-    };
-
-    const handleMouseLeave = () => {
-      // Move interaction point far away when mouse leaves window
-      mouse.targetX = -1000;
-      mouse.targetY = -1000;
     };
 
     const resize = () => {
@@ -61,8 +49,6 @@ export default function DotGrid() {
     };
 
     window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('click', handleClick);
     window.addEventListener('drift:ripple', handleCustomRipple as EventListener);
     resize();
@@ -72,6 +58,11 @@ export default function DotGrid() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
       
+      const { pointer } = useExperienceStore.getState();
+      const rect = canvas.getBoundingClientRect();
+      mouse.targetX = pointer.x === -1000 ? -1000 : pointer.x - rect.left;
+      mouse.targetY = pointer.y === -1000 ? -1000 : pointer.y - rect.top;
+
       // Interpolate mouse movement for smoothness (easing)
       mouse.x += (mouse.targetX - mouse.x) * 0.12;
       mouse.y += (mouse.targetY - mouse.y) * 0.12;
