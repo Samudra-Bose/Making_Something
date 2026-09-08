@@ -201,7 +201,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       style={{ zIndex: 10 }}
     >
       {/* GRIND & WATER */}
-      <div className="st-brew-grind-water w-full h-screen relative bg-transparent overflow-hidden depth-bg">
+      <div className="st-brew-grind-water w-full h-screen relative bg-[#2D1B11] overflow-hidden depth-bg">
         
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[5] opacity-0 st-bg-word-brew pointer-events-none text-[30vw] font-display tracking-tighter text-[#333]">
           BREW
@@ -269,7 +269,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       </div>
 
       {/* TRANSITION TO SHOP */}
-      <div className="st-brew-shop-trans w-full h-[50vh] relative bg-transparent overflow-hidden flex items-center justify-center z-10">
+      <div className="st-brew-shop-trans w-full h-[50vh] relative bg-[#D9D3C5] overflow-hidden flex items-center justify-center z-10">
          {/* Blank space to overlap with Shop.tsx -mt-[50vh] */}
       </div>
     </div>
