@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import './Waves.css';
+import { useExperienceStore } from '../experience/store';
 
 class Grad {
   constructor(x, y, z) {
@@ -320,6 +321,25 @@ const Waves = ({
 
     function tick(t) {
       const mouse = mouseRef.current;
+      const b = boundingRef.current;
+      const { pointer } = useExperienceStore.getState();
+      
+      const targetX = pointer.x === -1000 ? mouse.x : pointer.x - b.left;
+      const targetY = pointer.y === -1000 ? mouse.y : pointer.y - b.top;
+
+      if (!mouse.set && pointer.x !== -1000) {
+        mouse.x = targetX;
+        mouse.y = targetY;
+        mouse.sx = mouse.x;
+        mouse.sy = mouse.y;
+        mouse.lx = mouse.x;
+        mouse.ly = mouse.y;
+        mouse.set = true;
+      } else {
+        mouse.x = targetX;
+        mouse.y = targetY;
+      }
+
       mouse.sx += (mouse.x - mouse.sx) * 0.1;
       mouse.sy += (mouse.y - mouse.sy) * 0.1;
       const dx = mouse.x - mouse.lx,
@@ -343,27 +363,6 @@ const Waves = ({
       setSize();
       setLines();
     }
-    function onMouseMove(e) {
-      updateMouse(e.clientX, e.clientY);
-    }
-    function onTouchMove(e) {
-      const touch = e.touches[0];
-      updateMouse(touch.clientX, touch.clientY);
-    }
-    function updateMouse(x, y) {
-      const mouse = mouseRef.current,
-        b = boundingRef.current;
-      mouse.x = x - b.left;
-      mouse.y = y - b.top;
-      if (!mouse.set) {
-        mouse.sx = mouse.x;
-        mouse.sy = mouse.y;
-        mouse.lx = mouse.x;
-        mouse.ly = mouse.y;
-        mouse.set = true;
-      }
-    }
-
     function onClick(e) {
       const b = boundingRef.current;
       ripples.push({ 
@@ -388,15 +387,11 @@ const Waves = ({
     setLines();
     frameIdRef.current = requestAnimationFrame(tick);
     window.addEventListener('resize', onResize);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('click', onClick);
     window.addEventListener('drift:ripple', onCustomRipple);
 
     return () => {
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('click', onClick);
       window.removeEventListener('drift:ripple', onCustomRipple);
       cancelAnimationFrame(frameIdRef.current);

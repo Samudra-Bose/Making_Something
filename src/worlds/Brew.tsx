@@ -194,7 +194,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       style={{ zIndex: 10, backgroundColor: '#F2F0EB' }}
     >
       {/* 1. GRIND */}
-      <div className="st-brew-grind w-full h-screen relative flex items-center justify-center overflow-hidden bg-[#F2F0EB]">
+      <div className="st-brew-grind w-full h-screen relative flex items-center justify-center overflow-hidden bg-[#1A100C]">
         <img src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=500&auto=format&fit=crop" className="st-grind-beans absolute inset-0 w-full h-full object-cover mix-blend-multiply brightness-50" />
         <img src="https://images.unsplash.com/photo-1517486448375-9e66db9a6a8b?q=80&w=2069&auto=format&fit=crop" className="st-grind-grounds absolute inset-0 w-full h-full object-cover opacity-0 mix-blend-multiply" />
       </div>

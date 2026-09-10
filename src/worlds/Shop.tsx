@@ -27,6 +27,13 @@ export default function Shop({ isJourney }: ShopProps = {}) {
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     
     const render = () => {
+      const { pointer } = useExperienceStore.getState();
+      
+      if (pointer.x !== -1000) {
+        mouse.current.x = pointer.x / window.innerWidth;
+        mouse.current.y = pointer.y / window.innerHeight;
+      }
+
       target.current.x += (mouse.current.x - target.current.x) * 0.08;
       target.current.y += (mouse.current.y - target.current.y) * 0.08;
       
@@ -47,18 +54,8 @@ export default function Shop({ isJourney }: ShopProps = {}) {
 
     reqId = requestAnimationFrame(render);
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouse.current.x = e.clientX / window.innerWidth;
-      mouse.current.y = e.clientY / window.innerHeight;
-    };
-
-    if (!isTouch) {
-      window.addEventListener('mousemove', handleMouseMove);
-    }
-
     return () => {
       cancelAnimationFrame(reqId);
-      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 

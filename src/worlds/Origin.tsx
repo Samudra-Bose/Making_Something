@@ -97,17 +97,17 @@ export default function Origin({ isJourney }: OriginProps = {}) {
       pinTl.to('.st-meta-varietal', { y: '-4vh', ease: 'none', duration: 0.17 }, 0.65);
 
       // 0.82 -> 1.00 (ORIGIN -> ROAST VISUAL TRANSITION)
-      pinTl.to('.st-hero-subject-img', { scale: 1.17, ease: 'none', duration: 0.036 }, 0.82);
-      pinTl.to('.st-hero-subject-container', { clipPath: 'inset(10% 10% 10% 10%)', ease: 'none', duration: 0.027 }, 0.856);
-      pinTl.to('.st-hero-title-container', { opacity: 0, x: '-5vw', ease: 'none', duration: 0.018 }, 0.883);
-      pinTl.to('.st-entry-logo', { opacity: 0, y: '-10vh', ease: 'none', duration: 0.03 }, 0.883);
-      pinTl.to('.st-entry-meta-top', { opacity: 0, ease: 'none', duration: 0.03 }, 0.883);
-      pinTl.to('.st-hero-subject-container', { clipPath: 'ellipse(25% 35% at 50% 50%)', ease: 'none', duration: 0.027 }, 0.910);
-      pinTl.to('.st-hero-subject-img', { opacity: 0.3, ease: 'none', duration: 0.023 }, 0.937);
-      pinTl.to('.st-hero-pin', { opacity: 0, ease: 'none', duration: 0.022 }, 0.978);
-
-      // Bean moves to camera
-      pinTl.to('.st-foreground-bean', { scale: 1.25, x: '12vw', y: '-5vh', ease: 'none', duration: 0.18 }, 0.82);
+      // "camera pushes inward -> crop tightens -> coffee detail becomes dominant -> green bean appears"
+      pinTl.to('.st-hero-subject-container', { clipPath: 'inset(0% 0% 0% 0%)', ease: 'power2.in', duration: 0.18 }, 0.82);
+      pinTl.to('.st-hero-subject-img', { scale: 3, ease: 'power2.in', duration: 0.18 }, 0.82);
+      
+      pinTl.to('.st-hero-title-container', { opacity: 0, y: '-20vh', ease: 'power1.in', duration: 0.10 }, 0.82);
+      pinTl.to('.st-entry-logo', { opacity: 0, y: '-15vh', ease: 'power1.in', duration: 0.10 }, 0.82);
+      pinTl.to('.st-entry-meta-top', { opacity: 0, y: '-5vh', ease: 'power1.in', duration: 0.10 }, 0.82);
+      
+      pinTl.to('.st-hero-bg-layer', { opacity: 0, ease: 'none', duration: 0.10 }, 0.90);
+      pinTl.to('.st-hero-subject-img', { opacity: 0, ease: 'none', duration: 0.10 }, 0.90);
+      pinTl.to('.st-foreground-bean', { opacity: 0, ease: 'none', duration: 0.10 }, 0.90);
 
     });
 

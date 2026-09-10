@@ -57,11 +57,15 @@ export default function Journey() {
 
       const typeX = gsap.quickTo('.depth-type', 'x', { duration: 0.8, ease: 'power2.out' });
 
-      handlePointerMove = (e: MouseEvent) => {
-         const x = (e.clientX / window.innerWidth - 0.5) * 2;
-         const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      handlePointerMove = () => {
+         const { pointer } = useExperienceStore.getState();
+         if (pointer.x === -1000) return;
 
-         const isCup = useExperienceStore.getState().activeWorld === 'brew' && useExperienceStore.getState().brewProgress > 0.8;
+         const x = (pointer.x / window.innerWidth - 0.5) * 2;
+         const y = (pointer.y / window.innerHeight - 0.5) * 2;
+
+         const state = useExperienceStore.getState();
+         const isCup = state.activeWorld === 'brew' && state.brewProgress > 0.8;
          const ptrMult = isCup ? 0.4 : 1.0;
          const typeMult = isCup ? 0.3 : 1.0;
 
@@ -75,7 +79,7 @@ export default function Journey() {
          typeX(x * -15 * typeMult);
       };
 
-      window.addEventListener('mousemove', handlePointerMove);
+      gsap.ticker.add(handlePointerMove);
     }
 
     // SPATIAL STAGE (Scroll-linked Parallax)
@@ -111,7 +115,7 @@ export default function Journey() {
 
     return () => {
       if (handlePointerMove) {
-        window.removeEventListener('mousemove', handlePointerMove);
+        gsap.ticker.remove(handlePointerMove);
       }
       st.kill();
       globalTl.kill();
