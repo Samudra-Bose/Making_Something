@@ -45,7 +45,7 @@ export default function Journey() {
 
     // POINTER INTERACTION
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    let handlePointerMove: ((e: MouseEvent) => void) | null = null;
+    let handlePointerMove: (() => void) | null = null;
 
     if (!isTouch && containerRef.current && !prefersReducedMotion) {
       const mainX = gsap.quickTo('.depth-main', 'x', { duration: 0.6, ease: 'power3.out' });

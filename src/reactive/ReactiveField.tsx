@@ -160,6 +160,7 @@ export default function ReactiveField() {
           const t = (p - states[i].p) / (states[i + 1].p - states[i].p);
           const tSmooth = smoothstep(0, 1, t);
           base = {
+            p: 0,
             disp: lerp(states[i].disp, states[i + 1].disp, tSmooth),
             op: lerp(states[i].op, states[i + 1].op, tSmooth),
             spd: lerp(states[i].spd, states[i + 1].spd, tSmooth),
@@ -363,7 +364,7 @@ export default function ReactiveField() {
   return (
     <div 
       ref={containerRef}
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden mix-blend-multiply transition-opacity duration-300"
+      className="fixed inset-0 pointer-events-none z-50 overflow-hidden mix-blend-multiply transition-opacity duration-300"
       style={{
         maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 60%)',
         WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 60%)'

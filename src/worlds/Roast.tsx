@@ -170,7 +170,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '-mt-[100vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
+      className={`relative w-full ${isJourney ? '-mt-[140vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
       data-world="roast"
       style={{ zIndex: 5 }}
     >
