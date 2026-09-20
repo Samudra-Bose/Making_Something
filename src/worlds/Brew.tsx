@@ -35,7 +35,6 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           pin: isJourney ? true : false,
           scroller: scroller,
           
-          end: '+=900%', // 900vh total
           scrub: 1,
           
           anticipatePin: 1,
