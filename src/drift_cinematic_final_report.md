@@ -1,37 +1,45 @@
-# DRIFT - Cinematic Scroll Overhaul Report
+# DRIFT Cinematic Orchestration Report
 
-## Architectural Transformation
+## 1. Master Integration Overview
+The goal of this phase was to consolidate state and behavior across the codebase to ensure a seamless "continuous interactive film" experience. This requires resolving fighting animations, nested scroll panes, duplicate physics loops, and maintaining global narrative consistency.
 
-The core issue has been resolved: **DRIFT is now a true single-timeline continuous scroll experience** in its default state, while preserving the spatial multi-world fork architecture for deliberate branching.
+## 2. Conflicts Found & Root Causes
 
-### 1. Global Scroll Unlocked
-- Removed artificial `h-[100dvh] overflow-hidden` constraints from `AppShell`.
-- Created `<Journey />` which linearly stacks `<Origin />`, `<Roast />`, `<Brew />`, and `<Shop />`.
-- Each component detects if it is running in `Journey` mode (`isJourney={true}`) and switches from acting as an independent scroll window to becoming a native height element inside the global document.
-- Installed and configured **Lenis** globally inside `Journey.tsx` to provide incredibly smooth, dampened native scrolling that GSAP binds to.
+### A. Nested and Duplicated Scrolls (The "Boxed Website" look)
+- **Root Cause:** When multiple forks were opened (e.g. Origin and Roast side by side), the `ForkPane` component used `overflow-hidden` while its inner children (like `Roast.tsx`) used native `overflow-y-auto`. `AppShell` disabled global scrolling (`overflow-hidden max-h-screen`).
+- **Effect:** The user experienced standard "boxed" web scrollbars inside each pane. Furthermore, the `Lenis` instance mounted in `Journey.tsx` was unmounted, completely losing smooth scrolling and velocity-based visual impacts.
 
-### 2. Cinematic Choreography Refactor
+### B. GSAP Trigger Fighting
+- **Root Cause:** Inside `Origin`, `Roast`, `Brew`, and `Shop`, the `ScrollTrigger` used `scroller: isJourney ? window : containerRef.current`. When in Fork Mode, they expected to be triggered by scrolling inside their container.
+- **Effect:** Opening a world inside a Fork pane reset its scroll to `0`, treating it like an independent page rather than a single continuous timeline.
 
-We successfully implemented multiple advanced Awwwards-style scroll techniques:
+### C. Duplicated / Lost Physics (Reactive BG)
+- **Root Cause:** Velocity tracking (`setGlobalVelocity`) and Pointer interactions were fragmented. In Fork mode, `Journey.tsx`'s pointer and scroll velocity impulses were destroyed.
 
-#### A. Origin (Pinned Cinematic Hero)
-The Entry sequence perfectly hands off to Origin. Instead of standard parallax, the hero uses a **Pinned Sequence**:
-- The hero stays pinned for `300vh` of scroll.
-- **Scroll Phase 1:** The text splits line-by-line, moving at different depths. The background scales slightly.
-- **Scroll Phase 2:** The "ETHIOPIA" text slides diagonally behind the expanding subject image, creating a profound sense of depth.
-- **Scroll Phase 3:** The subject image expands to fill `100vw/100vh`, color temperature shifts, and it becomes the transition canvas into the Roast phase.
+## 3. Orchestration Fixes Applied
 
-#### B. Roast (Horizontal Narrative Mapping)
-Instead of forcing the user to scroll vertically through stacked sections, **Roast translates vertical scrolling into a horizontal journey**:
-- The browser continues scrolling vertically seamlessly.
-- The `Roast` content container is pinned and slides horizontally from `01 - Green` through `07 - Handoff`.
-- The user feels like they are moving along a conveyor timeline. 
-- Auto-fork transitions were disabled during Journey mode so the timeline never abruptly splits.
+### A. Unified Global Scroll (Lenis)
+Moved the `Lenis` instantiation to `ExperienceController.tsx` which is ALWAYS mounted. This ensures there is exactly ONE global scroll source running at all times, tracking `globalVelocity` and `scroll` centrally via Zustand. Removed `overflow-hidden` from `AppShell`.
 
-#### C. Unified Reactivity
-Because `activeWorld` is now dynamically synchronized to global scroll via Intersection Observers & GSAP `onEnter` callbacks across the Journey timeline, the `<ReactiveField />` (background canvas) smoothly morphs its physics and visual language to match the current stage without needing an abrupt page state change.
+### B. Removing Nested Scrolls
+Stripped `overflow-y-auto` from all World components. They are now purely visual layers. 
 
-## Verification
-- All UI "discreteness" has been removed through continuous `min-h-screen` layouts.
-- Background canvases transition smoothly as the user crosses thresholds.
-- Buttons and navigation now elegantly use `scrollIntoView` when in the Journey experience instead of trapping the user in a new pane.
+### C. The "Virtual Scroll Track" (Cinematic 4-Window Mode)
+In 4-window (Fork) mode, `App.tsx` now renders an invisible `#global-scroll-track` with `height: 1300vh`. 
+This allows the global `window` to continue scrolling the exact same narrative timeline. The absolute `ForkPane`s stay visually pinned on screen, but their interior GSAP timelines scrub perfectly in sync with the global scroll. 
+- `Origin` maps to `0vh - 400vh`
+- `Roast` maps to `400vh - 700vh`
+- `Brew` maps to `700vh - 1000vh`
+- `Shop` maps to `1000vh - 1300vh`
+
+### D. GSAP Audit & Refactor
+Re-wrote all `ScrollTrigger` definitions inside the World components. 
+- **Scroller:** Fixed to `window` for all scenarios.
+- **Trigger/Start/End:** Uses dynamic assignment. In `Journey` mode, it uses relative triggers (`trigger: '.st-hero-pin'`). In Fork mode, it uses absolute pixel triggers (`start: '400vh', end: '700vh'`). This allows the visual elements to live inside fixed panes without confusing `ScrollTrigger`.
+- **Pinning:** Disabled `pin: true` in Fork mode, since the elements are already inside absolutely positioned, static panes. 
+
+## 4. Final State & Remaining Issues
+- **Continuous Canvas:** The website now feels like a unified piece of software rather than a set of nested web pages.
+- **Reactive Background:** `ReactiveField.tsx` perfectly picks up velocity spikes and story progression across all 4 windows simultaneously, matching the narrative vibe (turbulent for roast, radial for brew, calm for shop).
+- **Reduced Motion:** Verified that media queries gracefully bypass high-frequency spatial tracking.
+- **Next Steps:** Monitor performance of the 4-window mode on low-end devices, as 4 concurrent GSAP scrubs on complex filters can be heavy.

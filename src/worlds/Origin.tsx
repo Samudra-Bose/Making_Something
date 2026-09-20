@@ -18,9 +18,9 @@ export default function Origin({ isJourney }: OriginProps = {}) {
 
   useEffect(() => {
     if (!containerRef.current || !isActive) return;
-    const scroller = isJourney ? window : containerRef.current;
+    const scroller = window;
     
-    ScrollTrigger.getAll().filter(t => t.scroller === scroller && (t.vars.trigger === '.drift-entry-stage' || t.vars.trigger === '.st-hero-pin')).forEach(t => t.kill());
+    ScrollTrigger.getAll().filter(t => t.vars.trigger === '.st-hero-pin' && t.scroller === scroller).forEach(t => t.kill());
 
     const mm = gsap.matchMedia(scroller);
 
@@ -38,28 +38,21 @@ export default function Origin({ isJourney }: OriginProps = {}) {
         
       introTl.fromTo('.st-entry-meta-top',
         { opacity: 0 },
-        { opacity: 1, duration: 0.7, ease: 'power2.out' }, 0.5);
+        { opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power1.out' }, 0.4);
         
       introTl.fromTo('.st-entry-meta-bottom',
         { opacity: 0 },
-        { opacity: 1, duration: 0.7, ease: 'power2.out' }, 0.7);
-
-      // Initial Scroll States
-      gsap.set('.st-hero-subject-img', { scale: 0.96 });
-      gsap.set('.st-hero-bg-layer', { scale: 1.0 });
-      gsap.set('.st-foreground-bean', { x: '-3vw', scale: 1.0 });
-      gsap.set('.st-hero-title-container', { y: '0vh' });
-      gsap.set('.st-entry-meta-top', { y: '0vh' });
+        { opacity: 1, duration: 0.6, ease: 'power1.out' }, 0.6);
 
       // Pinned Timeline (400vh for long scroll)
       const pinTl = gsap.timeline({
         scrollTrigger: {
-          trigger: '.st-hero-pin',
+          trigger: isJourney ? '.st-hero-pin' : null,
           scroller: scroller,
-          start: 'top top',
-          end: '+=400%', 
+          start: isJourney ? 'top top' : '0',
+          end: isJourney ? '+=400%' : '400vh', 
           scrub: 1,
-          pin: true,
+          pin: isJourney ? true : false,
           anticipatePin: 1,
           onUpdate: (self) => {
             if (isActive) useExperienceStore.getState().setActiveWorld('origin');
@@ -115,7 +108,7 @@ export default function Origin({ isJourney }: OriginProps = {}) {
   }, [isActive, isJourney]);
 
   return (
-    <div ref={containerRef} onScroll={(e) => setScroll(e.currentTarget.scrollTop)} className={`relative w-full ${isJourney ? '' : 'h-full overflow-y-auto overflow-x-hidden'}`} data-world="origin" style={{ zIndex: 10 }}>
+    <div ref={containerRef} onScroll={(e) => setScroll(e.currentTarget.scrollTop)} className={`relative w-full ${isJourney ? '' : ''}`} data-world="origin" style={{ zIndex: 10 }}>
       <div className="st-hero-pin w-full h-screen relative overflow-hidden bg-transparent">
         <div className="drift-entry-stage w-full h-full relative">
           

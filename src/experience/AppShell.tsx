@@ -18,11 +18,8 @@ gsap.config({
 import { useExperienceStore } from './store';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const openForks = useExperienceStore(s => s.openForks);
-  const isJourney = openForks.length === 1 && openForks[0] === 'journey';
-
   useEffect(() => {
-    // Refresh ScrollTrigger on resize only — do NOT kill all triggers on unmount
+    // Refresh ScrollTrigger on resize only - do NOT kill all triggers on unmount
     const handleResize = () => {
       ScrollTrigger.refresh();
     };
@@ -34,7 +31,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className={`relative w-full min-h-[100dvh] bg-drift-bg text-drift-foreground font-sans selection:bg-drift-accent/30 selection:text-drift-highlight ${isJourney ? '' : 'overflow-hidden max-h-[100dvh]'}`}>
+    <div className={`relative w-full min-h-[100dvh] bg-drift-bg text-drift-foreground font-sans selection:bg-drift-accent/30 selection:text-drift-highlight`}>
       {children}
     </div>
   );

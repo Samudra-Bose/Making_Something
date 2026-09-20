@@ -6,31 +6,14 @@ import Origin from './Origin';
 import Roast from './Roast';
 import Brew from './Brew';
 import Shop from './Shop';
-import Lenis from 'lenis';
+
 export default function Journey() {
   const setGlobalProgress = useExperienceStore(s => s.setGlobalProgress);
   const scroll = useExperienceStore(s => s.scroll);
   const globalVelocity = useExperienceStore(s => s.globalVelocity);
   const containerRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-      smoothWheel: true,
-      infinite: false,
-    });
-
-    lenis.on('scroll', (e: any) => {
-      useExperienceStore.getState().setScroll(e.scroll);
-      useExperienceStore.getState().setGlobalVelocity(e.velocity);
-      ScrollTrigger.update();
-    });
-
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-    
-    gsap.ticker.lagSmoothing(0);
 
     const st = ScrollTrigger.create({
       trigger: '#journey-container',
@@ -119,8 +102,6 @@ export default function Journey() {
       }
       st.kill();
       globalTl.kill();
-      lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
     };
   }, [setGlobalProgress]);
 

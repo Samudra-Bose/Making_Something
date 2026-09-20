@@ -18,7 +18,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
 
   useEffect(() => {
     if (!containerRef.current || !isActive) return;
-    const scroller = isJourney ? window : containerRef.current;
+    const scroller = window;
     
     ScrollTrigger.getAll().filter(t => t.scroller === scroller && t.vars.trigger === '.st-roast-pin').forEach(t => t.kill());
 
@@ -27,12 +27,15 @@ export default function Roast({ isJourney }: RoastProps = {}) {
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const roastTl = gsap.timeline({
         scrollTrigger: {
-          trigger: '.st-roast-pin',
+          trigger: isJourney ? '.st-roast-pin' : null,
+          start: isJourney ? 'top top' : '400vh',
+          end: isJourney ? '+=300%' : '700vh',
+          pin: isJourney ? true : false,
           scroller: scroller,
-          start: 'top top',
-          end: '+=300%', 
+          
+           
           scrub: 1,
-          pin: true,
+          
           anticipatePin: 1,
           onUpdate: (self) => {
             if (isActive) {
@@ -170,7 +173,7 @@ export default function Roast({ isJourney }: RoastProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '-mt-[140vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
+      className={`relative w-full ${isJourney ? '-mt-[140vh]' : ''}`} 
       data-world="roast"
       style={{ zIndex: 5 }}
     >

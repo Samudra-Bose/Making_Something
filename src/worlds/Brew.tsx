@@ -18,7 +18,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
 
   useEffect(() => {
     if (!containerRef.current || !isActive) return;
-    const scroller = isJourney ? window : containerRef.current;
+    const scroller = window;
     
     // Cleanup old triggers
     ScrollTrigger.getAll().filter(t => t.scroller === scroller && t.vars.trigger === '.st-brew-pin').forEach(t => t.kill());
@@ -29,12 +29,15 @@ export default function Brew({ isJourney }: BrewProps = {}) {
       
       const brewTl = gsap.timeline({
         scrollTrigger: {
-          trigger: '.st-brew-pin',
+          trigger: isJourney ? '.st-brew-pin' : null,
+          start: isJourney ? 'top top' : '700vh',
+          end: isJourney ? '+=300%' : '1000vh',
+          pin: isJourney ? true : false,
           scroller: scroller,
-          start: 'top top',
+          
           end: '+=900%', // 900vh total
           scrub: 1,
-          pin: true,
+          
           anticipatePin: 1,
           onUpdate: (self) => {
              if (isActive) {
@@ -122,7 +125,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '-mt-[140vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
+      className={`relative w-full ${isJourney ? '-mt-[140vh]' : ''}`} 
       data-world="brew"
       style={{ zIndex: 10 }}
     >

@@ -61,7 +61,7 @@ export default function Shop({ isJourney }: ShopProps = {}) {
 
   useEffect(() => {
     if (!containerRef.current || !isActive) return;
-    const scroller = isJourney ? window : containerRef.current;
+    const scroller = window;
     
     ScrollTrigger.getAll().filter(t => t.scroller === scroller && t.vars.trigger && t.vars.trigger.toString().includes('st-shop')).forEach(t => t.kill());
 
@@ -96,10 +96,10 @@ export default function Shop({ isJourney }: ShopProps = {}) {
         scrollTrigger: {
           trigger: '.st-shop-hero',
           scroller: scroller,
-          start: 'top top',
+          
           end: '+=150%',
           scrub: 1,
-          pin: true,
+          
           onUpdate: (self) => {
             if (isActive) useExperienceStore.getState().setActiveWorld('shop');
           }
@@ -132,7 +132,7 @@ export default function Shop({ isJourney }: ShopProps = {}) {
     <div 
       ref={containerRef} 
       onScroll={(e) => setScroll(e.currentTarget.scrollTop)} 
-      className={`relative w-full ${isJourney ? '-mt-[50vh]' : 'h-full overflow-y-auto overflow-x-hidden'}`} 
+      className={`relative w-full ${isJourney ? '-mt-[50vh]' : ''}`} 
       data-world="shop"
       style={{ zIndex: 40, backgroundColor: 'transparent' }}
     >
