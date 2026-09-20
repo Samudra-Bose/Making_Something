@@ -11,14 +11,14 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Playfair Display", serif;
 
-  --color-drift-bg: #EAE6DF; /* Paper / Warm Cream */
-  --color-drift-surface: #F5F3EF; /* Lighter Paper */
-  --color-drift-surface-hover: #DEDAD1; /* Muted Mineral */
-  --color-drift-foreground: #161412; /* Deep Espresso / Ink */
-  --color-drift-foreground-muted: #6A645D; /* Muted Mineral */
-  --color-drift-border: rgba(22, 20, 18, 0.15); /* Ink rules */
-  --color-drift-accent: #9A5A35; /* Subtle Copper / Roasted */
-  --color-drift-highlight: #475442; /* Organic Green */
+  --color-drift-bg: var(--theme-bg); 
+  --color-drift-surface: var(--theme-surface); 
+  --color-drift-surface-hover: var(--theme-surface-hover); 
+  --color-drift-foreground: var(--theme-foreground); 
+  --color-drift-foreground-muted: var(--theme-foreground-muted); 
+  --color-drift-border: var(--theme-border); 
+  --color-drift-accent: var(--theme-accent); 
+  --color-drift-highlight: var(--theme-highlight); 
   
   --color-world-origin: #DFE2DA;
   --color-world-roast: #EADCD1;
@@ -27,6 +27,30 @@
 }
 
 @layer base {
+  :root {
+    --theme-bg: #EAE6DF;
+    --theme-surface: #F5F3EF;
+    --theme-surface-hover: #DEDAD1;
+    --theme-foreground: #161412;
+    --theme-foreground-muted: #6A645D;
+    --theme-border: rgba(22, 20, 18, 0.15);
+    --theme-accent: #9A5A35;
+    --theme-highlight: #475442;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --theme-bg: #161412;
+      --theme-surface: #221F1C;
+      --theme-surface-hover: #332F2A;
+      --theme-foreground: #EAE6DF;
+      --theme-foreground-muted: #A39D97;
+      --theme-border: rgba(234, 230, 223, 0.15);
+      --theme-accent: #D9885C;
+      --theme-highlight: #6B7D63;
+    }
+  }
+
   body {
     background-color: var(--color-drift-bg);
     color: var(--color-drift-foreground);
@@ -38,7 +62,80 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 500;
-    letter-spacing: -0.025em;
   }
 }
+
+@layer utilities {
+  .text-hero {
+    font-size: clamp(3.5rem, 8vw, 8rem);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    font-family: var(--font-display);
+  }
+  
+  .text-world-title {
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+  }
+
+  .text-major-statement {
+    font-size: clamp(1.5rem, 3vw, 3rem);
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+    font-family: var(--font-display);
+  }
+
+  .text-body {
+    font-size: clamp(1rem, 1.2vw, 1.25rem);
+    line-height: 1.65;
+    font-family: var(--font-sans);
+  }
+
+  .text-metadata {
+    font-size: clamp(0.75rem, 0.9vw, 0.875rem);
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+  }
+
+  .clip-reveal {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    animation: clipRevealAnim 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  }
+
+  @keyframes clipRevealAnim {
+    0% { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%); transform: translateY(20px); opacity: 0; }
+    100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); transform: translateY(0); opacity: 1; }
+  }
+
+  .split-line-reveal {
+    overflow: hidden;
+  }
+  .split-line-reveal > span {
+    display: inline-block;
+    transform: translateY(100%);
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .split-line-reveal.is-visible > span {
+    transform: translateY(0);
+  }
+
+  .depth-movement {
+    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .depth-movement.is-active {
+    transform: translateZ(50px) scale(1.05);
+  }
+
+  .scale-motion {
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .scale-motion:hover {
+    transform: scale(1.02);
+  }
+}
+
 html.lenis, html.lenis body { height: auto; } .lenis.lenis-smooth { scroll-behavior: auto !important; } .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; } .lenis.lenis-stopped { overflow: hidden; } .lenis.lenis-smooth iframe { pointer-events: none; }

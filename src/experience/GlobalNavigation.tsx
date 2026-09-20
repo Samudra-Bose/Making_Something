@@ -30,22 +30,23 @@ export default function GlobalNavigation() {
           transition={{ type: 'spring', stiffness: 60, damping: 20 }}
         />
       </div>
+      
     <motion.div 
-      className="fixed top-0 left-0 w-full p-6 lg:p-12 z-50 flex justify-between items-start pointer-events-none"
+      className="fixed top-0 left-0 w-full p-6 lg:p-12 z-50 flex justify-between items-start pointer-events-none max-w-[100vw] overflow-x-hidden"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1.5, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex flex-col gap-2 pointer-events-auto">
-        <h1 className="text-xl md:text-2xl font-display text-drift-foreground tracking-[0.2em] uppercase">
+        <h1 className="font-display text-2xl lg:text-3xl text-drift-foreground tracking-[0.2em] uppercase">
           Drift
         </h1>
-        <div className="flex gap-2 text-[10px] font-sans text-drift-foreground-muted tracking-widest uppercase">
+        <div className="flex gap-2 text-metadata text-drift-foreground-muted">
           {openForks.length > 0 ? `${openForks.length} active` : 'Environment'}
         </div>
       </div>
 
-      <div className="flex gap-4 md:gap-6 lg:gap-12 pointer-events-auto">
+      <div className="flex gap-4 md:gap-6 lg:gap-12 pointer-events-auto flex-wrap justify-end">
         {worlds.map((world) => {
           const isJourneyMode = openForks.length === 1 && openForks[0] === 'journey';
           const isOpen = isJourneyMode || openForks.includes(world.id);
@@ -79,12 +80,26 @@ export default function GlobalNavigation() {
               aria-current={isActive ? 'page' : undefined}
             >
               <div className="flex items-center gap-2 md:gap-3">
-                <span className={`text-[10px] tracking-widest transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted/50 group-hover:text-drift-foreground/70'}`}>
+                <motion.span 
+                  animate={{ 
+                    y: isActive ? [0, -2, 0] : 0, 
+                    opacity: isOpen ? 1 : 0.6 
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className={`text-metadata transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted group-hover:text-drift-foreground/70'}`}
+                >
                   {world.number}
-                </span>
-                <span className={`hidden md:inline text-[10px] tracking-[0.15em] uppercase transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted group-hover:text-drift-foreground/80'}`}>
+                </motion.span>
+                <motion.span 
+                  animate={{ 
+                    y: isActive ? [0, -2, 0] : 0, 
+                    opacity: isOpen ? 1 : 0.6 
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className={`hidden md:inline text-metadata transition-colors duration-500 ${isOpen ? 'text-drift-foreground' : 'text-drift-foreground-muted group-hover:text-drift-foreground/80'}`}
+                >
                   {world.label}
-                </span>
+                </motion.span>
               </div>
               
               {/* Active Indicator Line */}
@@ -92,8 +107,8 @@ export default function GlobalNavigation() {
                 <motion.div 
                   className="absolute inset-0 bg-drift-foreground"
                   initial={{ scaleX: 0 }}
-                  animate={{ scaleX: isActive ? 1 : isOpen ? 0.3 : 0 }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  animate={{ scaleX: isActive ? globalProgress || 1 : isOpen ? 0.3 : 0 }}
+                  transition={{ duration: 0.4, ease: "linear" }}
                   style={{ transformOrigin: 'right' }}
                 />
               </div>
@@ -123,14 +138,14 @@ function CartToggle() {
       aria-label={`Open Cart, ${count} items`}
     >
       <div className="flex items-center gap-2 md:gap-3">
-        <span className="hidden md:inline text-[10px] tracking-[0.15em] uppercase text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
+        <span className="hidden md:inline text-metadata text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
           Cart
         </span>
-        <span className="md:hidden text-[10px] tracking-[0.15em] uppercase text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
+        <span className="md:hidden text-metadata text-drift-foreground-muted group-hover:text-drift-foreground/80 transition-colors duration-500">
           C
         </span>
         {count > 0 && (
-          <span className="text-[10px] tabular-nums tracking-widest text-drift-bg bg-drift-foreground px-2 py-0.5 rounded-sm">
+          <span className="text-metadata tabular-nums text-drift-bg bg-drift-foreground px-2 py-0.5 rounded-sm">
             {count}
           </span>
         )}
