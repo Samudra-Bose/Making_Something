@@ -55,7 +55,11 @@ export default function App() {
               {openForks.length === 1 && openForks[0] === 'journey' ? (
                 <Journey />
               ) : (
-                <ForkManager />
+                <>
+                  {/* Invisible global scroll track to give window the exact height of all worlds combined */}
+                  <div id="global-scroll-track" className="w-full opacity-0 pointer-events-none" style={{ height: '1300vh' }} />
+                  <ForkManager />
+                </>
               )}
             </motion.div>
           )}

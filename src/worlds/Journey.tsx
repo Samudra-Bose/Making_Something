@@ -6,121 +6,137 @@ import Origin from './Origin';
 import Roast from './Roast';
 import Brew from './Brew';
 import Shop from './Shop';
-import Lenis from 'lenis';
+
 export default function Journey() {
   const setGlobalProgress = useExperienceStore(s => s.setGlobalProgress);
   const scroll = useExperienceStore(s => s.scroll);
   const globalVelocity = useExperienceStore(s => s.globalVelocity);
   const containerRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-      smoothWheel: true,
-      infinite: false,
-    });
-
-    lenis.on('scroll', (e: any) => {
-      useExperienceStore.getState().setScroll(e.scroll);
-      useExperienceStore.getState().setGlobalVelocity(e.velocity);
-      ScrollTrigger.update();
-    });
-
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-    
-    gsap.ticker.lagSmoothing(0);
-
-    const st = ScrollTrigger.create({
-      trigger: '#journey-container',
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: (self) => {
-        setGlobalProgress(self.progress);
-      }
-    });
-
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // POINTER INTERACTION
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     let handlePointerMove: (() => void) | null = null;
 
-    if (!isTouch && containerRef.current && !prefersReducedMotion) {
-      const mainX = gsap.quickTo('.depth-main', 'x', { duration: 0.6, ease: 'power3.out' });
-      const mainY = gsap.quickTo('.depth-main', 'y', { duration: 0.6, ease: 'power3.out' });
-      
-      const fgX = gsap.quickTo('.depth-fg', 'x', { duration: 0.4, ease: 'power3.out' });
-      const fgY = gsap.quickTo('.depth-fg', 'y', { duration: 0.4, ease: 'power3.out' });
-      const fgRot = gsap.quickTo('.depth-fg', 'rotation', { duration: 0.4, ease: 'power3.out' });
-
-      const typeX = gsap.quickTo('.depth-type', 'x', { duration: 0.8, ease: 'power2.out' });
-
-      handlePointerMove = () => {
-         const { pointer } = useExperienceStore.getState();
-         if (pointer.x === -1000) return;
-
-         const x = (pointer.x / window.innerWidth - 0.5) * 2;
-         const y = (pointer.y / window.innerHeight - 0.5) * 2;
-
-         const state = useExperienceStore.getState();
-         const isCup = state.activeWorld === 'brew' && state.brewProgress > 0.8;
-         const ptrMult = isCup ? 0.4 : 1.0;
-         const typeMult = isCup ? 0.3 : 1.0;
-
-         mainX(x * 6 * ptrMult);
-         mainY(y * 5 * ptrMult);
-
-         fgX(x * 10 * ptrMult);
-         fgY(y * 8 * ptrMult);
-         fgRot(x * 2 * ptrMult);
-
-         typeX(x * -15 * typeMult);
-      };
-
-      gsap.ticker.add(handlePointerMove);
-    }
-
-    // SPATIAL STAGE (Scroll-linked Parallax)
-    // Environment: 0.25x, Background: 0.45x, Secondary: 0.75x, Main: 1.0x (default), Typography: 1.10x, Foreground: 1.30x
-    // GSAP ScrollTrigger can apply basic y movement to all elements with these classes.
-    // However, since many elements are inside pinned containers, standard y-transforms might fight with inner timelines.
-    // For elements NOT part of a pinned timeline, we can do this. If they are pinned, it's safer to control them in their respective timelines.
-    // For now, let's keep the classes as descriptive markers and only apply global parallax if they have `.global-parallax`.
-    const pBg = gsap.utils.toArray('.global-parallax.depth-bg');
-    pBg.forEach((el: any) => {
-      gsap.to(el, { y: (i, t) => prefersReducedMotion ? 0 : -ScrollTrigger.maxScroll(window) * 0.55, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
-    });
-
-    const pFg = gsap.utils.toArray('.global-parallax.depth-fg');
-    pFg.forEach((el: any) => {
-      gsap.to(el, { y: (i, t) => prefersReducedMotion ? 0 : ScrollTrigger.maxScroll(window) * 0.30, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
-    });
-
-    const globalTl = gsap.timeline({
-      scrollTrigger: {
+    let ctx = gsap.context(() => {
+      const st = ScrollTrigger.create({
         trigger: '#journey-container',
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1
+        onUpdate: (self) => {
+          setGlobalProgress(self.progress);
+        }
+      });
+
+      if (!isTouch && containerRef.current) {
+        const motionMult = prefersReducedMotion ? 0.3 : 1.0;
+        
+        const mainX = gsap.quickTo('.depth-main', 'x', { duration: 0.8, ease: 'power2.out' });
+        const mainY = gsap.quickTo('.depth-main', 'y', { duration: 0.8, ease: 'power2.out' });
+        const mainRot = gsap.quickTo('.depth-main', 'rotation', { duration: 0.8, ease: 'power2.out' });
+        
+        // Foreground object: slower spring return
+        const fgX = gsap.quickTo('.depth-fg', 'x', { duration: 1.2, ease: 'elastic.out(1, 0.75)' });
+        const fgY = gsap.quickTo('.depth-fg', 'y', { duration: 1.2, ease: 'elastic.out(1, 0.75)' });
+        const fgRot = gsap.quickTo('.depth-fg', 'rotation', { duration: 1.2, ease: 'elastic.out(1, 0.75)' });
+
+        const heroX = gsap.quickTo('.st-hero-subject-img', 'x', { duration: 0.8, ease: 'power2.out' });
+        const heroY = gsap.quickTo('.st-hero-subject-img', 'y', { duration: 0.8, ease: 'power2.out' });
+        const heroScale = gsap.quickTo('.st-hero-subject-img', 'scale', { duration: 0.8, ease: 'power2.out' });
+
+        const typeX = gsap.quickTo('.depth-type', 'x', { duration: 0.8, ease: 'power2.out' });
+
+        let lastX = -1000;
+        let lastY = -1000;
+        let targetX = 0;
+        let targetY = 0;
+
+        handlePointerMove = () => {
+           const { pointer } = useExperienceStore.getState();
+           if (pointer.x === -1000) return;
+
+           if (lastX === -1000) {
+             lastX = pointer.x;
+             lastY = pointer.y;
+             return;
+           }
+
+           const dx = (pointer.x - lastX) / window.innerWidth;
+           const dy = (pointer.y - lastY) / window.innerHeight;
+           
+           targetX += dx * 5; 
+           targetY += dy * 5;
+
+           lastX = pointer.x;
+           lastY = pointer.y;
+
+           // Decay back to 0 (settles when pointer stops)
+           targetX *= 0.92;
+           targetY *= 0.92;
+
+           // Clamp to [-1, 1]
+           const cx = Math.max(-1, Math.min(1, targetX)) * motionMult;
+           const cy = Math.max(-1, Math.min(1, targetY)) * motionMult;
+
+           const state = useExperienceStore.getState();
+           const isCup = state.activeWorld === 'brew' && state.brewProgress > 0.8;
+           const ptrMult = isCup ? 0.4 : 1.0;
+           const typeMult = isCup ? 0.3 : 1.0;
+
+           // Main coffee object (max ±6px, ±5px, ±1.5deg)
+           mainX(cx * 6 * ptrMult);
+           mainY(cy * 5 * ptrMult);
+           mainRot(cx * 1.5 * ptrMult);
+
+           // Foreground object (max ±10px, ±8px, ±2deg)
+           fgX(cx * 10 * ptrMult);
+           fgY(cy * 8 * ptrMult);
+           fgRot(cx * 2 * ptrMult);
+           
+           // Hero image subtle response (x ±3px, y ±2px, scale +0.5%)
+           heroX(cx * 3);
+           heroY(cy * 2);
+           const mag = Math.sqrt(cx*cx + cy*cy);
+           heroScale(1 + Math.min(1, mag) * 0.005);
+
+           typeX(cx * -15 * typeMult);
+        };
+
+        gsap.ticker.add(handlePointerMove);
       }
-    });
-    // 19. GLOBAL OBJECT TRAVEL (Typography)
-    // Moves slowly down the left edge, rotating slightly over the entire journey
-    globalTl.fromTo('.st-global-travel-text', 
-      { y: '-30vh', x: '0px' }, 
-      { y: '30vh', x: '10px', ease: 'none' }
-    );
+
+      // SPATIAL STAGE (Scroll-linked Parallax)
+      const pBg = gsap.utils.toArray('.global-parallax.depth-bg');
+      pBg.forEach((el: any) => {
+        gsap.to(el, { y: (i, t) => prefersReducedMotion ? 0 : -ScrollTrigger.maxScroll(window) * 0.55, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+      });
+
+      const pFg = gsap.utils.toArray('.global-parallax.depth-fg');
+      pFg.forEach((el: any) => {
+        gsap.to(el, { y: (i, t) => prefersReducedMotion ? 0 : ScrollTrigger.maxScroll(window) * 0.30, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+      });
+
+      const globalTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#journey-container',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1
+        }
+      });
+      globalTl.fromTo('.st-global-travel-text', 
+        { y: '-30vh', x: '0px' }, 
+        { y: '30vh', x: '10px', ease: 'none' }
+      );
+    }, containerRef);
 
     return () => {
       if (handlePointerMove) {
         gsap.ticker.remove(handlePointerMove);
       }
-      st.kill();
-      globalTl.kill();
-      lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
+      ctx.revert();
     };
   }, [setGlobalProgress]);
 

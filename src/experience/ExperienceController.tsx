@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { useExperienceStore } from './store';
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// ExperienceController is the SINGLE source of truth for pointer tracking.
-// It does NOT listen to window scroll — AppShell is overflow-hidden so window never scrolls.
-// Each world container reports its own scroll via setScroll().
+// ExperienceController is the SINGLE source of truth for pointer and scroll tracking.
+// It manages the global Lenis instance to provide a unified scroll experience.
 
 export default function ExperienceController() {
-  const { setPointer, setPointerVelocity } = useExperienceStore();
+  const { setPointer, setPointerVelocity, setScroll, setGlobalVelocity } = useExperienceStore();
 
+  // Pointer tracking
   useEffect(() => {
     let lastX = 0;
     let lastY = 0;
@@ -57,6 +60,33 @@ export default function ExperienceController() {
       cancelAnimationFrame(frameId);
     };
   }, [setPointer, setPointerVelocity]);
+
+  // Global Scroll tracking (Lenis)
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      infinite: false,
+    });
+
+    lenis.on('scroll', (e: any) => {
+      setScroll(e.scroll);
+      setGlobalVelocity(e.velocity);
+      ScrollTrigger.update();
+    });
+
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(lenis.raf);
+    };
+  }, [setScroll, setGlobalVelocity]);
 
   return null;
 }
