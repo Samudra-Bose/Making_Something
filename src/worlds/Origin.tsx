@@ -142,7 +142,8 @@ export default function Origin({ isJourney }: OriginProps = {}) {
 
       // 0.65-0.85 (0.6645 -> 0.7705)
       pinTl.to('.st-origin-subject-img', { scale: 1.15, duration: 0.106, ease: 'none', immediateRender: false }, 0.6645);
-      pinTl.fromTo('.st-meta-wrapper', { x: '0vw' }, { x: '3vw', duration: 0.106, ease: 'none', immediateRender: false }, 0.6645);
+      pinTl.fromTo('.st-meta-altitude', { x: '0vw' }, { x: '3vw', duration: 0.106, ease: 'none', immediateRender: false }, 0.6645);
+      pinTl.fromTo('.st-meta-varietal', { y: '0vh' }, { y: '-3vh', duration: 0.106, ease: 'none', immediateRender: false }, 0.6645);
       
       // Origin Object
       pinTl.fromTo('.st-foreground-bean', { x: '-10vw', rotation: -2 }, { x: '0vw', rotation: 2, duration: 0.265, ease: 'none', immediateRender: false }, 0.32);
@@ -195,9 +196,13 @@ export default function Origin({ isJourney }: OriginProps = {}) {
                     <div className="pl-24 st-title-line-3 text-white/70">COFFEE</div>
                   </div>
                </div>
-               <div className="absolute bottom-[12%] right-[15%] text-right st-meta-wrapper mix-blend-difference text-white">
+               <div className="absolute bottom-[12%] right-[15%] text-right st-meta-altitude mix-blend-difference text-white">
                  <p className="text-[11px] tracking-[0.35em] font-sans uppercase mb-3 opacity-60">Elevation</p>
                  <p className="text-6xl font-display">1,900M</p>
+               </div>
+               <div className="absolute top-[55%] left-[10%] text-left st-meta-varietal mix-blend-difference text-white">
+                 <p className="text-[11px] tracking-[0.35em] font-sans uppercase mb-3 opacity-60">Process</p>
+                 <p className="text-6xl font-display">Natural</p>
                </div>
             </div>
 
@@ -252,4 +257,8 @@ export default function Origin({ isJourney }: OriginProps = {}) {
     </div>
   );
 }
+
+
+
+
 

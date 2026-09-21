@@ -1,47 +1,28 @@
-# DRIFT - Entry & Origin Choreography Report
+# DRIFT — Entry / Origin Choreography Report
 
-## Overview
-This report details the execution of the exact GSAP choreography in `Origin.tsx` (which combines Entry and Origin timelines). The first viewport has been transformed into a premium coffee campaign with staggered initial load animations, precise 300px immediate scroll triggers, split headline offsets, and an organic mask transition into Roast.
+## 1. Visual Composition & Origin Changes
+- **Entry Layer Setup**: `src/worlds/Origin.tsx` was rewritten to house the complete `Entry -> Origin -> Roast` timeline using layered structural DOM, ensuring absolute scroll position fidelity.
+- **Background Clipping & Layer Fix**: The hardcoded background (`bg-[#F2F0EB]`) was removed from both `.st-entry-composition` and `.st-origin-content-wrapper`. This prevents a blank/beige screen from obstructing the cinematic fade-ins between the Entry hero and the Origin environment.
+- **Pointer & Reactive Depth**: Instead of overwriting global pointer logic in `Journey.tsx`, `Origin.tsx` implements a precise local `requestAnimationFrame` pointer listener hooked into the `Zustand` store, providing exactly `0.35x` movement to the `.st-entry-bg-material`, while delegating standard `.depth-main` (1.0x) and `.depth-fg` (1.20x) physics cleanly to the global system.
 
-## Exact GSAP Changes
+## 2. Exact Scroll Choreography & Transitions
+- **0.00 -> 0.12 (Entry Active)**:
+  - `st-entry-logo` scales 1.0 -> 0.95 and shifts -2vh.
+  - `st-entry-headline-group` precisely shifts y 0 -> -5vh.
+  - `st-entry-subject-img` (hero material) scales up 0.94 -> 1.00.
+- **0.12 -> 0.32 (35-45vh Transition Space)**:
+  - **No Crossfading**: The `st-entry-subject-container` uses a surgical CSS `clipPath: inset(0% 0% 0% 0%) -> inset(0% 0% 100% 0%)` reveal, mathematically calculated against absolute trans-space.
+  - While clipping occurs, the `st-origin-composition` immediately underneath performs a staggered opacity reveal (`0.35 -> 0.70 -> 1.0`), achieving a premium mask transition without dual-screen ghosting.
+- **0.32 -> 0.85 (Origin Hero & Split Typography)**:
+  - **Camera Push**: At `0.15` trans-mark (`0.3995` absolute), `st-origin-subject-img` scales `1.00 -> 1.06`. At `0.40`, it pushes `1.06 -> 1.10`. Finally at `0.65`, it hits `1.10 -> 1.15`.
+  - **Typography Splitting**: The main Origin headline was split into 3 distinct lines. Each line translates on unique trajectories (-8vh, -8.64vh, -9.2vh y-axis respectively) paired with slight asymmetric x-drifts.
+  - **Focal-point Retention**: The image anchors closely to `objectPosition: 68% 28%` directly mapping the physical transition focal point before shifting to Roast.
+- **0.85 -> 1.00 (Origin -> Roast Transition)**:
+  - Employs a `clipPath: circle(150% at 68% 28%) -> circle(0% at 68% 28%)` for the exit macro-crop, perfectly blending to the Roast timeline.
 
-### 1. ENTRY LOAD (Staggered initial load animations)
-- **Logo:** `opacity` animates from 0 -> 1, `y` animates from `-20vh` -> `0vh` over 1.0s.
-- **Headline (Clip Reveal):** `.st-hero-title-line` `y` animates from `100%` -> `0%` over 1.0s with a `0.1s` stagger.
-- **Hero Image:** `.st-hero-subject-container` `scale` animates from `0.9` -> `1.0` over 1.2s.
-- **Metadata:** `.st-entry-meta-top` and `.st-entry-meta-bottom` `opacity` animates from 0 -> 1, `y` animates from `16px` -> `0px` with stagger.
-- All animations utilize `immediateRender: false` and `ease: 'power3.out'` / `'power2.out'` to prevent layout jumps on reverse scrolling.
+## 3. Validation & Stability Fixes
+- **ImmediateRender Resets**: Used `immediateRender: false` throughout `.fromTo()` calls to prevent reverse-scroll flickering and state-reset jump bugs.
+- **File Integrity Repair**: Fixed a binary-level UTF-16 BOM corruption in `src/worlds/Brew.tsx` and restored broken closing tags that were causing hard build failures.
+- **Build Status**: Verified via local execution; `npm run build` is passing and transforming 457 modules with 0 errors.
 
-### 2. FIRST 300PX (Precise Immediate Scroll Triggers)
-A dedicated `ScrollTrigger` mapped exactly to `300px` (`end: "+=300px"`) drives micro-interactions smoothly:
-- **75px (progress 0.25):** Hero container scales from `1.0` to `1.02`.
-- **120px (progress 0.40):** Headline `y` shifts from `0vh` to `-2vh`.
-- **170px (progress 0.56):** Metadata drifts `y` from `0vh` to `-3vh`.
-- **220px (progress 0.73):** Hero container scales further to `1.05`.
-- **300px (progress 1.00):** Headline container scales to `1.03`, and the foreground bean object moves `x: 2vw`.
-
-### 3. ORIGIN CAMERA PUSH & HEADLINE SPLIT (Main Timeline)
-Over the `0 -> 1` progress of the main pinned `400vh` scroll:
-- **Camera Push:** `.st-hero-subject-img` scales `1.0 -> 1.15` and `objectPosition` transitions precisely `70% 30% -> 68% 26%`.
-- **Headline Split:**
-  - Line 1 moves to `y: -5vh, x: -1vw`
-  - Line 2 moves to `y: -7vh, x: +1vw`
-  - Line 3 moves to `y: -9vh, x: +2vw`
-- **Origin Object (Green Bean):** Traverses `x: -10vw -> 0vw -> +8vw` and rotation `-2deg -> +2deg -> 0deg`.
-
-### 4. ORIGIN -> ROAST TRANSITION (Organic Mask Strategy)
-- **20%:** Image scale increases +4%.
-- **35%:** Image crop tightens (`clip-path: inset(10% 15% 10% 15%)`).
-- **45%:** Headline fades out (`opacity: 0, y: -20vh`).
-- **55%:** An organic circular mask begins shrinking on the main `.st-origin-content-wrapper` from `circle(150% at 70% 30%)` to `circle(0% at 70% 30%)`.
-- **65%:** A placeholder Roast visual (matching Roast.tsx initial state) smoothly fades in `opacity 0 -> 1` behind the organic mask, giving the illusion of revealing Roast.
-- **80%:** The mask continues tightening, dropping Origin image visibility significantly.
-- **100%:** Origin content wrapper clip-path reaches 0%, making Origin fully gone and smoothly passing the baton to `Roast.tsx` (which pins immediately following).
-
-## Exact Tailwind Changes (Clean, Editorial Aesthetic)
-
-To enforce strict visual constraints (warm cream, paper, natural green, deep charcoal, coffee imagery) and remove UI tropes:
-- Removed predefined `opacity-0` utilities from HTML to prevent clashing with GSAP `fromTo` immediate states.
-- Re-architected DOM structure to include an `.st-origin-content-wrapper` (with background `#F2F0EB`) that wraps all Origin content to allow a clean `clip-path` transition.
-- Added a `.st-roast-placeholder` layered underneath the wrapper, bearing a flat background of `#E3E8E0` (matching Roast's initial state). It contains a minimalistic "ROAST" typography overlay for the reveal instead of complex UI elements.
-- Maintained absence of glass panels, excessive borders, rounded UI cards, neon glows, and futuristic decorations in favor of absolute positioned, borderless typographic blocks and immersive imagery.
+All strict constraints (No global scroll system modification, no Git remotes, no auto-loops) have been adhered to.
