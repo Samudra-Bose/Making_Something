@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useExperienceStore } from '../experience/store';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -13,7 +13,6 @@ interface BrewProps {
 export default function Brew({ isJourney }: BrewProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeFork = useExperienceStore(s => s.activeFork);
-  const setScroll = useExperienceStore(s => s.setScroll);
 
   const isActive = isJourney || activeFork === 'brew';
 
@@ -35,9 +34,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           end: isJourney ? '+=600%' : '1300vh',
           pin: isJourney ? true : false,
           scroller: scroller,
-          
           scrub: 1,
-          
           anticipatePin: 1,
           onEnter: () => {
              if (isActive) useExperienceStore.getState().setActiveWorld('brew');
@@ -47,6 +44,102 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           },
           onUpdate: (self) => {
              if (isActive) {
+               useExperienceStore.getState().setBrewProgress(self.progress); 
+             }
+          }
+        }
+      });
+
+      // 1. GRIND (0.0 – 1.0)
+      // 0–25%: beans scale 0.92→1.00, rotation 0→6deg
+      brewTl.fromTo('.st-brew-bg-fill', { opacity: 0 }, { opacity: 1, duration: 0.1, ease: 'none', immediateRender: false }, 0);
+      brewTl.fromTo('.st-grind-beans', { scale: 0.92, rotation: 0 }, { scale: 1.0, rotation: 6, duration: 0.25, ease: 'none', immediateRender: false }, 0);
+      // 25–50%: camera scale 1.00→1.07
+      brewTl.fromTo('.st-brew-grind', { scale: 1.0 }, { scale: 1.07, duration: 0.25, ease: 'none', immediateRender: false }, 0.25);
+      // 50–70%: whole beans opacity 1→0, grounds opacity 0→1
+      brewTl.to('.st-grind-beans', { opacity: 0, duration: 0.2, ease: 'none' }, 0.5);
+      brewTl.fromTo('.st-grind-grounds', { opacity: 0 }, { opacity: 1, duration: 0.2, ease: 'none', immediateRender: false }, 0.5);
+      // 70–100%: grounds y 0→+3vh then settle back to 2vh (no floating up)
+      brewTl.fromTo('.st-grind-grounds', { y: '0vh' }, { y: '3vh', duration: 0.15, ease: 'power2.out', immediateRender: false }, 0.70);
+      brewTl.to('.st-grind-grounds', { y: '2vh', duration: 0.15, ease: 'power1.inOut' }, 0.85);
+      brewTl.to('.st-brew-grind', { opacity: 0, duration: 0.1 }, 1.0);
+
+      // 2. WATER (1.0 – 2.0)
+      // 0%: not visible; 15%: enters viewport top
+      brewTl.fromTo('.st-water-stream', { y: '-100vh', opacity: 0 }, { y: '-55vh', opacity: 1, duration: 0.2, ease: 'none', immediateRender: false }, 1.15);
+      // 35%: approaches coffee
+      brewTl.to('.st-water-stream', { y: '-15vh', duration: 0.2, ease: 'power1.in' }, 1.35);
+      // 50%: touches surface
+      brewTl.to('.st-water-stream', { y: '2vh', duration: 0.15, ease: 'power1.in' }, 1.50);
+      // 65%: surface responds
+      brewTl.fromTo('.st-water-surface', { opacity: 0, scaleY: 0.8 }, { opacity: 1, scaleY: 1.0, duration: 0.15, ease: 'power1.out', immediateRender: false }, 1.65);
+      brewTl.to('.st-water-stream', { scaleY: 0.85, opacity: 0.7, duration: 0.15, ease: 'power1.inOut' }, 1.65);
+      // 80%: stabilizes
+      brewTl.to('.st-water-surface', { scaleY: 1.02, duration: 0.1, ease: 'none' }, 1.80);
+      // 90%: steam appears
+      brewTl.fromTo('.st-water-steam', { opacity: 0, y: '5vh' }, { opacity: 0.45, y: '0vh', duration: 0.1, ease: 'power1.out', immediateRender: false }, 1.90);
+      brewTl.to('.st-brew-water', { opacity: 0, duration: 0.1 }, 2.0);
+
+      // 3. BLOOM (2.0 – 3.0)
+      // Pin primary composition. 0-20% quiet
+      brewTl.fromTo('.st-bloom-text', { y: '5vh', opacity: 0 }, { y: '0vh', opacity: 1, duration: 0.2, ease: 'power1.out', immediateRender: false }, 2.0);
+      // 20–40%: water contact — darkens
+      brewTl.to('.st-bloom-grounds', { filter: 'brightness(0.65)', duration: 0.2, ease: 'none' }, 2.2);
+      // 40–55%: darkens further
+      brewTl.to('.st-bloom-grounds', { filter: 'brightness(0.35)', duration: 0.15, ease: 'none' }, 2.4);
+      // 55–75%: expansion originates from surface (scale 1.00→1.35)
+      brewTl.fromTo('.st-bloom-grounds',
+        { scale: 1.00, transformOrigin: 'center 60%' },
+        { scale: 1.35, duration: 0.2, ease: 'power2.out', immediateRender: false },
+        2.55
+      );
+      brewTl.fromTo('.st-bloom-steam', { opacity: 0, y: '8vh', scale: 0.85 }, { opacity: 0.5, y: '0vh', scale: 1.1, duration: 0.3, ease: 'power1.out', immediateRender: false }, 2.55);
+      // 75–85%: max expansion
+      // 85–100%: settling (scale 1.35→1.05)
+      brewTl.to('.st-bloom-grounds', { scale: 1.05, duration: 0.15, ease: 'power2.inOut' }, 2.85);
+      brewTl.to('.st-bloom-steam', { opacity: 0.35, scale: 1.12, duration: 0.15, ease: 'none' }, 2.85);
+      brewTl.to('.st-brew-bloom', { opacity: 0, duration: 0.1 }, 3.0);
+
+      // 4. POUR (3.0 – 4.0)
+      // Vessel tilts 0deg→8deg, stream revealed
+      brewTl.fromTo('.st-pour-vessel', { rotation: 0 }, { rotation: 8, duration: 0.8, ease: 'power1.inOut', immediateRender: false }, 3.1);
+      brewTl.fromTo('.st-pour-path', { strokeDashoffset: '301' }, { strokeDashoffset: '0', duration: 0.8, ease: 'power1.inOut', immediateRender: false }, 3.1);
+      // Surface response: scale 0.2→1.15→1.0 (reduced secondary text motion by 50%)
+      brewTl.fromTo('.st-pour-ring', { scale: 0.2, opacity: 0 }, { scale: 1.15, opacity: 1, duration: 0.3, ease: 'power2.out', immediateRender: false }, 3.3);
+      brewTl.to('.st-pour-ring', { scale: 1.0, opacity: 0.75, duration: 0.4, ease: 'power1.inOut' }, 3.6);
+      // Secondary typography at 50% reduced movement
+      brewTl.fromTo('.st-pour-text', { opacity: 0, x: '-1.5vw' }, { opacity: 1, x: '0vw', duration: 0.3, ease: 'power1.out', immediateRender: false }, 3.2);
+      brewTl.to('.st-brew-pour', { opacity: 0, duration: 0.1 }, 4.0);
+
+      // 5. EXTRACTION (4.0 – 5.0)
+      // Reveal 92°C → 1:16 → 03:42 sequentially — no dashboards
+      brewTl.fromTo('.st-extract-img', { scale: 1.0 }, { scale: 1.05, duration: 1.0, ease: 'none', immediateRender: false }, 4.0);
+      brewTl.fromTo('.st-extract-temp', { opacity: 0, y: '5vh' }, { opacity: 1, y: '0vh', duration: 0.15, ease: 'power2.out', immediateRender: false }, 4.10);
+      brewTl.to('.st-extract-temp', { opacity: 0, y: '-4vh', duration: 0.12, ease: 'power2.in' }, 4.30);
+      brewTl.fromTo('.st-extract-ratio', { opacity: 0, y: '5vh' }, { opacity: 1, y: '0vh', duration: 0.15, ease: 'power2.out', immediateRender: false }, 4.42);
+      brewTl.to('.st-extract-ratio', { opacity: 0, y: '-4vh', duration: 0.12, ease: 'power2.in' }, 4.60);
+      brewTl.fromTo('.st-extract-time', { opacity: 0, y: '5vh' }, { opacity: 1, y: '0vh', duration: 0.15, ease: 'power2.out', immediateRender: false }, 4.72);
+      brewTl.to('.st-brew-extract', { opacity: 0, duration: 0.1 }, 5.0);
+
+      // 6. CUP (5.0 – 6.0)
+      // scale 0.84→1.00, y 8vh→0 (object motion reduced by 60%, atmospheric by 50%)
+      brewTl.fromTo('.st-cup-main', { scale: 0.84, y: '8vh' }, { scale: 1.0, y: '0vh', duration: 1.0, ease: 'power2.out', immediateRender: false }, 5.0);
+      // Steam: opacity 0→0.5, y 10px→-25px
+      brewTl.fromTo('.st-cup-steam-final', { opacity: 0, y: '10px' }, { opacity: 0.5, y: '-25px', duration: 0.7, ease: 'power1.out', immediateRender: false }, 5.3);
+
+      // 7. CUP → SHOP (6.0 – 7.0)
+      // 0%: cup dominant; 20%: cup +5% scale; 35%: camera pulls back
+      brewTl.to('.st-cup-main', { scale: 1.05, duration: 0.2, ease: 'power1.inOut' }, 6.0);
+      // 45%: package enters (handled by Shop transTl); 75%: cup recedes
+      brewTl.to('.st-brew-cup', { scale: 0.9, y: '-8vh', opacity: 0.6, duration: 0.25, ease: 'power1.inOut' }, 6.50);
+      // 90–100%: Shop takes control
+      brewTl.to('.st-brew-cup', { opacity: 0, scale: 0.8, y: '-18vh', duration: 0.25, ease: 'power1.in' }, 6.75);
+
+    });
+
+    return () => mm.revert();
+  }, [isActive, isJourney]);
+
   return (
     <div 
       ref={containerRef} 
@@ -58,7 +151,6 @@ export default function Brew({ isJourney }: BrewProps = {}) {
         
         {/* 6. CUP (Base layer) - Massive, Asymmetric */}
         <div className="st-brew-cup absolute inset-0 bg-[#F2F0EB] flex items-center justify-center z-10 overflow-hidden">
-          {/* Huge cup taking 50-60% of viewport, slightly off-center */}
           <div className="st-cup-main w-[120vw] h-[120vw] md:w-[60vw] md:h-[60vw] max-w-[800px] absolute bottom-[-10%] md:bottom-[-20%] right-[-10%] md:right-[-5%] z-10">
             <img
               src={BREW_IMAGES.cup.url}
@@ -71,7 +163,6 @@ export default function Brew({ isJourney }: BrewProps = {}) {
             />
             <div className="st-cup-steam-final absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-white/40 blur-[40px] rounded-full pointer-events-none opacity-0" />
           </div>
-          {/* Overlapping Typography */}
           <div className="absolute top-[20%] left-[6%] md:left-[10%] z-20 pointer-events-none mix-blend-difference text-white">
             <h2 className="text-[18vw] md:text-[14vw] font-display uppercase tracking-tighter leading-[0.8] opacity-95">RITUAL</h2>
           </div>
@@ -97,7 +188,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
         {/* 4. POUR - Asymmetric focus */}
         <div className="st-brew-pour absolute inset-0 flex items-center justify-center bg-[#F2F0EB] z-30 overflow-hidden">
           <div className="absolute top-[15%] left-[6%] md:left-[10%] z-10 pointer-events-none mix-blend-difference text-white">
-            <div className="text-[22vw] md:text-[16vw] font-display uppercase tracking-tighter leading-[0.85] opacity-95">POUR</div>
+            <div className="st-pour-text text-[22vw] md:text-[16vw] font-display uppercase tracking-tighter leading-[0.85] opacity-95">POUR</div>
           </div>
           
           <div className="st-pour-vessel absolute right-[-20%] md:right-[5%] bottom-[-10%] md:bottom-auto md:top-[20%] w-[120vw] h-[120vw] md:w-[60vw] md:h-[60vw] rounded-full border-[1px] border-[#3B2516]/10 relative flex items-center justify-center z-20 bg-transparent mix-blend-multiply">
@@ -110,28 +201,27 @@ export default function Brew({ isJourney }: BrewProps = {}) {
                style={{ objectPosition: BREW_IMAGES.pourVessel.position }}
              />
             <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
-               <circle cx="50" cy="50" r="49" fill="none" stroke="#3B2516" strokeWidth="0.5" strokeDasharray="301" className="st-pour-path opacity-50" />
+               <circle cx="50" cy="50" r="49" fill="none" stroke="#3B2516" strokeWidth="0.5" strokeDasharray="301" strokeDashoffset="301" className="st-pour-path opacity-50" />
             </svg>
             <div className="st-pour-ring absolute w-[85%] h-[85%] rounded-full border border-white/30 opacity-0 pointer-events-none" />
           </div>
         </div>
 
-        {/* 3. BLOOM — unique image: pour-over bloom moment */}
+        {/* 3. BLOOM — pour-over bloom moment */}
         <div className="st-brew-bloom absolute inset-0 flex items-center justify-center bg-[#1A100C] z-40 overflow-hidden">
           <img
             src={BREW_IMAGES.bloom.url}
             alt={BREW_IMAGES.bloom.alt}
             loading="lazy"
             decoding="async"
-            className="st-bloom-grounds absolute top-0 right-0 w-[120vw] md:w-[70vw] h-[70vh] md:h-screen object-cover opacity-70"
+            className="st-bloom-grounds absolute top-0 right-0 w-[120vw] md:w-[70vw] h-[70vh] md:h-screen object-cover opacity-70 origin-[center_60%]"
             style={{ objectPosition: BREW_IMAGES.bloom.position }}
           />
-          <div className="st-bloom-center absolute right-[10%] md:right-[20%] w-[80vw] h-[80vw] md:w-[45vw] md:h-[45vw] bg-[#3B2516]/80 rounded-full blur-[80px] opacity-0 mix-blend-screen" />
           <div className="st-bloom-steam absolute top-1/4 right-[5%] w-[80vw] md:w-[50vw] h-[60vh] bg-white/10 blur-[80px] opacity-0" />
           <div className="st-bloom-text absolute bottom-[15%] md:bottom-[20%] left-[6%] md:left-[10%] z-20 text-[20vw] md:text-[16vw] font-display text-white mix-blend-difference tracking-tighter uppercase pointer-events-none leading-[0.8] opacity-95">BLOOM</div>
         </div>
 
-        {/* 2. WATER — unique image: kettle/water introduction */}
+        {/* 2. WATER — kettle/water introduction */}
         <div className="st-brew-water absolute inset-0 flex items-center justify-center bg-[#F2F0EB] z-50 overflow-hidden">
           <img
             src={BREW_IMAGES.water.url}
@@ -146,7 +236,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
           <div className="st-water-steam absolute top-[30%] right-[10%] w-[90vw] md:w-[50vw] h-[50vh] bg-white/30 blur-[60px] opacity-0 z-30" />
         </div>
 
-        {/* 1. GRIND (Top layer) — two distinct images for beans vs grounds */}
+        {/* 1. GRIND (Top layer) — beans vs grounds */}
         <div className="st-brew-grind absolute inset-0 flex items-center justify-center bg-transparent z-[60] overflow-hidden">
           <div className="st-brew-bg-fill absolute inset-0 bg-[#1A100C]" />
           <img
@@ -168,7 +258,7 @@ export default function Brew({ isJourney }: BrewProps = {}) {
         </div>
       </div>
 
-      {/* 7. CUP -> PRODUCT TRANSITION SPACE (Handled by Shop.tsx overlap) */}
+      {/* Transition space — Shop's overlap zone */}
       <div className="w-full h-[50vh] relative bg-transparent" />
     </div>
   );
